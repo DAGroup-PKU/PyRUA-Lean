@@ -1,0 +1,17 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.venv/
+build/
+dist/
+
+# Experiment outputs stay local: run directories, results and logs.  Tracked under runs/:
+# the empty memory corpora for RPent's local memory profile.
+runs/*
+!runs/_empty-memory/
+!runs/_empty-memory-robotwin/
+!runs/_empty-memory-robocasa/
+results/
+logs/
