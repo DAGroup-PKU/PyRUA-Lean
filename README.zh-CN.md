@@ -5,7 +5,7 @@
 **Fewer Tokens, Better Action: GPT-6 Astra Robot Agents with 14% Higher Success Rate but 65% Fewer Tokens**
 
 [![项目主页](https://img.shields.io/badge/项目-主页-8C0000.svg)](https://dagroup-pku.github.io/PyRUA-Lean/)
-![arXiv](https://img.shields.io/badge/arXiv-coming%20soon-b31b1b.svg)
+[![arXiv](https://img.shields.io/badge/arXiv-2610.01939-b31b1b.svg)](https://arxiv.org/abs/2610.01939)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776ab?logo=python&logoColor=white)](pyproject.toml)
 [![English](https://img.shields.io/badge/lang-English-blue.svg)](README.md)
@@ -102,6 +102,22 @@ pyrualean summarize runs/demo
 
 - [docs/guide.zh-CN.md](docs/guide.zh-CN.md)：`robo` 接口、prompt、单次与交互式运行、预算、评测与配置。
 - [docs/setup.md](docs/setup.md)：搭建三个机器人环境和 agent 运行时（英文）。
+
+## 引用
+
+如果你用到了 PyRUA-Lean，请引用我们的论文：
+
+```bibtex
+@misc{si2026fewer,
+  title={Fewer Tokens, Better Action: GPT-6 Astra Robot Agents with 14\% Higher Success Rate but 65\% Fewer Tokens},
+  author={Ruiyang Si and Jianxin Bi and Shunyu Yang and Rui Ni and Wenbo Huang and Qiang Wang and Shulong Jiang and Duomin Wang and Xiuyu Li and Haiwen Feng and Zhen Dong and Daquan Zhou},
+  year={2026},
+  eprint={2610.01939},
+  archivePrefix={arXiv},
+  primaryClass={cs.CV},
+  url={https://arxiv.org/abs/2610.01939}
+}
+```
 
 ## 许可与致谢
 
