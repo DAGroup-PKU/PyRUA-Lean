@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import io
 import math
+import os
 import re
 from argparse import Namespace
 from pathlib import Path
@@ -21,7 +22,7 @@ from pyrualean import (
     render_prompt,
 )
 from pyrualean.arms import ArmToolkit, arm_contract, robot_words
-from pyrualean.hosts import robodojo_support_arm_patch as support_patch
+from pyrualean.hosts import robodojo_env_server as support_arm
 from pyrualean.hosts import rpent_robodojo as host
 from pyrualean.play import build_prompt
 from pyrualean.prompt import _public_members
@@ -1328,117 +1329,151 @@ def test_connect_without_reset_patches_rpents_client_and_restores_it(monkeypatch
     assert host._connect_reset_default() is False
 
 
-# -- the support-arm patch of RoboDojo's collect client ------------------------------
-
-COLLECT_ENV = """import numpy as np
+# -- the benchmark's third arm (robodojo_env_server) ----------------------------------
 
 
-def _expand_control_info(env, control_info: dict, env_idx: int):
-    interpolation_nums = int(env.obs_manager.collect_interval)
-    control_info_list = [dict(control_info) for _ in range(interpolation_nums)]
-    for robot in env.robot_manager.robot_list:
-        if robot.type != "target":
-            continue
-        control_info_list[0]["target"] = True
-    return control_info_list
+def _fake_bridge(monkeypatch, interact: bool = True):
+    """A ``robodojo_runtime.bridge`` and a collect-client module shaped like the real ones."""
 
+    import sys
+    import types
 
-def create_collect_env():
+    collect = types.ModuleType("fake_collect_env")
+
+    def _expand_control_info(env, control_info, env_idx):
+        return [dict(control_info) for _ in range(env.substeps)]
+
+    collect._expand_control_info = _expand_control_info
+
     class CollectEnv:
         num_envs = 1
+        substeps = 3
 
-        def reset(self, random_mode=False):
-            if random_mode:
-                self.reward_manager.init_state()
-                self.run_reward()
-                return
-            self.reward_manager.init_state()
-            # this, get_reward() sees a non-empty check list and reports 0.
-            self.run_reward()
-
-        def apply_target(self, control_info: dict, env_idx=0):
-            control_seq = _expand_control_info(self, control_info, env_idx)
-            self.robot_manager.control_manager.push([env_idx], [control_seq])
-            self.reward_manager.step([env_idx])
-
-    return CollectEnv
-"""
-
-
-def _fake_runtime(tmp_path: Path) -> Path:
-    root = tmp_path / "robodojo_runtime"
-    path = root / support_patch.COLLECT_FILE
-    path.parent.mkdir(parents=True)
-    path.write_text(COLLECT_ENV)
-    return root
-
-
-def test_support_arm_patch_queues_and_replays_the_third_arm(tmp_path):
-    root = _fake_runtime(tmp_path)
-    assert support_patch.status(root) == "upstream"
-    assert len(support_patch.apply(root)) == 1 and support_patch.status(root) == "corrected"
-    assert support_patch.apply(root) == []  # nothing left to do
-    namespace: dict[str, Any] = {}
-    exec(
-        compile((root / support_patch.COLLECT_FILE).read_text(), "collect_env.py", "exec"),
-        namespace,
-    )
-
-    class _Robot:
-        def __init__(self, kind):
-            self.type = kind
-
-    class _Recorder:
         def __init__(self):
-            self.calls = []
+            self.interact = interact
+            self.support_arm_action = [[]]
+            self.pushed: list[list[dict]] = []
+            self.turns: list[str] = []
 
-        def __getattr__(self, name):
-            return lambda *a, **k: self.calls.append(name)
+        def query_support_arm_traj(self, env_idx):
+            self.turns.append(f"query{env_idx}")
+            if self.turns.count(f"query{env_idx}") == 1:  # one trajectory, queued once
+                self.support_arm_action[env_idx].extend({"support_arm0": i} for i in range(4))
 
-    env = namespace["create_collect_env"]()()
-    env.obs_manager = type("O", (), {"collect_interval": 3})()
-    env.robot_manager = type("R", (), {"robot_list": [_Robot("target"), _Robot("support")]})()
-    env.robot_manager.control_manager = _Recorder()
-    env.reward_manager = _Recorder()
-    queued: list[int] = []
-    env.run_reward = lambda: None
-    env.interact = True
-    env.support_arm_action = [[{"support_arm0": i} for i in range(4)]]
-    env.query_support_arm_traj = lambda env_idx: queued.append(env_idx)
-    env.check_support_arm_stable = lambda env_idx: queued.append(-1)
-    env.reset()
-    assert queued == [0]  # the first trajectory is queued once the checks are registered
-    seq = namespace["_expand_control_info"](env, {"a": 1}, 0)
-    assert [c.get("support_arm0") for c in seq] == [0, 1, 2]  # one queued entry per substep
-    assert env.support_arm_action == [[{"support_arm0": 3}]]
-    env.apply_target({"a": 1})
-    assert queued == [0, 0, -1]  # its turn after every step
-    env.interact = False  # every other task: as before
-    env.apply_target({"a": 1})
-    env.reset(random_mode=True)
-    assert queued == [0, 0, -1]
-    assert len(support_patch.revert(root)) == 1 and support_patch.status(root) == "upstream"
-    assert (root / support_patch.COLLECT_FILE).read_text() == COLLECT_ENV
+        def check_support_arm_stable(self, env_idx):
+            self.turns.append(f"check{env_idx}")
 
+        def apply_target(self, control_info, env_idx=0):
+            # the collect client calls the module function, looked up at call time
+            self.pushed.append(collect._expand_control_info(self, control_info, env_idx))
 
-def test_support_arm_patch_refuses_a_file_it_was_not_written_for(tmp_path):
-    root = _fake_runtime(tmp_path)
-    (root / support_patch.COLLECT_FILE).write_text(
-        COLLECT_ENV.replace("            continue\n", "")
-    )
-    with pytest.raises(support_patch.PatchError, match="the runtime changed"):
-        support_patch.apply(root)
-    assert support_patch.status(root) == "upstream"
+    CollectEnv.__module__ = "fake_collect_env"
+    monkeypatch.setitem(sys.modules, "fake_collect_env", collect)
+    bridge = types.ModuleType("fake_bridge")
+
+    class NativeEnv:
+        def __init__(self, task_config):
+            self.env = CollectEnv()
+
+        def reset(self, seed=None):
+            bridge._standard_reset(self.env, seed)
+
+        def apply_action(self, action, action_type="joint", *, eval_fair=False):
+            self.env.apply_target({"left_arm": action}, 0)
+
+    bridge.NativeEnv = NativeEnv
+    bridge._standard_reset = lambda env, layout: env.turns.append("reset")
+    bridge._random_reset = lambda env: env.turns.append("random reset")
+    return bridge, collect
 
 
-def test_host_refuses_a_runtime_that_never_moves_the_support_arm(monkeypatch):
-    monkeypatch.delenv("ROBODOJO_SUPPORT_ARM", raising=False)
-    monkeypatch.setattr(support_patch, "status", lambda root=None: "upstream")
-    with pytest.raises(RuntimeError, match="robodojo_support_arm_patch"):
-        host.ensure_support_arm()
+def test_third_arm_is_queued_replayed_and_given_its_turn(monkeypatch):
+    bridge, collect = _fake_bridge(monkeypatch)
+    support_arm.install(bridge)
+    support_arm.install(bridge)  # a second install changes nothing
+    native = bridge.NativeEnv({})
+    env = native.env
+    native.reset(0)
+    assert env.turns == ["reset", "query0"]  # queued once the checks are registered
+    assert len(env.support_arm_action[0]) == 4
+    native.apply_action([0.1], "joint", eval_fair=False)
+    first = env.pushed[-1]
+    assert [step.get("support_arm0") for step in first] == [0, 1, 2]  # one queued step a substep
+    assert all(step["left_arm"] == [0.1] for step in first)  # the robot's own target is kept
+    assert env.turns[-2:] == ["query0", "check0"]  # its turn after the action
+    native.apply_action([0.2])
+    assert [step.get("support_arm0") for step in env.pushed[-1]] == [3, None, None]
+    assert env.support_arm_action == [[]]
+
+
+def test_tasks_without_a_third_arm_run_as_before(monkeypatch):
+    bridge, collect = _fake_bridge(monkeypatch, interact=False)
+    support_arm.install(bridge)
+    native = bridge.NativeEnv({})
+    native.reset(0)
+    native.apply_action([0.1])
+    assert native.env.turns == ["reset"]
+    assert native.env.pushed == [[{"left_arm": [0.1]}] * 3]
+
+
+def test_host_starts_the_env_server_through_this_library(monkeypatch):
+    import sys
+    import types
+
+    started: list[dict] = []
+
+    def ProcessDaemon(**kwargs):  # noqa: N802 - RPent's class name
+        started.append(kwargs)
+        return kwargs
+
+    robot_spec = types.ModuleType("robots.robodojo.robot_spec")
+    robot_spec.ProcessDaemon = ProcessDaemon
+    for name in ("robots", "robots.robodojo"):
+        monkeypatch.setitem(sys.modules, name, types.ModuleType(name))
+    monkeypatch.setitem(sys.modules, "robots.robodojo.robot_spec", robot_spec)
+    monkeypatch.setattr(sys.modules["robots.robodojo"], "robot_spec", robot_spec, raising=False)
+    monkeypatch.setenv("PYTHONPATH", "/rpent")
+    script = os.path.join("/r", "robots", "robodojo", "env_server.py")
+    with host._env_server_through_pyrualean():
+        robot_spec.ProcessDaemon(
+            name="robodojo_env_server",
+            cmd=["/sim/python", "-u", script, "--task", "make_kong"],
+            env_overrides={"A": "1"},
+        )
+        robot_spec.ProcessDaemon(name="robodojo_vla_server", cmd=["/py", "serve.py"])
+    assert robot_spec.ProcessDaemon is ProcessDaemon  # put back
+    env_server, vla = started
+    assert env_server["cmd"] == [
+        "/sim/python",
+        "-u",
+        "-m",
+        "pyrualean.hosts.robodojo_env_server",
+        script,
+        "--task",
+        "make_kong",
+    ]
+    paths = env_server["env_overrides"]["PYTHONPATH"].split(os.pathsep)
+    assert paths[-1] == "/rpent" and Path(paths[0], "pyrualean", "robodojo.py").is_file()
+    assert env_server["env_overrides"]["A"] == "1"
+    assert vla == {"name": "robodojo_vla_server", "cmd": ["/py", "serve.py"]}  # untouched
     monkeypatch.setenv("ROBODOJO_SUPPORT_ARM", "upstream")
-    host.ensure_support_arm()  # as installed, on purpose
+    assert host._support_arm_default() is False
     monkeypatch.delenv("ROBODOJO_SUPPORT_ARM")
-    for state in ("corrected", "missing"):
-        monkeypatch.setattr(support_patch, "status", lambda root=None, state=state: state)
-        host.ensure_support_arm()
+    assert host._support_arm_default() is True
+
+
+def test_env_server_entry_runs_rpents_script_with_its_arguments(monkeypatch, tmp_path):
+    import sys
+
+    script = tmp_path / "env_server.py"
+    script.write_text("import sys, json\nprint(json.dumps(sys.argv))\n")
+    installed: list[bool] = []
+    monkeypatch.setattr(support_arm, "install", lambda bridge=None: installed.append(True))
+    monkeypatch.setattr(sys, "argv", ["x"])
+    out = io.StringIO()
+    monkeypatch.setattr(sys, "stdout", out)
+    support_arm.main([str(script), "--task", "make_kong"])
+    assert installed == [True]
+    assert out.getvalue().strip() == f'["{script}", "--task", "make_kong"]'
+    with pytest.raises(SystemExit):
+        support_arm.main([])

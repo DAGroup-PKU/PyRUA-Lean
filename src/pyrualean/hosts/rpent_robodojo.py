@@ -35,7 +35,11 @@ RPent's toolset moves by position only, and its IK lets the wrist drift.
 
 The host attaches to the simulator without RPent's second reset
 (:func:`_connect_without_reset`): tasks with an articulated object do not
-survive it.  ``ROBODOJO_CONNECT_RESET=1`` gives RPent's behaviour back.
+survive it.  ``ROBODOJO_CONNECT_RESET=1`` gives RPent's behaviour back.  It
+starts the simulator through :mod:`.robodojo_env_server`, which drives the
+benchmark's third arm (the opponent or demonstrator of three tasks) as
+RoboDojo's own evaluation client does; ``ROBODOJO_SUPPORT_ARM=upstream`` runs
+RPent's server as it is.
 
 This module needs RPent (a revision with ``robots/robodojo``, i.e. ``d08d712``
 or later) and its ``robodojo`` extra importable; run it with that interpreter
@@ -65,7 +69,6 @@ from ..robodojo import RobodojoRobot, _arm_state
 from ..runner import PolicyLoadError, load_policy, policy_sha256, run_policy
 from ..sandbox import DESCRIPTION as SANDBOX_DESCRIPTION
 from ..sandbox import audit_source, make_builtins
-from . import robodojo_support_arm_patch as support_patch
 from . import robodojo_tools as tools
 from .common import RESULT_SCHEMA, RpentBackend, resolve_rpent_root, stop_all
 
@@ -215,24 +218,46 @@ def _connect_without_reset():
         env_client.RoboDojoEnvClient.__init__ = original
 
 
-def ensure_support_arm() -> None:
-    """Refuse a RoboDojo runtime whose collect client never moves the support arm.
+def _support_arm_default() -> bool:
+    return os.environ.get("ROBODOJO_SUPPORT_ARM", "").strip().lower() != "upstream"
 
-    In ``play_tic_tac_toe``, ``make_kong`` and ``imitate_sorting_sequence`` the benchmark drives a
-    third arm (an opponent, a demonstrator); the client RPent steps the simulator through never
-    queues it, so those tasks cannot be solved (:mod:`pyrualean.hosts.robodojo_support_arm_patch`).
-    ``ROBODOJO_SUPPORT_ARM=upstream`` runs the runtime as installed; a runtime that is not
-    importable from this interpreter cannot be inspected and is let through.
+
+@contextlib.contextmanager
+def _env_server_through_pyrualean():
+    """Start RPent's RoboDojo env server through :mod:`.robodojo_env_server`.
+
+    RPent spawns ``robots/robodojo/env_server.py`` with its simulator interpreter; inside this
+    context the same command runs that script through ``python -m
+    pyrualean.hosts.robodojo_env_server``, which first attaches what RoboDojo's own evaluation
+    client does for the benchmark's third arm (an opponent, a demonstrator) and then runs the
+    script unchanged.  Every argument and environment variable RPent gives the server is kept;
+    this library's ``src`` is put on its ``PYTHONPATH``.
     """
 
-    if os.environ.get("ROBODOJO_SUPPORT_ARM", "").strip().lower() == "upstream":
-        return
-    if support_patch.status() == "upstream":
-        raise RuntimeError(
-            "RoboDojo's collect client never moves the support arm of the interactive tasks: run "
-            "`python -m pyrualean.hosts.robodojo_support_arm_patch` with this interpreter "
-            "(docs/setup.md), or set ROBODOJO_SUPPORT_ARM=upstream to run it as installed"
-        )
+    from robots.robodojo import robot_spec
+
+    original = robot_spec.ProcessDaemon
+    script = os.path.join("robots", "robodojo", "env_server.py")
+    src = str(Path(__file__).resolve().parents[2])
+
+    def daemon(*args: Any, **kwargs: Any) -> Any:
+        cmd = list(kwargs.get("cmd") or [])
+        at = [i for i, part in enumerate(cmd) if str(part).endswith(script)]
+        if kwargs.get("name") == "robodojo_env_server" and at:
+            kwargs["cmd"] = (
+                cmd[: at[0]] + ["-m", "pyrualean.hosts.robodojo_env_server"] + cmd[at[0] :]
+            )
+            env = dict(kwargs.get("env_overrides") or {})
+            inherited = env.get("PYTHONPATH", os.environ.get("PYTHONPATH", ""))
+            env["PYTHONPATH"] = os.pathsep.join(part for part in (src, inherited) if part)
+            kwargs["env_overrides"] = env
+        return original(*args, **kwargs)
+
+    robot_spec.ProcessDaemon = daemon
+    try:
+        yield
+    finally:
+        robot_spec.ProcessDaemon = original
 
 
 def boot_options(args: argparse.Namespace) -> dict[str, Any]:
@@ -363,12 +388,12 @@ def boot(
     )
     spec = get_robot_spec()
     components = {"env"} if env_only else None
-    own_sim = not sim_python or os.path.abspath(sim_python) == os.path.abspath(sys.executable)
-    if env_endpoint is None and own_sim:
-        ensure_support_arm()  # the simulator runs this interpreter's RoboDojo runtime
     if connect_reset is None:
         connect_reset = _connect_reset_default()
-    with contextlib.nullcontext() if connect_reset else _connect_without_reset():
+    with (
+        contextlib.nullcontext() if connect_reset else _connect_without_reset(),
+        _env_server_through_pyrualean() if _support_arm_default() else contextlib.nullcontext(),
+    ):
         daemons, runtime_kwargs = spec.init_runtime(args, out_dir, events, components)
     from robots.robodojo.toolkit import RoboDojoToolkit
 

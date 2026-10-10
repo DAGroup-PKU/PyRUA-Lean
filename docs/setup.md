@@ -91,10 +91,7 @@ opens `apps/*.kit` by relative path and the kit file loads every extension
 under `source/`.  With the NVIDIA index on the command line uv takes
 `warp-lang` from it, and that index only publishes nightlies; the stack was
 verified with the PyPI release, so pin it afterwards: `uv pip install
---index-url https://pypi.org/simple warp-lang==1.18.0`.  Then, with that
-environment's interpreter and this library importable, `python -m
-pyrualean.hosts.robodojo_support_arm_patch` (`--check` reports the state,
-`--revert` restores the runtime's file; why is below).
+--index-url https://pypi.org/simple warp-lang==1.18.0`.
 
 - Assets: `hf download RoboDojo-Benchmark/RoboDojo --repo-type dataset
   --include 'Assets/**'`; `ROBODOJO_ASSETS_ROOT` is the directory that
@@ -133,15 +130,18 @@ pyrualean.hosts.robodojo_support_arm_patch` (`--check` reports the state,
   development-mode client: tasks with an articulated object do not survive
   it (`Object ... of type articulation not found in env 0`).
   `--connect-reset` (or `ROBODOJO_CONNECT_RESET=1`) brings it back.
-- The support-arm patch above: three tasks have a third arm the benchmark
-  drives itself (the opponent of `play_tic_tac_toe` and `make_kong`, the
+- The benchmark's third arm.  Three tasks have an arm the benchmark drives
+  itself (the opponent of `play_tic_tac_toe` and `make_kong`, the
   demonstrator of `imitate_sorting_sequence`).  RoboDojo's own evaluation
-  client queues and replays that arm; the collect client RPent steps the
-  simulator through does neither, so the opponent never moves.  The patch
-  adds the eval client's three steps to the installed `collect_env.py`,
-  guarded by the task's `interact` flag (every other task runs as before),
-  and the host refuses an unpatched runtime (`ROBODOJO_SUPPORT_ARM=upstream`
-  runs it as installed).
+  client queues that arm's trajectory and replays it inside each action; the
+  steppable client RPent's env server goes through (the bridge and collect
+  client of `rlinf-robodojo-runtime`) does neither, so the opponent never
+  moves.  The host therefore starts RPent's env server through
+  `python -m pyrualean.hosts.robodojo_env_server`, which attaches the eval
+  client's three steps to the runtime's classes in memory, only for a task
+  that has such an arm, and then runs the server script unchanged; nothing
+  installed is modified.  `ROBODOJO_SUPPORT_ARM=upstream` runs RPent's server
+  as it is.
 - What RoboDojo scores.  A task's `run_reward` registers checks that are
   latched: the task is solved at the first native action at which they all
   hold.  45 of the 54 tasks include `all_robot_back_to_origin` (both
