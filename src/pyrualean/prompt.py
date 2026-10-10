@@ -108,15 +108,17 @@ def _public_members(robot_cls: type) -> dict[str, Any]:
 
     An override keeps the position of the member it overrides, so a robot
     that re-documents ``image`` for its own cameras does not reorder the
-    reference.  ``RobotBase``'s configuration attributes never show.
+    reference.  ``RobotBase``'s configuration attributes never show, and
+    neither do the members the robot declares absent (``ABSENT_MEMBERS``).
     """
 
+    absent = frozenset(getattr(robot_cls, "ABSENT_MEMBERS", ()))
     members: dict[str, Any] = {}
     for klass in reversed(robot_cls.__mro__):
         if klass is object:
             continue
         for name, member in vars(klass).items():
-            if name.startswith("_") or name in _HOST_ONLY:
+            if name.startswith("_") or name in _HOST_ONLY or name in absent:
                 continue
             if isinstance(member, property) or inspect.isfunction(member):
                 members[name] = member
@@ -209,6 +211,11 @@ def api_reference(
     sections.append(
         "Result types (frozen dataclasses; access fields as attributes):\n\n" + "\n\n".join(results)
     )
+    # A robot without ``done`` never ends an episode as "terminated".
+    absent = frozenset(getattr(robot_cls, "ABSENT_MEMBERS", ()))
+    reasons = "truncated | timeout | cancelled"
+    if "done" not in absent:
+        reasons = "terminated | " + reasons
     sections.append(
         "Exceptions:\n"
         "    ToolError(RuntimeError): a call was rejected or a service failed; "
@@ -216,7 +223,7 @@ def api_reference(
         "    ValueError: an argument was invalid (e.g. a planar move over "
         "0.30 m) - nothing was executed.\n"
         "    EpisodeFinished(BaseException): the episode is over "
-        "(reason: terminated | truncated | timeout | cancelled); return."
+        f"(reason: {reasons}); return."
     )
     text = "\n\n".join(sections)
     if primitives == "no-vla":
@@ -269,7 +276,7 @@ class TaskCard:
     #: ``True``: the program will be run on other seeds of the same task, so
     #: the images are only an example layout (transfer mode).
     transfer: bool = False
-    #: Which robot the card describes (``libero``, ``robocasa``, ``robotwin``).
+    #: Which robot the card describes (one of :data:`pyrualean.robots.ROBOTS`).
     robot: str = "libero"
     #: Robot-specific initial facts rendered as extra bullets (non-LIBERO
     #: robots put their identifiers and initial pose here).
@@ -396,14 +403,10 @@ documented below.
 
 # How the episode is scored
 
-- Success = the benchmark's own task predicate fires (`terminated`) at any
-  moment while `run` executes.  The simulator checks it, not you.
+{scoring_head}
 - The return value of `run` is ignored.
-- The episode counts as a failure when `run` raises an uncaught exception,
-  when the host's wall-clock budget of {budget_s} s runs out, or when the
-  simulator step budget ({max_env_steps} steps) is exhausted.
-- Once the task terminates, every further motion call raises
-  `EpisodeFinished` (a BaseException): just return.
+{scoring_limits}
+{scoring_tail}
 
 # Output format
 
@@ -413,6 +416,34 @@ block and nothing else.  The program may import `math`, `time` and `numpy`
 self-contained: helper functions live in the same file.  Print short progress
 lines with `print(...)`; stdout is saved with the episode.
 """
+
+
+#: The scoring bullets of :data:`CONTRACT` (first, limits, last): ``True`` for
+#: a robot whose benchmark reports success while ``run`` executes, ``False``
+#: for one judged from the scene the program leaves behind
+#: (``RobotAdapter.live_success``), where a limit is not itself a failure.
+SCORING_NOTES = {
+    True: (
+        "- Success = the benchmark's own task predicate fires (`terminated`) at any\n"
+        "  moment while `run` executes.  The simulator checks it, not you.",
+        "- The episode counts as a failure when `run` raises an uncaught exception,\n"
+        "  when the host's wall-clock budget of {budget_s} s runs out, or when the\n"
+        "  simulator step budget ({max_env_steps} steps) is exhausted.",
+        "- Once the task terminates, every further motion call raises\n"
+        "  `EpisodeFinished` (a BaseException): just return.",
+    ),
+    False: (
+        "- Success is judged by the benchmark from the scene `run` leaves behind.\n"
+        "  Nothing reports it while `run` executes: no result carries a task-success\n"
+        "  flag, so the program must decide from its own observations when the\n"
+        "  instruction is satisfied, and return.",
+        "- `run` is stopped by an uncaught exception, by the host's wall-clock budget\n"
+        "  of {budget_s} s or by the simulator step budget ({max_env_steps} steps); the\n"
+        "  scene is judged as it is then.",
+        "- Once the simulator step budget is exhausted, every further motion call\n"
+        "  raises `EpisodeFinished` (a BaseException): just return.",
+    ),
+}
 
 
 def render_prompt(
@@ -436,12 +467,16 @@ def render_prompt(
     adapter = get_adapter(card.robot if card is not None else "libero")
     max_env_steps = card.max_env_steps if card is not None else 10000
     services = adapter.services if primitives == "full" else adapter.services_novla
+    scoring_head, scoring_limits, scoring_tail = SCORING_NOTES[bool(adapter.live_success)]
     contract = CONTRACT.format(
         budget_s=budget_s,
         max_env_steps=max_env_steps,
         robot_blurb=adapter.blurb,
         cls=(robot_cls or adapter.robot_cls).__name__,
         services=f", {services}" if services else "",
+        scoring_head=scoring_head,
+        scoring_limits=scoring_limits.format(budget_s=budget_s, max_env_steps=max_env_steps),
+        scoring_tail=scoring_tail,
     )
     reference = api_reference(robot_cls or adapter.robot_cls, primitives=primitives)
     know = (

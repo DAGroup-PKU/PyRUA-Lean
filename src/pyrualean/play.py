@@ -6,14 +6,17 @@
 #
 #     https://www.apache.org/licenses/LICENSE-2.0
 
-"""Drive one episode of a code arm with an agent runtime: Codex CLI or Claude Code.
+"""Drive one episode of a code arm with an agent runtime: Codex, Claude Code or OpenAI.
 
 The host boots RPent's stack for the chosen robot (``--robot``), wraps it in
 the adapter's robot class (:class:`LiberoRobot` for LIBERO),
 exposes the arm's tools (``python`` / ``run_program`` + ``finish``) through
 RPent's in-process HTTP MCP server and launches the agent against it:
-``codex exec`` (``--runtime codex``, the default) or Claude Code through the
-Claude Agent SDK (``--runtime claude``, :mod:`pyrualean.claude_runtime`).
+``codex exec`` (``--runtime codex``, the default), Claude Code through the
+Claude Agent SDK (``--runtime claude``, :mod:`pyrualean.claude_runtime`), or
+an in-process chat-completions loop against any OpenAI-compatible endpoint
+(``--runtime openai``, :mod:`pyrualean.openai_runtime`: the arm's tools are
+called directly, no MCP server is needed by the agent).
 The runtime owns the agent loop; this module owns the budget, the audit of
 the event stream and ``result.json``.  One episode per process.
 """
@@ -41,14 +44,16 @@ from .arms import ARMS, ArmToolkit, arm_contract, robot_words
 from .claude_runtime import resolve_cli, run_claude_agent, sdk_max_turns
 from .generate import codex_catalog_flags, provider_overrides
 from .hosts.common import RESULT_SCHEMA, RpentBackend, resolve_rpent_root, stop_all
+from .openai_runtime import run_openai_agent
 from .prompt import api_reference, knowledge_text
 from .robots import ROBOTS, RobotAdapter, get_adapter
 from .sandbox import DESCRIPTION as SANDBOX_DESCRIPTION
 
 #: RPent's LIBERO guides (the default set for ``--guides`` on that robot).
 GUIDE_NAMES = ("strict_hybrid_guide.md", "pro_hybrid_guide.md", "env_calibration.md")
-#: Agent runtimes: the Codex CLI (``codex exec``) or Claude Code (Claude Agent SDK).
-RUNTIMES = ("codex", "claude")
+#: Agent runtimes: the Codex CLI (``codex exec``), Claude Code (Claude Agent SDK) or
+#: the in-process OpenAI chat-completions loop (any OpenAI-compatible endpoint).
+RUNTIMES = ("codex", "claude", "openai")
 
 
 def _make_backend(host: Any, toolkit: Any) -> Any:
@@ -438,6 +443,7 @@ def play_episode(
     runtime: str = "codex",
     claude_cli: str | None = None,
     primitives: str = "full",
+    openai_options: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Run one episode of ``arm`` on ``cell`` and write ``result.json``.
 
@@ -453,8 +459,12 @@ def play_episode(
     subprocess, ``claude`` runs Claude Code through the Claude Agent SDK
     (:func:`pyrualean.claude_runtime.run_claude_agent`; ``claude_cli`` names
     the ``claude`` executable, the SDK's bundled one when it cannot be
-    found).  Boot, prompt, MCP server, budgets and ``result.json`` are the
-    same for both; only the event stream files (``<runtime>_events.jsonl``,
+    found), ``openai`` runs :func:`pyrualean.openai_runtime.run_openai_agent`
+    in-process against ``base_url`` (the key read from ``api_key_env``;
+    ``openai_options`` are its keyword arguments: ``temperature``,
+    ``max_tokens``, ``extra_body``, ``image_max_side``, ``nudges`` ...).
+    Boot, prompt, MCP server, budgets and ``result.json`` are the same for
+    all; only the event stream files (``<runtime>_events.jsonl``,
     ``<runtime>_stderr.txt``) and ``generation`` are runtime-specific.
 
     ``codex_home`` points Codex at a clean ``CODEX_HOME`` (no memories, no
@@ -538,8 +548,8 @@ def play_episode(
         "created_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
         "notes": [],
     }
-    if runtime == "claude":
-        result["host"]["runtime"] = "claude"
+    if runtime != "codex":
+        result["host"]["runtime"] = runtime
     toolkit = None
     daemons: list[Any] = []
     server = None
@@ -621,9 +631,15 @@ def play_episode(
             )
             if codex_home:
                 result["host"]["codex_home"] = env["CODEX_HOME"]
-        else:
+        elif runtime == "claude":
             cli_path = resolve_cli(claude_cli)
             result["host"]["claude_cli"] = cli_path or "bundled"
+        else:
+            if not base_url:
+                base_url = os.environ.get("OPENAI_BASE_URL") or os.environ.get("PYRUALEAN_BASE_URL")
+            if not base_url:
+                raise ValueError("--runtime openai needs --base-url (or OPENAI_BASE_URL)")
+            result["host"]["base_url"] = base_url
         policy_started = time.perf_counter()
         attempts = 0
         generation: dict[str, Any] | None = None
@@ -633,7 +649,33 @@ def play_episode(
             if remaining <= 0:
                 status, returncode = "timeout", None
                 break
-            if runtime == "claude":
+            if runtime == "openai":
+                generation = run_openai_agent(
+                    prompt,
+                    images,
+                    arm_toolkit,
+                    model=model,
+                    base_url=base_url,
+                    api_key=(
+                        os.environ.get(api_key_env)
+                        if api_key_env
+                        else os.environ.get("OPENAI_API_KEY")
+                    ),
+                    max_turns=max_turns,
+                    budget_s=remaining,
+                    out_dir=out_dir,
+                    arm=arm,
+                    on_timeout=lambda: robo._stop_episode("timeout"),
+                    **(openai_options or {}),
+                )
+                status, returncode = generation["status"], generation["returncode"]
+                if status == "error":
+                    # The provider failed after the retries: judged below like
+                    # any other provider failure (planner_error when nothing
+                    # was solved and finish was never called).
+                    status = "completed"
+                audit = generation
+            elif runtime == "claude":
                 generation = run_claude_agent(
                     prompt,
                     images,
@@ -717,7 +759,7 @@ def play_episode(
                     result["generation"]["compactions"] = recovered.get("compactions")
         else:
             result["generation"] = generation or {
-                "runtime": "claude",
+                "runtime": runtime,
                 "errors": ["the wall clock expired before the agent started"],
                 "tool_calls": {},
             }
@@ -797,6 +839,26 @@ def play_episode(
     return result
 
 
+def _openai_options(args: argparse.Namespace) -> dict[str, Any]:
+    """Keyword arguments of :func:`run_openai_agent` from the ``openai runtime`` flags."""
+
+    options: dict[str, Any] = {
+        "temperature": args.openai_temperature,
+        "max_tokens": args.openai_max_tokens,
+        "image_max_side": args.image_max_side,
+        "nudges": args.openai_nudges,
+        "tool_choice": args.openai_tool_choice,
+    }
+    if args.openai_extra_body:
+        extra = json.loads(args.openai_extra_body)
+        if not isinstance(extra, dict):
+            raise ValueError("--openai-extra-body must be a JSON object")
+        options["extra_body"] = extra
+    if args.openai_timeout_s is not None:
+        options["request_timeout_s"] = args.openai_timeout_s
+    return options
+
+
 def main(argv: list[str] | None = None) -> int:
     pre = argparse.ArgumentParser(add_help=False)
     pre.add_argument("--robot", default="libero", choices=ROBOTS)
@@ -804,7 +866,7 @@ def main(argv: list[str] | None = None) -> int:
     adapter = get_adapter(known.robot)
     host = adapter.host_module()
     parser = argparse.ArgumentParser(prog="python -m pyrualean.play", description=__doc__)
-    parser.add_argument("--robot", default="libero", help="libero | robocasa | robotwin")
+    parser.add_argument("--robot", default="libero", help="libero | robocasa | robotwin | robodojo")
     parser.add_argument("--arm", choices=ARMS, required=True)
     host.add_cell_args(parser)
     host.add_boot_args(parser)
@@ -860,12 +922,54 @@ def main(argv: list[str] | None = None) -> int:
         "--runtime",
         choices=RUNTIMES,
         default=setting("RUNTIME", "codex"),
-        help="agent runtime: codex (Codex CLI) or claude (Claude Code via the Claude Agent SDK)",
+        help=(
+            "agent runtime: codex (Codex CLI), claude (Claude Code via the Claude Agent SDK) "
+            "or openai (in-process loop against any OpenAI-compatible endpoint)"
+        ),
     )
     parser.add_argument(
         "--claude-cli",
         default=setting("CLAUDE_CLI", "claude"),
         help="claude executable for --runtime claude (default: $PYRUALEAN_CLAUDE_CLI or PATH)",
+    )
+    openai_group = parser.add_argument_group(
+        "openai runtime", "--runtime openai: in-process loop against --base-url"
+    )
+    openai_group.add_argument(
+        "--openai-temperature",
+        type=float,
+        default=None,
+        help="sampling temperature (provider default)",
+    )
+    openai_group.add_argument(
+        "--openai-max-tokens", type=int, default=4096, help="max_tokens per model reply (4096)"
+    )
+    openai_group.add_argument(
+        "--openai-extra-body",
+        default=setting("OPENAI_EXTRA_BODY", None),
+        help='JSON merged into every request, e.g. \'{"reasoning_effort": "high"}\' or '
+        '\'{"chat_template_kwargs": {"enable_thinking": true}}\'',
+    )
+    openai_group.add_argument(
+        "--openai-tool-choice",
+        choices=("auto", "required"),
+        default="auto",
+        help="auto: the model may answer in text; required: every reply must call a tool",
+    )
+    openai_group.add_argument(
+        "--image-max-side",
+        type=int,
+        default=0,
+        help="downscale images the model receives to this longer side (0 = native 1024)",
+    )
+    openai_group.add_argument(
+        "--openai-nudges",
+        type=int,
+        default=2,
+        help="reminders sent when the model replies without a tool call before finish (2)",
+    )
+    openai_group.add_argument(
+        "--openai-timeout-s", type=float, default=None, help="per-request timeout (900)"
     )
     parser.add_argument(
         "--primitives",
@@ -898,6 +1002,7 @@ def main(argv: list[str] | None = None) -> int:
         runtime=args.runtime,
         claude_cli=args.claude_cli,
         primitives=args.primitives,
+        openai_options=_openai_options(args) if args.runtime == "openai" else None,
     )
     print(
         json.dumps(

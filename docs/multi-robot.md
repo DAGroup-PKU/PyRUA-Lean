@@ -1,7 +1,7 @@
 # Adding a robot to PyRUA-Lean
 
 PyRUA-Lean drives any RPent robot through three pieces, all selected by the
-robot's name (`--robot libero|robocasa|robotwin`):
+robot's name (`--robot libero|robocasa|robotwin|robodojo`):
 
 | piece | file | what it is |
 |---|---|---|
@@ -65,6 +65,15 @@ generator work):
   `CLOSE`, arm names) are uppercase class attributes; `RESULT_TYPES` (the
   frozen result dataclasses of the reference) and `ClassVar`-annotated
   configuration are not rendered as constants.
+- A base member the robot does not have goes into `ABSENT_MEMBERS` and is
+  overridden to raise (RoboDojo: `{"done", "world_map"}`; RPent keeps
+  RoboDojo's success from its own planner and records no world maps).  It is
+  then left out of the API reference, `RobotAdapter.live_success` is false
+  when `done` is absent, the contract says that the final scene is judged,
+  and the tool feedback carries no success field.  Do not answer with a
+  constant instead: an always-False `done` turns the `while not robo.done`
+  habit into a loop that burns the step budget.  Hosts ask
+  `robo._reported_success()`, never `robo.done`.
 - `world_map` reads `.npz` archives and bare `.npy` arrays; override it only
   for a robot-specific docstring.
 - At the end of the module:

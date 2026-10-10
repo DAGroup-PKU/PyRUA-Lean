@@ -86,12 +86,14 @@ calls, the token usage and the benchmark's own verdict.
 | `libero` (default) | LIBERO-PRO | Franka arm; scripted servos, Pi0.5 VLA, SAM3 perception |
 | `robotwin` | RoboTwin 2.0 | two arms; LingBot-VLA |
 | `robocasa` | RoboCasa365 | mobile manipulator; RLDX-1 VLA, navigation |
+| `robodojo` | RoboDojo | two ARX-X5 arms; this library's own full-pose motion (IK in the host), gripper and 3D-perception primitives, the Pi0.5 task policy, SAM3 (experimental, as in RPent; the benchmark reports no success during an episode) |
 
 [docs/multi-robot.md](docs/multi-robot.md) is the contract for adding a robot.
 
 ## How it works
 
-- **Same primitives, same judge.** Each `robo` method maps one to one onto an RPent tool and runs through RPent,
+- **Same primitives, same judge.** Each `robo` method maps one to one onto an RPent tool and runs through RPent
+  (on RoboDojo the motion, gripper and perception tools are this library's own, registered on RPent's toolkit),
   so an episode leaves the same records as an RPent episode and is scored by the benchmark's own success check.
 - **Results, not exceptions.** Motion calls block and return what actually happened (`Move.reached`,
   `Pick.success`, ...); misuse raises, and a finished episode stops every further motion.

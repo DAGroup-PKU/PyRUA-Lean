@@ -84,12 +84,13 @@ pyrualean summarize runs/demo
 | `libero`（默认） | LIBERO-PRO | Franka 单臂；脚本化伺服、Pi0.5 VLA、SAM3 感知 |
 | `robotwin` | RoboTwin 2.0 | 双臂；LingBot-VLA |
 | `robocasa` | RoboCasa365 | 移动操作机器人；RLDX-1 VLA、导航 |
+| `robodojo` | RoboDojo | 双臂 ARX-X5；本库自己的全位姿运动（宿主侧 IK）、夹爪与 3D 感知原语，Pi0.5 整任务策略，SAM3（与 RPent 一样属实验性；回合进行中基准不回报成功与否） |
 
 新增机器人的约定见 [docs/multi-robot.md](docs/multi-robot.md)。
 
 ## 工作方式
 
-- **同样的原语，同样的判分。** `robo` 的每个方法一一对应 RPent 的一个工具，并经由 RPent 执行，所以一局留下的记录和
+- **同样的原语，同样的判分。** `robo` 的每个方法一一对应 RPent 的一个工具，并经由 RPent 执行（RoboDojo 上的运动、夹爪和感知工具是本库自己的，注册在 RPent 的 toolkit 上），所以一局留下的记录和
   RPent 的一局相同，成功与否由基准自己的判定决定。
 - **返回结果，而不是抛异常。** 运动调用会阻塞，并返回实际发生了什么（`Move.reached`、`Pick.success` 等）；
   误用会报错，任务完成后所有后续运动都会被拦下。
