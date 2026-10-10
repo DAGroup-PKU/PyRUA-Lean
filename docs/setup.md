@@ -203,10 +203,12 @@ episode per cell, the 54 tasks at layouts 0-2):
 | the Pi0.5 policy alone | 157 | 12 (8 %) |
 | this library's primitives, without the policy | 158 | 68 (43 %) |
 | the same, the cells of the 18 tasks that sweep never solved re-run after the last fixes | 158 | 76 (48 %) |
-| this library's primitives with the policy, layout 0 | 52 | 25 (48 %) |
+| this library's primitives with the policy | 158 | 76 (48 %) |
 
 The rows with the policy were measured with the policy wrapper feeding the
-checkpoint its own channel order.  Episodes that did not boot are not scored
+checkpoint its own channel order.  Cell by cell the policy adds nothing on
+average to these primitives (76 against 75 on the 157 cells scored in both;
+19 cells solved only with it, 18 only without).  Episodes that did not boot are not scored
 (`imitate_sorting_sequence` never boots within 900 s).  37 of the 53 tasks
 that boot were solved at least once.
 
