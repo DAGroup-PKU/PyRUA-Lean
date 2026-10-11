@@ -1,7 +1,7 @@
 # Adding a robot to PyRUA-Lean
 
 PyRUA-Lean drives any RPent robot through three pieces, all selected by the
-robot's name (`--robot libero|robocasa|robotwin|robodojo`):
+robot's name (`--robot libero|robocasa|robotwin|robodojo|robodojo_xpl|robodojo_xpl_rgb`):
 
 | piece | file | what it is |
 |---|---|---|

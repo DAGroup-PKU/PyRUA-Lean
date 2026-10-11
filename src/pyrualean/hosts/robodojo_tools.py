@@ -27,6 +27,7 @@ the episode's budget; a tool stops at the step limit.
 from __future__ import annotations
 
 import math
+import zlib
 from collections.abc import Sequence
 from functools import partial
 from typing import Any
@@ -35,6 +36,7 @@ import numpy as np
 
 from ..robodojo import HOME_MAX_ACTIONS, HOME_TOL_RAD
 from . import robodojo_kinematics as kin
+from . import robodojo_sight as sight
 
 ARMS = kin.ARMS
 #: Extra native actions at the end of a motion while the joints settle on the target.
@@ -55,14 +57,82 @@ NEAR_DEG = 8.0
 #: swing back does not sweep across the table: one swing knocked a placed board off.
 HOME_LIFT_BELOW = 1.0
 HOME_LIFT_M = 0.06
+#: ``locate`` measures a footprint on a grid this fine (metres), one point per occupied cell:
+#: an oblique camera sees an object's sides edge-on, and counted pixel by pixel they outweigh
+#: its top (a cube's sides pulled its long axis onto the diagonal).
+FOOTPRINT_CELL_M = 0.002
+#: A footprint spread at least this many times further along its principal axis than across it
+#: (variances) is measured along its principal axes; one nearer to a square or a circle has no
+#: axis of its own and takes the sides of the smallest rectangle around it.
+LONG_FOOTPRINT = 1.4
+#: The extents of a footprint leave this percentage of its cells outside at either end: a few
+#: stray cells at the mask's edge do not stretch it, and a thin end (a brush's head) stays in.
+FOOTPRINT_TRIM = 0.5
+#: The lowest points of a mask are as often what the object stands on as the object (a pad
+#: under a cube, 5 mm high, added 1.5 cm to its footprint): for an object taller than
+#: FOOT_MIN_HEIGHT_M the footprint is taken from the points more than FOOT_M above its lowest.
+FOOT_M = 0.003
+FOOT_MIN_HEIGHT_M = 0.012
+#: ``locate`` completes a round object's hidden far side: a slice this thick (metres) whose
+#: points lie on an arc of a circle of a graspable size, within this fraction of the radius
+#: (the two sides of a box corner miss their best circle by a tenth of it) and over at least
+#: this much of the circle, counts as round.
+SLICE_M = 0.01
+ROUND_MIN_RADIUS_M = 0.008
+ROUND_MAX_RADIUS_M = 0.12
+ROUND_FIT = 0.04
+ROUND_MIN_ARC_DEG = 100.0
+#: ... and, of three or more such slices, one whose centre is further than this (metres) from
+#: the median of their centres is dropped: a sparse slice of a doll once fitted a circle twice
+#: too large.  More than half of them have to be that close, or none is used.
+ROUND_AXIS_M = 0.006
+#: The gripper beyond the arm's links, in the end-effector link's frame (x the pointing
+#: direction, y the closing axis; metres), as the head camera saw it at five openings: the rail
+#: the fingers run on, 9 cm to either side at 7.5 cm out, and the two fingers from 9 cm out to
+#: the tips, 1.3 cm off the axis closed and 5.8 cm open.  ``locate`` drops mask pixels on them.
+RAIL_AT_M = 0.075
+RAIL_HALF_M = 0.09
+RAIL_RADIUS_M = 0.04
+FINGER_FROM_M = 0.09
+FINGER_CLOSED_M = 0.013
+FINGER_TRAVEL_M = 0.045
+FINGER_RADIUS_M = 0.035
+#: Without a depth image an object is looked for in the other cameras at pixels at least this
+#: far apart (pixels), and a pixel asked about lies on a measured object when one of that
+#: object's measured pixels is this near.  A mask over more than PROBE_TABLE_SHARE of the image
+#: is the table.
+SEED_APART_PX = 6
+#: Without depth, a mask is the robot's own arm when the segmenter was this unsure of it and
+#: this share of it lies on the robot's outline in the picture (a block under an open gripper
+#: lies on that outline too, but is found with a high score).
+ROBOT_MASK_SCORE = 0.5
+ROBOT_MASK_SHARE = 0.5
+#: ... and a measured centre this far outside the table top is not an object on the table.
+OFF_TABLE_M = 0.02
+#: The robot is in front of part of an object when this share of the rim just outside its mask
+#: (RIM_PX wide) lies on the robot's outline.
+HIDDEN_RIM_SHARE = 0.15
+RIM_PX = 3
+#: Two cameras whose masks fit the measured solid less well than this (F1) agree only roughly:
+#: over 260 objects the height was then off by 7 mm at the median and 35 mm at the worst tenth,
+#: against 3 and 15 above it.
+ROUGH_MATCH = 0.9
+PROBE_REACH_PX = 2.5
+PROBE_TABLE_SHARE = 0.25
 #: ``move_pose`` may take the half-turned pose (fingers swapped) only with a gripper this open.
 OPEN_FOR_HALF_TURN = 0.9
-#: A gripper closed on nothing reads an opening of 0.0 (measured); after a close, an opening
-#: above this means the fingers stopped on something.
-HOLD_MIN_OPENING = 0.05
-#: Gap between the fingers at opening 1.0, metres (each finger travels 0.044 m; measured: a
-#: 3.9 cm block read 0.432).
-FULL_GAP_M = 0.088
+#: A gripper closed on nothing reads an opening of 0.0 (448 closes in the sweeps read under
+#: 0.0025 and six more under 0.01); after a close, an opening above this means the fingers
+#: stopped on something.  It was 0.05 once: a coin, a key or a mug's handle stops them between
+#: 0.01 and 0.05, and 47 such closes were reported as holding nothing.
+HOLD_MIN_OPENING = 0.01
+#: The width of what is held at a measured opening, metres: GRIP_ZERO_M + GRIP_SPAN_M x
+#: opening.  Fitted in the simulator to cubes of 3.0 and 3.5 cm held across two faces
+#: (openings 0.254 and 0.300) and across the diagonal (0.368 and 0.433) and to an 8 cm bottle
+#: (0.711): all five within 0.5 mm.  The fingers' travel in the URDF, 0.088 m, is not the
+#: span: with it a 3.5 cm cube read 2.6 cm.
+GRIP_ZERO_M = 0.0023
+GRIP_SPAN_M = 0.1091
 
 
 # ---------------------------------------------------------------------------
@@ -444,8 +514,8 @@ def grip(
 ) -> dict[str, Any]:
     """Close (1) or open (-1) one gripper: repeat the command until the fingers stop.
 
-    ``opening`` (0..1, with an open command only) opens to that fraction of the full gap
-    instead of all the way, e.g. to reach between close neighbours.
+    ``opening`` (0..1, with an open command only) opens to that reading instead of all the
+    way, e.g. to reach between close neighbours.
     """
 
     if arm not in ARMS:
@@ -480,14 +550,14 @@ def grip(
     measured = _opening(state, arm)
     closing = command == 0.0
     holding = bool(closing and measured > HOLD_MIN_OPENING)
-    width = measured * FULL_GAP_M
+    width = GRIP_ZERO_M + GRIP_SPAN_M * measured if holding else 0.0
     return {
         "arm": arm,
         "gripper": "closed" if closing else "open",
         "opening": round(measured, 3),
         "opening_before": round(before, 3),
         "holding": holding,
-        "width_m": round(max(width, 0.0), 4) if closing else None,
+        "width_m": round(width, 4) if closing else None,
         "steps_used": steps,
         "status": {k: status[k] for k in ("step", "step_limit") if k in status},
     }
@@ -575,15 +645,18 @@ def home(
 # ---------------------------------------------------------------------------
 
 
-def _obs_state(primitives: Any) -> dict[str, Any]:
-    obs = getattr(primitives, "_last_obs", None) or _obs(primitives)
-    return obs.get("state") or {}
-
-
 def _on_robot(state: dict[str, Any], points: np.ndarray, radius: float = 0.045) -> np.ndarray:
-    """Which world points lie on either arm: within ``radius`` of its links (base to the tips)."""
+    """Which world points lie on either arm: within ``radius`` of its links (base to the tips),
+    on the rail of its gripper or on one of its fingers, wherever those stand open."""
 
     hit = np.zeros(len(points), dtype=bool)
+
+    def near(a: np.ndarray, b: np.ndarray, within: float) -> np.ndarray:
+        ab = b - a
+        n = float(ab @ ab)
+        t = np.clip(((points - a) @ ab) / n, 0.0, 1.0) if n > 1e-12 else np.zeros(len(points))
+        return np.linalg.norm(points - (a + t[:, None] * ab), axis=1) < within
+
     for arm in ARMS:
         try:
             q = _joints(state, arm)
@@ -595,16 +668,54 @@ def _on_robot(state: dict[str, Any], points: np.ndarray, radius: float = 0.045) 
         chain = [f[:3, 3] for f in fr]
         chain.append(fr[-1][:3, 3] + fr[-1][:3, 0] * kin.TIP_OFFSET)
         for a, b in zip(chain, chain[1:], strict=False):
-            ab = b - a
-            n = float(ab @ ab)
-            t = np.clip(((points - a) @ ab) / n, 0.0, 1.0) if n > 1e-12 else np.zeros(len(points))
-            d = np.linalg.norm(points - (a + t[:, None] * ab), axis=1)
-            hit |= d < radius
+            hit |= near(a, b, radius)
+        origin, forward, side = fr[-1][:3, 3], fr[-1][:3, 0], fr[-1][:3, 1]
+        rail = origin + forward * RAIL_AT_M
+        hit |= near(rail - side * RAIL_HALF_M, rail + side * RAIL_HALF_M, RAIL_RADIUS_M)
+        opening = min(max(_opening(state, arm), 0.0), 1.0)
+        for sign in (1.0, -1.0):
+            off = side * sign * (FINGER_CLOSED_M + FINGER_TRAVEL_M * opening)
+            hit |= near(
+                origin + forward * FINGER_FROM_M + off,
+                origin + forward * kin.TIP_OFFSET + off,
+                FINGER_RADIUS_M,
+            )
     return hit
 
 
 def _camera(obs: dict[str, Any], camera: str) -> dict[str, Any] | None:
     return (obs.get("vision") or {}).get(camera)
+
+
+def depth_image(cam: dict[str, Any]) -> np.ndarray | None:
+    """A camera's depth along its optical axis, metres (H x W), or None when it has none.
+
+    RoboDojo's simulator gives it as ``depth`` (float metres; RPent's bridge calls the same
+    array ``distance_to_image_plane``) or as ``approximate_depth`` (whole millimetres, the
+    form its released data has), whichever its configuration switches on.
+    """
+
+    for key, scale in (
+        ("distance_to_image_plane", 1.0),
+        ("depth", 1.0),
+        ("approximate_depth", 1e-3),
+    ):
+        raw = cam.get(key)
+        if raw is None:
+            continue
+        depth = np.asarray(raw)
+        scale = 1e-3 if depth.dtype.kind in "iu" else scale  # integers are millimetres
+        depth = depth.astype(np.float64) * scale
+        return depth[..., 0] if depth.ndim == 3 else depth
+    return None
+
+
+def extrinsic_of(cam: dict[str, Any]) -> Any:
+    """A camera's pose in the world (4 x 4): RoboDojo names it ``extrinsic_matrix``,
+    XPolicyLab's observation format ``extrinsics_matrix``."""
+
+    pose = cam.get("extrinsic_matrix")
+    return cam.get("extrinsics_matrix") if pose is None else pose
 
 
 def world_points(
@@ -616,20 +727,106 @@ def world_points(
     depth (``distance_to_image_plane``) is along the optical axis.
     """
 
-    depth = cam.get("distance_to_image_plane")
+    depth = depth_image(cam)
     if depth is None:
-        depth = cam.get("depth")
-    depth = np.asarray(depth, dtype=np.float64)
-    if depth.ndim == 3:
-        depth = depth[..., 0]
+        raise KeyError("no depth image in the observation")
     k = np.asarray(cam["intrinsic_matrix"], dtype=np.float64)
-    t = np.asarray(cam["extrinsic_matrix"], dtype=np.float64)
+    t = np.asarray(extrinsic_of(cam), dtype=np.float64)
     d = depth[rows, cols]
     valid = np.isfinite(d) & (d > 0)
     r, c, d = rows[valid], cols[valid], d[valid]
     fx, fy, cx, cy = k[0, 0], k[1, 1], k[0, 2], k[1, 2]
     p = np.stack([(c - cx) / fx * d, -(r - cy) / fy * d, -d, np.ones_like(d)])
     return (t @ p)[:3].T, valid
+
+
+def _cells(xy: np.ndarray, cell: float = FOOTPRINT_CELL_M) -> np.ndarray:
+    """One point per occupied grid cell (the mean of the points in it): the footprint with
+    the same weight everywhere."""
+
+    _, cell_of, count = np.unique(
+        np.floor(xy / cell).astype(np.int64), axis=0, return_inverse=True, return_counts=True
+    )
+    cell_of = cell_of.reshape(-1)
+    sums = np.stack([np.bincount(cell_of, weights=xy[:, i]) for i in (0, 1)], axis=1)
+    return sums / count[:, None]
+
+
+def _footprint(xy: np.ndarray) -> tuple[float, float, float, np.ndarray]:
+    """A footprint's rectangle: the heading of its long side (degrees from +x, -90 .. 90), its
+    length and width, and its centre.
+
+    Every occupied cell counts once, so the answer does not depend on how densely each part
+    of the object was seen.  A footprint clearly longer one way lies along its principal
+    axes (a T, a hammer, a shoe: their smallest rectangle can sit askew).  A square or a
+    circle has no principal axis: there the rectangle of least area over all headings is
+    taken, which finds the sides of a square.
+    """
+
+    cells = _cells(xy)
+    trim = [FOOTPRINT_TRIM, 100.0 - FOOTPRINT_TRIM]
+
+    def extents(deg: float) -> tuple[float, float, float, float, float, np.ndarray, np.ndarray]:
+        a = math.radians(deg)
+        u = np.array([math.cos(a), math.sin(a)])
+        v = np.array([-u[1], u[0]])
+        (ul, uh), (vl, vh) = np.percentile(cells @ u, trim), np.percentile(cells @ v, trim)
+        return float((uh - ul) * (vh - vl)), ul, uh, vl, vh, u, v
+
+    spread, axes = np.linalg.eigh(np.cov((cells - cells.mean(axis=0)).T))
+    if spread[1] >= LONG_FOOTPRINT * max(float(spread[0]), 1e-12):
+        heading = math.degrees(math.atan2(axes[1, 1], axes[0, 1]))
+    else:
+        coarse = min(np.arange(0.0, 90.0, 2.0), key=lambda d: extents(d)[0])
+        heading = min(np.arange(coarse - 2.0, coarse + 2.01, 0.25), key=lambda d: extents(d)[0])
+    _, ul, uh, vl, vh, u, v = extents(heading)
+    centre = u * (ul + uh) / 2 + v * (vl + vh) / 2
+    length, width = uh - ul, vh - vl
+    if width > length:
+        length, width, heading = width, length, heading + 90.0
+    return (heading + 90.0) % 180.0 - 90.0, float(length), float(width), centre
+
+
+def _far_side(pts: np.ndarray) -> np.ndarray:
+    """Footprint points (N x 2) of what the camera cannot see of a round object.
+
+    A camera sees the near half of an upright bottle, cup or doll, so its visible points end
+    at the middle and their footprint sits towards the camera: against the scenes' true poses
+    the centre of an upright bottle was 6 to 14 mm off and its far edge up to 2 cm short.
+    Each horizontal slice whose visible points lie on a circular arc is completed to the full
+    circle, provided the circles of the object share one upright axis.  Flat-sided objects are
+    left alone: their slices are not arcs, and their tops, which the camera does see, cover
+    them.  So is a rounded body that is not round about an upright axis.
+    """
+
+    circles = []
+    for low in np.arange(kin.TABLE_Z + 0.004, float(pts[:, 2].max()), SLICE_M):
+        xy = pts[(pts[:, 2] >= low) & (pts[:, 2] < low + SLICE_M), :2]
+        if len(xy) < 15:
+            continue
+        # algebraic circle fit: |p|^2 = 2 c.p + (r^2 - |c|^2)
+        sol, *_ = np.linalg.lstsq(np.c_[2 * xy, np.ones(len(xy))], (xy**2).sum(axis=1), rcond=None)
+        centre = sol[:2]
+        radius = math.sqrt(max(float(sol[2] + centre @ centre), 0.0))
+        if not ROUND_MIN_RADIUS_M <= radius <= ROUND_MAX_RADIUS_M:
+            continue
+        rms = float(np.sqrt(((np.linalg.norm(xy - centre, axis=1) - radius) ** 2).mean()))
+        angles = np.sort(np.arctan2(xy[:, 1] - centre[1], xy[:, 0] - centre[0]))
+        gaps = np.diff(np.r_[angles, angles[0] + 2 * math.pi])
+        arc = 360.0 - math.degrees(float(gaps.max()))  # what the points cover of the circle
+        if rms <= ROUND_FIT * radius and arc >= ROUND_MIN_ARC_DEG:
+            circles.append((centre, radius))
+    if len(circles) >= 3:
+        # The slices of a round object share an axis: a circle off it is a misfit.  And when no
+        # more than half of them share one, the object is not round about an upright axis: the
+        # body of a piggy bank lying on its feet gave four circles, two of them alike, and the
+        # two put 2 cm on its width.
+        axis = np.median(np.array([c for c, _ in circles]), axis=0)
+        alike = [(c, r) for c, r in circles if np.linalg.norm(c - axis) <= ROUND_AXIS_M]
+        circles = alike if 2 * len(alike) > len(circles) else []
+    turn = np.linspace(0.0, 2 * math.pi, 90, endpoint=False)
+    ring = np.c_[np.cos(turn), np.sin(turn)]
+    return np.vstack([c + r * ring for c, r in circles]) if circles else np.zeros((0, 2))
 
 
 def object_geometry(points: np.ndarray) -> dict[str, Any] | None:
@@ -642,20 +839,10 @@ def object_geometry(points: np.ndarray) -> dict[str, Any] | None:
     spread = np.median(np.linalg.norm(pts[:, :2] - med, axis=1))
     keep = np.linalg.norm(pts[:, :2] - med, axis=1) <= max(4.0 * spread, 0.03)
     pts = pts[keep]  # pixels of other things at the mask's edge
-    xy = pts[:, :2]
-    centre = xy.mean(axis=0)
-    cov = np.cov((xy - centre).T)
-    w, v = np.linalg.eigh(cov)
-    major = v[:, int(np.argmax(w))]
-    minor = np.array([-major[1], major[0]])
-    along = (xy - centre) @ major
-    across = (xy - centre) @ minor
-    lo_a, hi_a = np.percentile(along, [2, 98])
-    lo_c, hi_c = np.percentile(across, [2, 98])
-    mid = centre + major * (lo_a + hi_a) / 2 + minor * (lo_c + hi_c) / 2
     top = float(np.percentile(pts[:, 2], 97))
-    heading = math.degrees(math.atan2(major[1], major[0]))
-    heading = (heading + 90.0) % 180.0 - 90.0  # an axis: -90 .. 90 from +x
+    low = float(pts[:, 2].min())
+    standing = pts[pts[:, 2] > low + FOOT_M] if top - low > FOOT_MIN_HEIGHT_M else pts
+    heading, length, width, mid = _footprint(np.vstack([standing[:, :2], _far_side(pts)]))
     across_heading = (heading + 180.0) % 180.0 - 90.0
     return {
         "center_xyz": [
@@ -665,13 +852,334 @@ def object_geometry(points: np.ndarray) -> dict[str, Any] | None:
         ],
         "top_z": round(top, 4),
         "height_m": round(top - kin.TABLE_Z, 4),
-        "length_m": round(float(hi_a - lo_a), 4),
-        "width_m": round(float(hi_c - lo_c), 4),
+        "length_m": round(length, 4),
+        "width_m": round(width, 4),
         "long_axis_deg": round(heading, 1),
         # pointing straight down, this yaw closes the fingers across the narrow side
         "grasp_yaw": round(across_heading, 1),
         "points": int(len(pts)),
     }
+
+
+# ---------------------------------------------------------------------------
+# perception without a depth image (RoboDojo's evaluation client sends none by default)
+# ---------------------------------------------------------------------------
+
+_WRISTS = {"cam_left_wrist": "left", "cam_right_wrist": "right"}
+
+
+def colour_only(primitives: Any, cam: dict[str, Any] | None = None) -> bool:
+    """Whether perception works from colour images alone.
+
+    Always when the host says so (``primitives.colour_only``, which the host for RoboDojo's
+    own evaluation client sets), and whenever the observation simply carries no depth image.
+    """
+
+    if getattr(primitives, "colour_only", False):
+        return True
+    if cam is None:
+        return False
+    return depth_image(cam) is None
+
+
+def _shown(obs: dict[str, Any]) -> dict[str, Any]:
+    """The robot state an observation's pictures show.
+
+    RoboDojo's evaluation client before its commit 6e3190f hands out each picture one
+    observation late: the state is the robot's now, the pictures are of the state before the
+    last action (measured in that client: a wrist camera's picture fits the previous
+    end-effector pose to a millimetre and the current one not at all while the arm moves).  A
+    host that knows this puts the state the pictures belong to under ``image_state``; without
+    it they are taken to be current.
+    """
+
+    shown = obs.get("image_state")
+    return shown if isinstance(shown, dict) and shown else (obs.get("state") or {})
+
+
+def _view(camera: str, state: dict[str, Any]) -> sight.View | None:
+    """A camera's pose from the state alone: the head camera is fixed, a wrist camera rides on
+    its arm's end-effector link."""
+
+    if camera == "cam_head":
+        return sight.head_view()
+    arm = _WRISTS.get(camera)
+    pose = state.get(f"{arm}_ee_pose") if arm else None
+    if pose is None:
+        return None
+    return sight.wrist_view([float(v) for v in np.ravel(pose)[:7]])
+
+
+def _scene(primitives: Any, obs: dict[str, Any]) -> dict[str, Any]:
+    """What has been measured in the images of this observation (kept until they change)."""
+
+    marks = []
+    for name in sorted(obs.get("vision") or {}):
+        color = (obs["vision"][name] or {}).get("color")
+        if color is not None:
+            marks.append(zlib.crc32(np.ascontiguousarray(np.asarray(color)[::8, ::8]).tobytes()))
+    key = tuple(marks)
+    scene = getattr(primitives, "_scene", None)
+    if not isinstance(scene, dict) or scene.get("key") != key:
+        scene = {"key": key, "regions": []}
+        try:
+            primitives._scene = scene
+        except AttributeError:
+            pass
+    return scene
+
+
+def _heights(primitives: Any) -> dict[str, tuple[float, str, float | None]]:
+    known = getattr(primitives, "_measured_heights", None)
+    if known is None:
+        known = {}
+        try:
+            primitives._measured_heights = known
+        except AttributeError:
+            pass
+    return known
+
+
+def _behind_robot(mask: np.ndarray, outline: np.ndarray) -> bool:
+    """Whether the robot's outline runs along the mask's edge: it then hides part of the object."""
+
+    grown = mask.copy()
+    for _ in range(RIM_PX):
+        wider = grown.copy()
+        wider[1:] |= grown[:-1]
+        wider[:-1] |= grown[1:]
+        wider[:, 1:] |= grown[:, :-1]
+        wider[:, :-1] |= grown[:, 1:]
+        grown = wider
+    rim = grown & ~mask
+    return bool(rim.any()) and float(outline[rim].mean()) >= HIDDEN_RIM_SHARE
+
+
+def _measure_in_colour(
+    primitives: Any,
+    obs: dict[str, Any],
+    camera: str,
+    mask: np.ndarray,
+    text_prompt: str | None,
+    min_score: float,
+) -> tuple[dict[str, Any] | None, dict[str, Any]]:
+    """An object's geometry from its mask in ``camera`` and whatever the other cameras show of it.
+
+    The other cameras are asked for the object twice: by the same words, and by the pixels
+    where points of the first mask's rays fall in their image (:func:`.robodojo_sight.seeds`);
+    :func:`.robodojo_sight.measure` takes of those masks the one that is the same object.
+    Returns the geometry (``object_geometry`` of the surface points) and what was seen.
+    """
+
+    state = _shown(obs)
+    vision = obs.get("vision") or {}
+    seen: dict[str, Any] = {"views": 1}
+    view = _view(camera, state)
+    if view is None:
+        return None, seen
+    first = sight.Sight(view, mask)
+    sam3 = getattr(primitives, "sam3_client", None)
+    others = []
+    spots = sight.seeds(first)
+    for name in vision:
+        if name == camera or sam3 is None:
+            continue
+        other = _view(name, state)
+        color = (vision[name] or {}).get("color")
+        if other is None or color is None:
+            continue
+        robot = sight.robot_pixels(other, state, own=_WRISTS.get(name))
+        masks = []
+        if text_prompt:
+            res = sam3.segment(color, text_prompt=text_prompt, min_score=min_score)
+            if res.found:
+                masks.append(np.asarray(res.mask, dtype=bool))
+        tried: list[tuple[int, int]] = []
+        if len(spots):
+            r, c, depth = other.project(spots)
+            for ri, ci, di in zip(r, c, depth, strict=True):
+                at = (int(round(float(ri))), int(round(float(ci))))
+                inside = 0 <= at[0] < other.shape[0] and 0 <= at[1] < other.shape[1]
+                if di <= 0.02 or not inside or robot[at]:
+                    continue
+                if any(abs(at[0] - a) + abs(at[1] - b) < SEED_APART_PX for a, b in tried):
+                    continue
+                if any(m[at] for m in masks):
+                    continue  # the mask there is already a candidate
+                tried.append(at)
+                res = sam3.segment(color, point=[at[0], at[1]], min_score=min_score)
+                if res.found:
+                    masks.append(np.asarray(res.mask, dtype=bool))
+        if masks:
+            others.append([sight.Sight(other, m, robot) for m in masks])
+    key = " ".join(str(text_prompt or "").lower().split())
+    known = _heights(primitives).get(key) if key else None
+    res = sight.measure(first, others, known=known)
+    if res is None:
+        return None, seen
+    seen["views"] = int(res["views"])
+    if res["views"] == 1 and not res.get("remembered"):
+        # one camera, nothing to check it against: has the robot got in front of the object?
+        outline = sight.robot_pixels(view, state, own=_WRISTS.get(camera), scale=1.0, between=False)
+        if _behind_robot(np.asarray(mask, dtype=bool), outline):
+            if res.get("outgrown"):
+                # two cameras measured it taller than what shows now: the rest is behind the arm
+                seen["hidden"] = (
+                    "the robot's arm hides part of it now (move the arm away and locate again)"
+                )
+                return None, seen
+            seen["guess"] = (
+                "one camera sees it and the robot's arm is in front of part of it: its size and "
+                "place may be off (move the arm away and locate again)"
+            )
+            points = np.asarray(res["points"], dtype=np.float64)
+            return object_geometry(points), seen
+    if res["views"] >= 2:
+        rough = res["match"] is not None and res["match"] < ROUGH_MATCH
+        if key and not rough:
+            # only what the cameras agreed on well is kept: a rough reading (an object in the
+            # gripper read as a column down to the table) would spoil every later one
+            _heights(primitives)[key] = (float(res["height_m"]), str(res["kind"]), res["match"])
+        if rough:
+            seen["guess"] = (
+                "the cameras agree only roughly: its height may be centimetres off "
+                "(locate it again from above before a grasp)"
+            )
+    elif res.get("remembered"):
+        seen["guess"] = "its height as measured before"
+    else:
+        seen["guess"] = (
+            "one camera sees it: its height is a guess (locate it again from above before a grasp)"
+        )
+    points = np.asarray(res["points"], dtype=np.float64)
+    _scene(primitives, obs)["regions"].append(
+        {"camera": camera, "rows": res["rows"], "cols": res["cols"], "points": points}
+    )
+    return object_geometry(points), seen
+
+
+def probe(primitives: Any, row: int, col: int, camera: str = "cam_head") -> dict[str, Any]:
+    """The world point a pixel shows, without a depth image.
+
+    The object under the pixel is segmented from that pixel and measured as ``locate`` measures
+    one; the answer is where the pixel's ray meets it.  A pixel on nothing that stands out
+    (the table, or something too flat to measure) is where its ray meets the table.
+    """
+
+    obs = _obs(primitives)
+    cam = _camera(obs, camera)
+    if cam is None:
+        return {"error": f"camera {camera!r} not in observation"}
+    color = cam.get("color")
+    if color is None:
+        return {"error": "camera color image missing"}
+    state = _shown(obs)
+    view = _view(camera, state)
+    if view is None:
+        return {"error": f"no pose for camera {camera!r} in the state"}
+    row, col = int(row), int(col)
+    if not (0 <= row < view.shape[0] and 0 <= col < view.shape[1]):
+        return {
+            "error": f"pixel [{row}, {col}] is outside the {view.shape[0]} x {view.shape[1]} image"
+        }
+
+    def answer(xyz: np.ndarray, surface: str) -> dict[str, Any]:
+        depth = float(-((xyz - view.pos) @ view.rot)[2])
+        return {
+            "camera": camera,
+            "pixel": [row, col],
+            "world_xyz": [round(float(v), 4) for v in xyz],
+            "depth_m": round(depth, 4),
+            "surface": surface,
+        }
+
+    def on_table() -> dict[str, Any]:
+        xy, ok = view.on_plane(np.array([row]), np.array([col]), kin.TABLE_Z)
+        x, y = float(xy[0, 0]), float(xy[0, 1])
+        on = kin.TABLE_X[0] - 0.01 <= x <= kin.TABLE_X[1] + 0.01
+        on = on and kin.TABLE_Y[0] - 0.01 <= y <= kin.TABLE_Y[1] + 0.01
+        if not ok[0] or not on:
+            return {"error": "the pixel looks past the table: there is no depth image to say where"}
+        return answer(np.array([x, y, kin.TABLE_Z]), "table")
+
+    def in_region(region: dict[str, Any]) -> dict[str, Any] | None:
+        if region["camera"] != camera or len(region["rows"]) == 0:
+            return None
+        gap = (region["rows"] - row) ** 2 + (region["cols"] - col) ** 2
+        i = int(np.argmin(gap))
+        if gap[i] > PROBE_REACH_PX**2:
+            return None
+        if gap[i] == 0:
+            return answer(region["points"][i], "object")
+        # between measured pixels: this pixel's own ray, as far out as its neighbour's point
+        d = view.rays(np.array([row]), np.array([col]))[0]
+        depth = float(-((region["points"][i] - view.pos) @ view.rot)[2])
+        return answer(view.pos + d * depth, "object")
+
+    scene = _scene(primitives, obs)
+    for region in scene["regions"]:
+        hit = in_region(region)
+        if hit is not None:
+            return hit
+    for flat in scene.get("flat", ()):
+        if flat["camera"] == camera and flat["mask"][row, col]:
+            return on_table()
+    sam3 = getattr(primitives, "sam3_client", None)
+    if sam3 is None:
+        return on_table()
+    res = sam3.segment(color, point=[row, col], min_score=0.0)
+    mask = np.asarray(res.mask, dtype=bool) if res.found else None
+    if mask is None or not mask[row, col] or mask.sum() > PROBE_TABLE_SHARE * mask.size:
+        if mask is not None and mask[row, col]:
+            scene.setdefault("flat", []).append({"camera": camera, "mask": mask})
+        return on_table()
+    geo, _seen = _measure_in_colour(primitives, obs, camera, mask, None, 0.0)
+    if geo is not None:
+        hit = in_region(scene["regions"][-1])
+        if hit is not None:
+            return hit
+    scene.setdefault("flat", []).append({"camera": camera, "mask": mask})
+    return on_table()
+
+
+probe._readonly = True  # type: ignore[attr-defined]
+
+
+def back_project(primitives: Any, row: int, col: int, camera: str = "cam_head") -> dict[str, Any]:
+    """The world point a pixel shows: through the depth image where there is one.
+
+    With depth it is RPent's ``back_project`` (the same projection, the same answer and the
+    same errors), for a host that runs without RPent; without depth it is :func:`probe`.
+    """
+
+    obs = _obs(primitives)
+    cam = _camera(obs, camera)
+    if cam is None:
+        return {"error": f"camera {camera!r} not in observation"}
+    if colour_only(primitives, cam):
+        return probe(primitives, row, col, camera)
+    depth = depth_image(cam)
+    k = np.asarray(cam.get("intrinsic_matrix"), dtype=np.float64)
+    t = np.asarray(extrinsic_of(cam), dtype=np.float64)
+    if k.shape != (3, 3) or t.shape != (4, 4):
+        return {"error": f"calibration missing/invalid: K={k.shape} T={t.shape}"}
+    h, w = int(depth.shape[0]), int(depth.shape[1])
+    row, col = int(row), int(col)
+    if not (0 <= row < h and 0 <= col < w):
+        return {"error": f"pixel out of range: row 0..{h - 1}, col 0..{w - 1}"}
+    d = float(depth[row, col])
+    if not math.isfinite(d) or d <= 0:
+        return {"error": f"invalid depth at pixel: {d}"}
+    points, _valid = world_points(cam, np.array([row]), np.array([col]))
+    return {
+        "camera": camera,
+        "pixel": [row, col],
+        "depth_m": round(d, 4),
+        "world_xyz": [round(float(v), 4) for v in points[0]],
+    }
+
+
+back_project._readonly = True  # type: ignore[attr-defined]
 
 
 def locate(
@@ -684,7 +1192,8 @@ def locate(
 
     if not isinstance(text_prompt, str) or not text_prompt.strip():
         return {"error": "text_prompt must be a non-empty string"}
-    cam = _camera(_obs(primitives), camera)
+    obs = _obs(primitives)
+    cam = _camera(obs, camera)
     if cam is None:
         return {"error": f"camera {camera!r} not in observation"}
     color = cam.get("color")
@@ -706,12 +1215,43 @@ def locate(
         "area_px": int(mask.sum()),
         "centroid_rc": [int(rows.mean()), int(cols.mean())] if len(rows) else None,
     }
+    if colour_only(primitives, cam):
+        view = _view(camera, _shown(obs))
+        if view is not None:
+            outline = sight.robot_pixels(
+                view, _shown(obs), own=_WRISTS.get(camera), scale=1.0, between=False
+            )
+            share = float(outline[mask].mean()) if mask.any() else 0.0
+            if share > 0:
+                out["robot_px_fraction"] = round(share, 3)
+            if share >= ROBOT_MASK_SHARE and float(res.score) < ROBOT_MASK_SCORE:
+                out["views"] = 1
+                out["geometry_error"] = "the mask lies on the robot's own arm or gripper"
+                return out
+        geo, seen = _measure_in_colour(primitives, obs, camera, mask, text_prompt, float(min_score))
+        out["views"] = seen["views"]
+        if seen.get("guess"):
+            out["height_guess"] = seen["guess"]
+        if geo is None:
+            out["geometry_error"] = (
+                seen.get("hidden") or "too little of it above the table (flat, far or hidden)"
+            )
+            return out
+        x, y = float(geo["center_xyz"][0]), float(geo["center_xyz"][1])
+        if not (
+            kin.TABLE_X[0] - OFF_TABLE_M <= x <= kin.TABLE_X[1] + OFF_TABLE_M
+            and kin.TABLE_Y[0] - OFF_TABLE_M <= y <= kin.TABLE_Y[1] + OFF_TABLE_M
+        ):
+            out["geometry_error"] = "what the mask shows is not on the table"
+            return out
+        out.update(geo)
+        return out
     try:
         points, _valid = world_points(cam, rows, cols)
     except Exception as exc:  # noqa: BLE001 - a missing depth image is a result, not a crash
         out["geometry_error"] = f"no depth: {exc}"
         return out
-    on_robot = _on_robot(_obs_state(primitives), points)
+    on_robot = _on_robot(_shown(obs), points)
     if on_robot.any():
         out["robot_px_fraction"] = round(float(on_robot.mean()), 3)
         points = points[~on_robot]
@@ -781,6 +1321,19 @@ SPECS: dict[str, dict[str, Any]] = {
             "required": ["text_prompt"],
         },
     },
+    "back_project": {
+        "name": "back_project",
+        "description": "The world point a pixel shows: on the object under it, else on the table.",
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "row": {"type": "integer"},
+                "col": {"type": "integer"},
+                "camera": {"type": "string"},
+            },
+            "required": ["row", "col"],
+        },
+    },
     "home": {
         "name": "home",
         "description": "Return one arm or both to the joint angles the episode started with; "
@@ -816,16 +1369,22 @@ def register(toolkit: Any) -> None:
 
 
 __all__ = [
-    "FULL_GAP_M",
+    "GRIP_SPAN_M",
+    "GRIP_ZERO_M",
     "HOLD_MIN_OPENING",
     "HOME_MAX_ACTIONS",
     "HOME_TOL_RAD",
     "SPECS",
+    "back_project",
+    "colour_only",
+    "depth_image",
+    "extrinsic_of",
     "grip",
     "home",
     "locate",
     "move_pose",
     "object_geometry",
+    "probe",
     "register",
     "world_points",
 ]

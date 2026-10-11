@@ -140,8 +140,11 @@ verified with the PyPI release, so pin it afterwards: `uv pip install
   `python -m pyrualean.hosts.robodojo_env_server`, which attaches the eval
   client's three steps to the runtime's classes in memory, only for a task
   that has such an arm, and then runs the server script unchanged; nothing
-  installed is modified.  `ROBODOJO_SUPPORT_ARM=upstream` runs RPent's server
-  as it is.
+  installed is modified.  It also gives the environment the `eval_seed` the
+  evaluation client's environment has (the layout set):
+  `imitate_sorting_sequence` reads it to find its demonstrator's trajectory,
+  and without it that task's first reset failed and its env server never
+  listened.  `ROBODOJO_SUPPORT_ARM=upstream` runs RPent's server as it is.
 - What RoboDojo scores.  A task's `run_reward` registers checks that are
   latched: the task is solved at the first native action at which they all
   hold.  45 of the 54 tasks include `all_robot_back_to_origin` (both
@@ -174,12 +177,23 @@ compose from the others is a primitive.
   something, never.
 - `set_gripper(arm, command, opening=None)` repeats the command until the
   fingers stop, reports whether something stopped them apart and how wide it
-  is, and opens part way with `opening`.  `KEEP` in a motion re-commands the
-  last command, so a held object stays squeezed.
+  is, and opens part way with `opening`.  The width is 0.0023 m + 0.1091 m x
+  the measured opening, fitted in the simulator to cubes of 3.0 and 3.5 cm
+  held across two faces and across the diagonal and to an 8 cm bottle (all
+  within 0.5 mm); the fingers' 0.088 m of travel in the URDF is not the span.
+  `KEEP` in a motion re-commands the last command, so a held object stays
+  squeezed.
 - `locate(text)` measures an object from its SAM3 mask and the depth image
   (centre, top, footprint, heading and the yaw of a top grasp across it);
-  mask pixels on the robot's own arm are dropped.  No other call exposes the
-  depth image.
+  mask pixels on the robot's own arm, its gripper's rail and its fingers are
+  dropped.  The head camera sees an object's top and its near side, so the
+  footprint counts each 2 mm cell once, lies along the principal axes when it
+  is clearly longer one way and along the smallest rectangle otherwise (a
+  cube), and a slice that is a circular arc counts as the whole circle (a
+  bottle's far side).  Against the true poses of 129 objects in 20 scenes
+  the centre is 1.7 mm off in the median and a cube's grasp yaw 0 degrees
+  (3.6 mm and 40 degrees when every pixel counted and the principal axes
+  were always taken).  No other call exposes the depth image.
 - `home(arm)` lifts a low grasp point 6 cm, then commands the joint angles the
   episode started with.
 - A twist is a `move_to` with another `roll`; a button press is a `move_to`
@@ -209,8 +223,9 @@ The rows with the policy were measured with the policy wrapper feeding the
 checkpoint its own channel order.  Cell by cell the policy adds nothing on
 average to these primitives (76 against 75 on the 157 cells scored in both;
 19 cells solved only with it, 18 only without).  Episodes that did not boot are not scored
-(`imitate_sorting_sequence` never boots within 900 s).  37 of the 53 tasks
-that boot were solved at least once.
+(`imitate_sorting_sequence` did not boot in any of these sweeps: its reset
+failed for want of `eval_seed`; it boots since, and has not been run with a
+model yet).  37 of the 53 tasks that booted were solved at least once.
 
 `runs/_empty-memory*/` are empty memory corpora for RPent's local memory
 profile (`--memory-profile local --memory-dir runs/_empty-memory`, one per

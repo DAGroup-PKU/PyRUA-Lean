@@ -181,14 +181,20 @@ def api_reference(
     # section below) and ``ClassVar``-annotated configuration are not
     # constants the policy needs.
     hidden = set(vars(RobotBase)) | {"RESULT_TYPES"} | set(vla_members)
-    hidden |= {
-        name
-        for name, annotation in inspect.get_annotations(robot_cls).items()
-        if str(annotation).replace("typing.", "").startswith("ClassVar")
-    }
+    # A robot class may build on another robot's (the same robot on another host): what it
+    # inherits from that one is as much its API as what it defines itself.
+    lineage = [cls for cls in reversed(robot_cls.__mro__) if not issubclass(RobotBase, cls)]
+    defined: dict[str, Any] = {}
+    for cls in lineage:
+        hidden |= {
+            name
+            for name, annotation in inspect.get_annotations(cls).items()
+            if str(annotation).replace("typing.", "").startswith("ClassVar")
+        }
+        defined.update(vars(cls))
     constants = [
         f"{var}.{name} = {value!r}"
-        for name, value in vars(robot_cls).items()
+        for name, value in defined.items()
         if name.isupper() and not name.startswith("_") and name not in hidden
     ]
     if constants:

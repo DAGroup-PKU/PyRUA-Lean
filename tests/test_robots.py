@@ -56,7 +56,14 @@ def test_registry_knows_libero_and_lists_the_other_robots():
     assert isinstance(adapter, RobotAdapter)
     assert adapter.robot_cls is LiberoRobot and adapter.knowledge == "libero"
     assert adapter.cameras == ("agentview", "wrist")
-    assert ROBOTS == ("libero", "robocasa", "robotwin", "robodojo")
+    assert ROBOTS == (
+        "libero",
+        "robocasa",
+        "robotwin",
+        "robodojo",
+        "robodojo_xpl",
+        "robodojo_xpl_rgb",
+    )
     with pytest.raises(ValueError):
         get_adapter("nao")
 

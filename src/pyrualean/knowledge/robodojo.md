@@ -113,10 +113,12 @@
   read 1.0 when open and 0.0 when closed on nothing.
 - `set_gripper(arm, command)` runs a full stroke (repeats the command until
   the fingers stop, 2 to 10 native actions) without moving the arms.  After a
-  close, `holding` says the fingers stopped on something and `width_m`
-  roughly how far apart (opening x 0.088 m; a 4 cm block gripped square read
-  0.038 m, gripped off-centre less).  `set_gripper(arm, robo.OPEN,
-  opening=0.5)` opens only to that fraction of the 8.8 cm gap: to reach
+  close, `holding` says the fingers stopped on something (anything thicker
+  than about 3 mm) and `width_m` how wide it is across the fingers
+  (0.002 m + 0.109 m x opening: a 3.5 cm block reads 0.035 held across two
+  faces and 0.049 across its diagonal; within 1 mm on things from 3 to 8 cm).
+  `set_gripper(arm, robo.OPEN, opening=0.5)` opens only that far: something
+  0.002 + 0.109 x opening metres wide then just fits (0.5: 5.7 cm), to reach
   between close neighbours (slices in a rack, tools in a tray) without
   catching them.
 - The fingers are position-controlled: the squeeze grows with how far the
@@ -135,7 +137,7 @@
 - A top grasp with these tools: `locate` the object; `set_gripper(arm, OPEN)`;
   `move_to` above it pointing down (`pitch=90, yaw=grasp_yaw`, 6-8 cm above
   `top_z`); descend with `path="line"` until the pads cover the top part of
-  the object (a 4 cm block: grasp point about 1.8 cm below its top);
+  the object (a 3.5 cm block: grasp point about 1.8 cm below its top);
   `set_gripper(arm, CLOSE)`; lift with `path="line"`; confirm.  A side grasp
   of an upright object: level (`pitch=0, roll=0`: the fingers close
   horizontally), `yaw` pointing from the arm's base at the object, grasp
@@ -184,11 +186,18 @@
   cameras show what an arm is about to grasp or is holding.
 - `locate(text, camera)` segments the object and measures it in 3D from the
   depth image: `center_xyz` (footprint centre, half its height), `top_z`,
-  `height_m`, the footprint `length_m` x `width_m`, its long axis
-  `long_axis_deg` (from +x) and `grasp_yaw`, the `yaw` that closes pointing-
-  down fingers across its narrow side.  It measures only what the camera sees:
-  a partly hidden object measures smaller, and a hollow one (bowl, bin) gives
-  its rim as `top_z`.  Nothing moves.
+  `height_m`, the footprint `length_m` x `width_m` (the smallest rectangle
+  around it), its long axis `long_axis_deg` (from +x) and `grasp_yaw`, the
+  `yaw` that closes pointing-down fingers across its narrow side (a cube's:
+  across two faces).  `center_xyz` is the middle of that rectangle: a handle,
+  a spout or a tail belongs to the footprint and pulls the middle away from
+  the body's (a piggy bank's by 1.2 cm, a mug's by about 1 cm).  It measures
+  what the camera sees, and fills in the far side of an object that is round
+  about an upright axis (a bottle, a cup) from the arc that is seen; what
+  other things or the robot's own gripper hide is not measured, so a partly
+  hidden object measures smaller and off-centre (move the arm away, or
+  measure from a wrist camera).  A hollow one (bowl, bin) gives its rim as
+  `top_z`.  Nothing moves.
 - `segment` + `back_project` give one mask and one surface point (pass the
   mask's `centroid` with the SAME camera); use them for a pixel that `locate`
   does not cover, e.g. a spot on the table.
@@ -211,6 +220,9 @@
   task-success flag.  Judge progress from the images and the robot state,
   and say so when you cannot tell.
 - Grasp: the target leaves its place and moves with the arm.
+- An amount the instruction names ("lift it by 10 cm") is measured on the
+  object, not on the gripper: a held object sags and slips a little in the
+  fingers.  Go 2-3 cm beyond the amount asked.
 - Transport: the hold stays stable through the lift and the lateral move.
 - Placement: the object rests where the instruction wants it after the
   gripper has opened and the arm has withdrawn; an object on a rim or beside

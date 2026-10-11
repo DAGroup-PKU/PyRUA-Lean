@@ -22,7 +22,14 @@ import importlib
 from dataclasses import dataclass
 from typing import Any
 
-ROBOTS: tuple[str, ...] = ("libero", "robocasa", "robotwin", "robodojo")
+ROBOTS: tuple[str, ...] = (
+    "libero",
+    "robocasa",
+    "robotwin",
+    "robodojo",
+    "robodojo_xpl",
+    "robodojo_xpl_rgb",
+)
 
 
 @dataclass(frozen=True)

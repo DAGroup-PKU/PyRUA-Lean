@@ -56,6 +56,33 @@ GUIDE_NAMES = ("strict_hybrid_guide.md", "pro_hybrid_guide.md", "env_calibration
 RUNTIMES = ("codex", "claude", "openai")
 
 
+def _recordable(options: dict[str, Any]) -> dict[str, Any]:
+    """What of a host's boot options ``result.json`` can hold: live objects by their type."""
+
+    kept: dict[str, Any] = {}
+    for key, value in options.items():
+        try:
+            json.dumps(value)
+        except (TypeError, ValueError):
+            kept[key] = f"<{type(value).__name__}>"
+        else:
+            kept[key] = value
+    return kept
+
+
+def _conclude(backend: Any) -> None:
+    """Tell a backend that the policy has finished, where it wants to know.
+
+    RPent's toolkits can be asked for the verdict at any time.  A host that runs a benchmark's
+    own evaluation loop (RoboDojo's client) lets that loop judge the scene once, when the
+    policy is done: its backend has ``conclude()``.
+    """
+
+    conclude = getattr(backend, "conclude", None)
+    if callable(conclude):
+        conclude()
+
+
 def _make_backend(host: Any, toolkit: Any) -> Any:
     """The host's own backend when it defines ``make_backend``, else :class:`RpentBackend`."""
 
@@ -557,11 +584,12 @@ def play_episode(
     arm_toolkit: ArmToolkit | None = None
     try:
         toolkit, daemons = host.boot(cell, out_dir, rpent_root=rpent_root, **boot_options)
-        result["host"]["boot_options"] = boot_options
+        result["host"]["boot_options"] = _recordable(boot_options)
         if runtime == "codex":
             result["host"]["codex_context"] = _codex_context_config(codex_home)
         result["host"]["sandbox"] = SANDBOX_DESCRIPTION
-        result["host"]["rpent_root"] = str(resolve_rpent_root(rpent_root))
+        with contextlib.suppress(FileNotFoundError):  # a host that runs nothing of RPent's
+            result["host"]["rpent_root"] = str(resolve_rpent_root(rpent_root))
         result["startup_s"] = time.perf_counter() - started
         backend = _make_backend(host, toolkit)
         card = host.dump_card(toolkit, cell, out_dir)
@@ -666,6 +694,9 @@ def play_episode(
                     out_dir=out_dir,
                     arm=arm,
                     on_timeout=lambda: robo._stop_episode("timeout"),
+                    # a backend whose environment somebody else owns says when that owner
+                    # has ended the episode
+                    should_stop=getattr(backend, "episode_over", None),
                     **(openai_options or {}),
                 )
                 status, returncode = generation["status"], generation["returncode"]
@@ -770,6 +801,7 @@ def play_episode(
                 f"{len(arm_toolkit.sandbox_flags)} cell(s) raised sandbox audit flags; "
                 "see tool_turns.json"
             )
+        _conclude(backend)
         result["environment_success"] = bool(backend.solved())
         if (
             status == "completed"

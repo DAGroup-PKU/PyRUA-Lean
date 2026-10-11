@@ -1416,6 +1416,30 @@ def test_tasks_without_a_third_arm_run_as_before(monkeypatch):
     assert native.env.pushed == [[{"left_arm": [0.1]}] * 3]
 
 
+def test_collect_env_gets_the_eval_seed_its_seed_manager_chose(monkeypatch):
+    # imitate_sorting_sequence reads env.eval_seed to find its demonstrator's trajectory; the
+    # collect client's environment has none, and the reset then dies before the server listens.
+    import types
+
+    bridge, collect = _fake_bridge(monkeypatch)
+    init = bridge.NativeEnv.__init__
+
+    def init_with_seed_manager(self, task_config):
+        init(self, task_config)
+        self.env.seed_manager = types.SimpleNamespace(eval_seed=2)
+
+    bridge.NativeEnv.__init__ = init_with_seed_manager
+    support_arm.install(bridge)
+    assert bridge.NativeEnv({}).env.eval_seed == 2
+
+    kept = types.SimpleNamespace(eval_seed=1, seed_manager=types.SimpleNamespace(eval_seed=2))
+    support_arm._give_eval_seed(kept)  # the evaluation client's own value is left alone
+    assert kept.eval_seed == 1
+    bare = types.SimpleNamespace()
+    support_arm._give_eval_seed(bare)
+    assert bare.eval_seed == 0
+
+
 def test_host_starts_the_env_server_through_this_library(monkeypatch):
     import sys
     import types

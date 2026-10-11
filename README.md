@@ -87,6 +87,8 @@ calls, the token usage and the benchmark's own verdict.
 | `robotwin` | RoboTwin 2.0 | two arms; LingBot-VLA |
 | `robocasa` | RoboCasa365 | mobile manipulator; RLDX-1 VLA, navigation |
 | `robodojo` | RoboDojo | two ARX-X5 arms; this library's own full-pose motion (IK in the host), gripper and 3D-perception primitives, the Pi0.5 task policy, SAM3 (experimental, as in RPent; the benchmark reports no success during an episode) |
+| `robodojo_xpl` | RoboDojo, under its own evaluation client | the `robodojo` robot (same API, tools and knowledge file) served to RoboDojo's client as an [XPolicyLab](https://github.com/XPolicyLab/XPolicyLab) policy ([integrations/xpolicylab/PyRUA_Lean](integrations/xpolicylab/PyRUA_Lean)): the client owns the simulator and gives the verdict; it must send the depth image and camera matrices (the host switches them on in the client it starts); no RPent runtime, no VLA (`--primitives no-vla`) |
+| `robodojo_xpl_rgb` | the same, on the client's default observation | perception from the three colour images alone (the default configuration sends no depth image): an object is measured from its masks in the cameras that see it |
 
 [docs/multi-robot.md](docs/multi-robot.md) is the contract for adding a robot.
 

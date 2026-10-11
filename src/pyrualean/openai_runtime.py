@@ -282,6 +282,7 @@ def run_openai_agent(
     transport: Transport | None = None,
     on_timeout: Callable[[], None] | None = None,
     sleep: Callable[[float], None] = time.sleep,
+    should_stop: Callable[[], bool] | None = None,
 ) -> dict[str, Any]:
     """Run one episode's agent loop; returns the ``generation`` record.
 
@@ -296,6 +297,10 @@ def run_openai_agent(
     which small thinking models need (they otherwise think and emit nothing).
     ``image_max_side`` downscales every image the model receives (0 keeps the
     native 1024 px that the prompt's pixel coordinates refer to).
+    ``should_stop`` is asked between requests, between retries and during a rate
+    limit's wait: once it answers true the loop ends there (``completed``) without
+    another request.  It is how a host says that whoever owns the environment has
+    ended the episode, so that nothing the model could still write would count.
     """
 
     out_dir = Path(out_dir)
@@ -370,6 +375,22 @@ def run_openai_agent(
     def remaining() -> float:
         return budget_s - (time.perf_counter() - started)
 
+    def over() -> bool:
+        return bool(should_stop is not None and should_stop())
+
+    def wait(seconds: float) -> None:
+        """Sleep, in slices short enough to notice that the episode has been ended."""
+
+        if should_stop is None:
+            sleep(seconds)
+            return
+        until = time.perf_counter() + seconds
+        while not over():
+            left = until - time.perf_counter()
+            if left <= 0:
+                break
+            sleep(min(1.0, left))
+
     def chat() -> dict[str, Any] | None:
         """One chat request with retries; ``None`` when the provider is down for good."""
 
@@ -391,7 +412,7 @@ def run_openai_agent(
         while True:
             attempt += 1
             left = remaining()
-            if left <= 0:
+            if left <= 0 or over():
                 return None
             t0 = time.perf_counter()
             try:
@@ -420,8 +441,8 @@ def run_openai_agent(
                     warnings.append(message)
                 limited += 1
                 attempt -= 1
-                wait = min(RATE_LIMIT_MAX_WAIT_S, 5.0 * 2.0 ** min(limited - 1, 5))
-                sleep(max(0.0, min(wait * (0.5 + random.random()), remaining())))
+                pause = min(RATE_LIMIT_MAX_WAIT_S, 5.0 * 2.0 ** min(limited - 1, 5))
+                wait(max(0.0, min(pause * (0.5 + random.random()), remaining())))
                 continue
             # 4xx other than 408/429 is our fault (bad request, context overflow): no retry.
             retryable = code in (0, 408, 409, 425) or code >= 500
@@ -432,20 +453,24 @@ def run_openai_agent(
                 return None
             # Recovered by a retry: recorded, but not held against the episode.
             warnings.append(message)
-            sleep(max(0.0, min(60.0, 2.0 * attempt, remaining())))
+            wait(max(0.0, min(60.0, 2.0 * attempt, remaining())))
 
     try:
         while True:
             if remaining() <= 0:
                 status, returncode = "timeout", None
                 break
+            if over():
+                break  # the episode was ended from outside: nothing more to write
             if arm_toolkit.turn_budget_exhausted and arm_toolkit.finish is None:
                 if post_budget_replies <= 0:
                     break
                 post_budget_replies -= 1
             response = chat()
             if response is None:
-                if remaining() <= 0:
+                if over():
+                    pass  # ended from outside while a request was being retried
+                elif remaining() <= 0:
                     status, returncode = "timeout", None
                 else:
                     status, returncode = "error", 2

@@ -27,6 +27,7 @@ import time
 from pathlib import Path
 
 from pyrualean.hosts import robodojo_kinematics as kin
+from pyrualean.hosts import robodojo_tools as tools
 from pyrualean.hosts import rpent_robodojo as host
 
 ap = argparse.ArgumentParser(
@@ -223,7 +224,7 @@ try:
                 or again.get("top_z", 0) > top + 0.05
             )
         )
-        lifted = bool(g.get("holding") and opening > 0.05 and moved)
+        lifted = bool(g.get("holding") and opening > tools.HOLD_MIN_OPENING and moved)
         rec.update(
             above=above.get("reached"),
             down=down.get("reached"),

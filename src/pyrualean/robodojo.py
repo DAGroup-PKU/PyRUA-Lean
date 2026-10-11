@@ -85,7 +85,8 @@ class ArmState:
     eef_pos: position of the end-effector link (the wrist flange), metres.
     eef_quat: end-effector orientation as a unit quaternion [w, x, y, z].
     gripper: measured gripper opening, normalised: 1.0 = open, 0.0 = closed on
-        nothing; closed on an object it reads the object's width / 0.088 m.
+        nothing; closed on an object 0.002 + 0.109 x this reading is the
+        object's width in metres.
         (Gripper COMMANDS use the opposite sign convention: see ``set_gripper``.)
     joints: the six arm joint angles, radians (the last turns the fingers about
         the pointing direction).
@@ -198,11 +199,11 @@ class Gripper:
     commanded: ``"closed"`` or ``"open"``.
     opening: the opening once the fingers stopped (1.0 = open, 0.0 = closed on
         nothing).
-    holding: after a close, the fingers stopped apart: something is between
-        them.  It does not say what: check that the intended object moves with
-        the arm.
-    width_m: after a close, the gap between the fingers (the held object's
-        width across the fingers), else None.
+    holding: after a close, the fingers stopped apart (an opening above 0.01,
+        about 3 mm): something is between them.  It does not say what: check
+        that the intended object moves with the arm.
+    width_m: after a close, the width of what is held, across the fingers
+        (0.0 when nothing is), else None.
     steps_used: native actions consumed.
     step / step_limit: native actions executed so far and the episode budget
         (None if the runtime did not report them).
@@ -294,24 +295,30 @@ class ObjectPose:
     """Outcome of ``locate``: an object measured from its mask and the depth image.
 
     found: SAM3 produced a mask scoring at least ``min_score``.
-    center_xyz: [x, y, z] of the middle of the object's footprint, at half its
-        height above the table, metres.  None when no 3D measurement was
+    center_xyz: [x, y, z] of the middle of the smallest rectangle around the
+        object's footprint, at half its height above the table, metres.  A
+        handle, a spout or a tail is part of the footprint and moves the
+        middle away from the body's.  None when no 3D measurement was
         possible (see ``note``).
     top_z: height of the object's top surface (the highest points seen).
     height_m: ``top_z`` above the table surface (0.765 m).
-    length_m / width_m: the footprint along its long and short sides.
+    length_m / width_m: the long and the short side of the smallest rectangle
+        around the footprint.
     long_axis_deg: direction of the long side on the table, degrees from +x
-        (-90 .. 90).
+        (-90 .. 90); of a square, one of its sides.
     grasp_yaw: the ``yaw`` for ``move_to(..., pitch=90, yaw=grasp_yaw)``:
-        pointing straight down, the fingers then close across the short side.
+        pointing straight down, the fingers then close across the short side
+        (a cube's: across two faces).
     score: SAM3 confidence.
     centroid: (row, col) of the mask in the image, as ``Segment.centroid``.
     area_px: mask pixels.
     camera: the camera measured from.
     note: why there is no 3D measurement (a flat object, no depth), else None.
 
-    The camera sees the top and the near side: an object's far side and the
-    parts hidden behind other things are not measured, so a footprint can be
+    The camera sees the top and the near side.  The far side of an object that
+    is round about an upright axis (a bottle, a cup) is filled in from the arc
+    that is seen; the far side of anything else, and what other things or the
+    robot's own gripper hide, is not measured, so such a footprint can be
     shorter than the object.  A held object is usually not found from the head
     camera.
     """
@@ -974,9 +981,10 @@ class RobodojoRobot(RobotBase):
         Args:
             arm: ``"left"`` or ``"right"``.
             gripper: ``robo.CLOSE`` (1) or ``robo.OPEN`` (-1).
-            opening: with ``robo.OPEN`` only: open to this fraction of the
-                full 0.088 m gap (0 < opening <= 1) instead of all the way,
-                e.g. to reach between close neighbours.
+            opening: with ``robo.OPEN`` only: open to this reading
+                (0 < opening <= 1) instead of all the way, e.g. to reach
+                between close neighbours.  Something 0.002 + 0.109 x opening
+                metres wide then just fits between the fingers.
         Returns:
             Gripper.  ``holding`` is not proof that the INTENDED object is
             held: confirm it moves with the arm (wrist camera, or ``locate``

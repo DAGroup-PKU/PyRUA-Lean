@@ -24,6 +24,12 @@ action's control sequence.  RPent's env server steps the simulator through the c
 ``src/collect_client/collect_env.py``), which does none of this: the opponent never plays and
 those tasks cannot be solved.  The same three steps are attached here, each only for a task that
 has such an arm, so every other task runs exactly as before.
+
+The evaluation client's environment also carries ``eval_seed``, the layout set it runs
+(``Eval_Layout/<benchmark>/<config>/<eval_seed>/``), and ``imitate_sorting_sequence`` reads it to
+find its demonstrator's trajectory.  The collect client's environment has no such attribute: that
+task's first reset raised ``AttributeError`` and its env server never listened.  The environment
+is given the value its seed manager already holds (``_give_eval_seed``).
 """
 
 from __future__ import annotations
@@ -64,6 +70,20 @@ def _take_turn(env: Any, env_idx: int = 0) -> None:
         env.check_support_arm_stable(env_idx=env_idx)
 
 
+def _give_eval_seed(env: Any) -> None:
+    """The layout set the environment was built on, where the evaluation client keeps it.
+
+    ``imitate_sorting_sequence`` loads its demonstrator's trajectory from
+    ``Traj/<benchmark>/<task>/<eval_seed>/<layout>.pkl`` when its checks are registered, reading
+    ``env.eval_seed``.  Only the evaluation client's environment has that attribute; on the
+    collect client the reset raises ``AttributeError`` and the env server never listens.  The seed
+    manager already holds the value: it chose the layout directory with it.
+    """
+
+    if env is not None and not hasattr(env, "eval_seed"):
+        env.eval_seed = getattr(getattr(env, "seed_manager", None), "eval_seed", 0)
+
+
 def _replaying(expand: Any) -> Any:
     """The control expansion, plus one queued step of the arm per substep.
 
@@ -100,6 +120,7 @@ def install(bridge: Any = None) -> None:
 
     def __init__(self: Any, task_config: dict) -> None:
         init(self, task_config)
+        _give_eval_seed(self.env)
         module = sys.modules.get(type(self.env).__module__)
         expand = getattr(module, "_expand_control_info", None)
         if expand is not None and not getattr(expand, MARK, False):

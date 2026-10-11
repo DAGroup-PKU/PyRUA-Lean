@@ -301,6 +301,43 @@ def test_rate_limits_are_waited_out_beyond_the_retries(robo, tmp_path, card_imag
     assert waits == [5.0, 10.0, 20.0, 40.0, 80.0, 120.0, 120.0, 120.0]
 
 
+def test_an_episode_ended_from_outside_gets_no_further_request(robo, tmp_path, card_images):
+    """Whoever owns the environment has ended the episode: the next request would be for nothing."""
+
+    toolkit = _toolkit(robo, tmp_path)
+    transport = ScriptedTransport(
+        [_reply([("c1", "python", {"code": "print(robo.state())"})])]  # and nothing after it
+    )
+    generation = _run(
+        toolkit, transport, tmp_path, card_images, should_stop=lambda: len(toolkit.turns) >= 1
+    )
+    assert generation["status"] == "completed" and generation["errors"] == []
+    assert generation["requests"] == 1 and toolkit.finish is None
+
+
+def test_a_rate_limit_wait_ends_when_the_episode_is_ended(robo, tmp_path, card_images, monkeypatch):
+    toolkit = _toolkit(robo, tmp_path)
+    monkeypatch.setattr(orun.random, "random", lambda: 0.5)  # no jitter
+    slept: list[float] = []
+    transport = ScriptedTransport([(429, "")])  # one refusal, then the episode is over
+    generation = orun.run_openai_agent(
+        "PROMPT TEXT",
+        card_images,
+        toolkit,
+        model="test-model",
+        base_url="http://provider.test/v1",
+        api_key="k",
+        max_turns=None,
+        budget_s=3600.0,
+        out_dir=tmp_path / "out",
+        transport=transport,
+        sleep=slept.append,
+        should_stop=lambda: len(slept) >= 2,  # ended two seconds into the five-second wait
+    )
+    assert generation["status"] == "completed" and generation["errors"] == []
+    assert generation["requests"] == 1 and len(slept) == 2 and max(slept) <= 1.0
+
+
 def test_client_error_is_not_retried(robo, tmp_path, card_images):
     toolkit = _toolkit(robo, tmp_path)
     transport = ScriptedTransport([(400, {"error": "context too long"})])
