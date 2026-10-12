@@ -1,25 +1,19 @@
-"""The directory RoboDojo's evaluation client runs from when PyRUA_Lean reads depth.
+"""A directory RoboDojo's evaluation client can run from, with depth switched on.
 
 What an observation holds is the client's configuration: ``env_cfg/<env_cfg_type>.yml`` sends
 three colour images and the robot's state, and a depth image and each camera's matrices where
 ``observation.vision`` switches them on (with the ``distance_to_image_plane`` capture of the
-camera file).  RoboDojo ships with them off.  PyRUA_Lean locates objects from the depth image,
-so its ``setup_eval_env_client.sh`` starts the client from a root of its own: RoboDojo's code
-and configuration copied (a few megabytes), those switches on in the copy, ``Assets`` and
-``eval_result`` linked back.  Nothing in the RoboDojo checkout is edited, and results land
-where they always do.
+camera file).  RoboDojo ships with them off.  The host of robot ``robodojo_xpl``
+(:mod:`.xpolicylab_robodojo`), which reads depth, starts the client it launches from a root
+of its own: RoboDojo's code and configuration copied (a few megabytes), those switches on in
+the copy, ``Assets`` linked.  Nothing in the RoboDojo checkout is edited.
 
-    python client_root.py <RoboDojo root> <new root> [--env-cfg arx_x5] [--deploy deploy.yml]
-
-prints the root to start the client from.  ``observation: rgb`` in ``deploy.yml`` leaves the
-client where it is: the RoboDojo root is printed and nothing is built (the client's default
-observation; the policy then works from the colour images alone).  Standard library and
-PyYAML only: this runs with the simulator's interpreter.
+The XPolicyLab adapter (``integrations/xpolicylab/PyRUA_Lean``) does not use this module: under
+RoboDojo's own entry point the client runs from the checkout, as it is configured.
 """
 
 from __future__ import annotations
 
-import argparse
 import os
 import shutil
 from pathlib import Path
@@ -28,8 +22,6 @@ from pathlib import Path
 SOURCE_PARTS = ("env", "src", "task", "utils", "scripts", "env_cfg")
 #: The cameras depth is rendered for, and the capture group they share.
 DEPTH_CAPTURES = ("common", "cam_head", "cam_left_wrist", "cam_right_wrist")
-POLICY_DIR = Path(__file__).resolve().parent
-OBSERVATIONS = ("rgbd", "rgb")
 _SKIP = shutil.ignore_patterns("__pycache__", "*.pyc")
 
 
@@ -76,15 +68,15 @@ def lay_out(
     """Build ``root`` from the RoboDojo checkout ``bench`` and return it.
 
     ``xpolicylab`` is the XPolicyLab checkout (default ``bench/XPolicyLab``): its own code is
-    copied, and of its policies only this one (``policy_dir``, default this file's
-    directory).  ``results`` is where ``eval_result`` points (default: a directory of
-    ``root``'s own).  Copies, not links: RoboDojo and XPolicyLab find ``env_cfg`` and
-    ``Assets`` by ``..`` from their own files, which from behind a link is the checkout.
+    copied, and of its policies only ``policy_dir`` (none when it is not given).  ``results``
+    is where ``eval_result`` points (default: a directory of ``root``'s own).  Copies, not
+    links: RoboDojo and XPolicyLab find ``env_cfg`` and ``Assets`` by ``..`` from their own
+    files, which from behind a link is the checkout.
     """
 
     root, bench = Path(root), Path(bench).resolve()
     xpolicylab = Path(xpolicylab).resolve() if xpolicylab else bench / "XPolicyLab"
-    policy_dir = Path(policy_dir).resolve() if policy_dir else POLICY_DIR
+    policy_dir = Path(policy_dir).resolve() if policy_dir else None
     root.mkdir(parents=True, exist_ok=True)
     for part in SOURCE_PARTS:
         if not (root / part).exists():
@@ -114,47 +106,9 @@ def lay_out(
     for entry in sorted((xpolicylab / "policy").iterdir()):
         if entry.is_file() and not (policies / entry.name).exists():  # __init__.py, lib.sh
             shutil.copy2(entry, policies / entry.name)
-    if not (policies / policy_dir.name).exists():
+    if policy_dir is not None and not (policies / policy_dir.name).exists():
         shutil.copytree(policy_dir, policies / policy_dir.name, ignore=_SKIP)
     return root
 
 
-def observation(deploy_yml: Path | None) -> str:
-    """``observation`` of the adapter's ``deploy.yml``: ``rgbd`` (the default) or ``rgb``."""
-
-    if deploy_yml is None or not Path(deploy_yml).is_file():
-        return "rgbd"
-    import yaml
-
-    cfg = yaml.safe_load(Path(deploy_yml).read_text(encoding="utf-8")) or {}
-    value = str(cfg.get("observation") or "rgbd").lower()
-    if value not in OBSERVATIONS:
-        raise SystemExit(f"{deploy_yml}: observation must be one of {OBSERVATIONS}, got {value!r}")
-    return value
-
-
-def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=(__doc__ or "").split("\n\n")[0])
-    parser.add_argument("bench", type=Path, help="the RoboDojo checkout (XPolicyLab inside)")
-    parser.add_argument("root", type=Path, help="the directory to build")
-    parser.add_argument("--env-cfg", default="arx_x5", help="env_cfg stem (default: arx_x5)")
-    parser.add_argument(
-        "--deploy", type=Path, default=POLICY_DIR / "deploy.yml", help="the adapter's deploy.yml"
-    )
-    args = parser.parse_args(argv)
-    if observation(args.deploy) == "rgb":
-        print(args.bench.resolve())
-        return 0
-    root = lay_out(
-        args.root,
-        args.bench,
-        depth=True,
-        env_cfg_type=args.env_cfg,
-        results=args.bench / "eval_result",
-    )
-    print(root.resolve())
-    return 0
-
-
-if __name__ == "__main__":
-    raise SystemExit(main())
+__all__ = ["DEPTH_CAPTURES", "SOURCE_PARTS", "lay_out", "with_depth"]

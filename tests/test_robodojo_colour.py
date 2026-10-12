@@ -575,7 +575,7 @@ def test_an_episode_under_the_adapter_runs_the_real_loop(monkeypatch, tmp_path):
     }
     (out,) = (tmp_path / "results").iterdir()  # under the directory the server started in
     result = json.loads((out / "result.json").read_text())
-    assert result["robot"] == "robodojo_xpl" and result["finish"]["status"] == "success"
+    assert result["robot"] == "robodojo_xpl_rgb" and result["finish"]["status"] == "success"
     assert result["host"]["boot_options"] == {"bridge": "<Bridge>"}
     assert result["environment_success"] is False and result["status"] == "completed"
     assert result["env_steps"] == task_env.take_action_cnt[0] > 0
@@ -659,7 +659,7 @@ def test_the_clients_trial_stands_when_the_verdict_cannot_be_delivered():
     assert not thread.is_alive() and task_env.end_flag == [True]  # judged, and no exception
 
 
-def test_the_adapter_picks_the_robot_by_what_the_client_sends(monkeypatch, tmp_path, capsys):
+def test_the_adapter_runs_the_colour_robot_whatever_the_client_sends(monkeypatch, tmp_path):
     from pyrualean import play
 
     robots: list[str] = []
@@ -672,19 +672,23 @@ def test_the_adapter_picks_the_robot_by_what_the_client_sends(monkeypatch, tmp_p
     monkeypatch.setattr(play, "play_episode", play_episode)
     module = _adapter_model(monkeypatch)
     cfg = {"poll_s": 0.05, "model": "some-model", "result_dir": tmp_path, "action_type": "joint"}
-    for scene, robot in ((DepthScene([CUBE]), "robodojo_xpl"), (Scene([CUBE]), "robodojo_xpl_rgb")):
-        model = module.Model({**cfg, "env_cfg_type": "arx_x5"})  # robot: auto is the default
+    # a depth image in the observation changes nothing: the adapter's robot does not read it
+    for scene in (DepthScene([CUBE]), Scene([CUBE])):
+        model = module.Model({**cfg, "env_cfg_type": "arx_x5"})
         model.reset()
         model.update_obs(scene.get_obs())
         model._episode.join(5.0)
-        assert robots[-1] == robot
-    assert "robot robodojo_xpl_rgb" in capsys.readouterr().out
-    # a robot that is named is the robot that runs, whatever the client sends
-    model = module.Model({**cfg, "robot": "robodojo_xpl_rgb"})
+        assert robots[-1] == "robodojo_xpl_rgb"
+    # the robot deploy.yml names is the robot that runs
+    import yaml
+
+    deploy = Path(module.__file__).with_name("deploy.yml")
+    assert yaml.safe_load(deploy.read_text())["robot"] == "robodojo_xpl_rgb"
+    model = module.Model({**cfg, "robot": "some_other_robot"})
     model.reset()
-    model.update_obs(DepthScene([CUBE]).get_obs())
+    model.update_obs(Scene([CUBE]).get_obs())
     model._episode.join(5.0)
-    assert robots[-1] == "robodojo_xpl_rgb"
+    assert robots[-1] == "some_other_robot"
     # what the kinematics do not drive is refused when the server starts, not mid-episode
     with pytest.raises(ValueError, match="six-joint"):
         module.Model({**cfg, "env_cfg_type": "franka"})
@@ -1169,26 +1173,33 @@ def test_the_host_picks_one_layout_the_way_xpolicylab_does(tmp_path):
         )
 
 
-def test_the_adapter_builds_the_clients_root_or_leaves_it_where_it_is(tmp_path, capsys):
+def test_a_root_with_depth_can_write_its_results_into_the_checkout(tmp_path):
+    import yaml
+
     from pyrualean.hosts import xpolicylab_robodojo as xhost
 
     source, top = _checkout(tmp_path)
     module = xhost.client_root()
-    rgb = tmp_path / "rgb.yml"
-    rgb.write_text("observation: rgb\n")
-    assert module.main([str(source), str(tmp_path / "unused"), "--deploy", str(rgb)]) == 0
-    assert capsys.readouterr().out.strip() == str(source.resolve())
-    assert not (tmp_path / "unused").exists()
-    # the adapter's own deploy.yml asks for depth: a root of its own, results in the checkout
-    assert module.main([str(source), str(tmp_path / "root")]) == 0
-    root = Path(capsys.readouterr().out.strip())
-    assert root == (tmp_path / "root").resolve() and (root / "eval_result").is_symlink()
+    root = module.lay_out(tmp_path / "root", source, results=source / "eval_result")
+    assert (root / "eval_result").is_symlink()
     assert (root / "eval_result").resolve() == (source / "eval_result").resolve()
-    import yaml
-
     vision = yaml.safe_load((root / "env_cfg" / "arx_x5.yml").read_text())["observation"]["vision"]
     assert vision["depth"] is True and vision["extrinsic_matrix"] is True
+    # no policy named: none is copied; RoboDojo's own tree is as it was
+    assert sorted(p.name for p in (root / "XPolicyLab" / "policy").iterdir()) == ["__init__.py"]
     assert yaml.safe_load((source / "env_cfg" / "arx_x5.yml").read_text()) == top
+
+
+def test_the_adapter_starts_the_client_as_robodojo_configures_it():
+    """The submitted directory holds nothing that changes what the client sends."""
+
+    adapter = Path(__file__).resolve().parents[1] / "integrations/xpolicylab/PyRUA_Lean"
+    assert not (adapter / "client_root.py").exists()
+    client = (adapter / "setup_eval_env_client.sh").read_text()
+    assert "env_cfg" not in client.replace("env_cfg_type", "") and "client_root" not in client
+    import yaml
+
+    assert "observation" not in yaml.safe_load((adapter / "deploy.yml").read_text())
 
 
 def test_a_late_picture_gets_the_camera_pose_it_was_taken_from():

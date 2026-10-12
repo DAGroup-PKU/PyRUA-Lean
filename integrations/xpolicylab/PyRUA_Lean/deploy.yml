@@ -11,16 +11,10 @@ action_type: joint
 gpu_id: null
 eval_batch: false
 
-# What the evaluation client sends besides the colour images and the robot's state.
-#   rgbd  setup_eval_env_client.sh starts the client from a copy of RoboDojo's configuration
-#         with the depth image and the camera matrices switched on (client_root.py; the
-#         RoboDojo checkout is not edited)
-#   rgb   RoboDojo's default observation
-observation: rgbd
-# The robot the programs are written against, as `pyrualean play --robot` names it.
-#   auto  robodojo_xpl when the observation holds a depth image and the camera matrices,
-#         robodojo_xpl_rgb (colour images only) when it does not
-robot: auto
+# The robot the programs are written against, as `pyrualean play --robot` names it:
+# RoboDojo's default observation, three colour images and the robot's state.  A depth image
+# or camera matrices, should a client send them, are not read.
+robot: robodojo_xpl_rgb
 primitives: no-vla
 
 # The agent that writes the programs: an OpenAI-compatible chat endpoint (OPENAI_BASE_URL,

@@ -15,10 +15,9 @@ state; a depth image and the camera matrices where its config switches them on, 
 host does for the client it starts) and counts the task's own action budget; a policy server
 answers ``update_obs`` / ``get_action``.  This host is the policy server.  :func:`boot`
 
-*   builds the directory the client runs from, with the adapter's own ``client_root.py``
-    (``integrations/xpolicylab/PyRUA_Lean``, the directory a submission adds as
-    ``policy/PyRUA_Lean``): RoboDojo's code and configuration copied, XPolicyLab's code and
-    the adapter beside them, ``Assets`` linked;
+*   builds the directory the client runs from (:mod:`.robodojo_client_root`): RoboDojo's
+    code and configuration copied, XPolicyLab's code and the adapter
+    (``integrations/xpolicylab/PyRUA_Lean``) beside them, ``Assets`` linked;
 *   serves a :class:`.xpolicylab_bridge.Bridge` with XPolicyLab's policy server, in a thread;
 *   starts the evaluation client on one task and one layout (``scripts/eval_policy.sh``, the
     script RoboDojo's own CLI ends in), which connects to that server;
@@ -45,8 +44,6 @@ from __future__ import annotations
 
 import argparse
 import contextlib
-import functools
-import importlib.util
 import json
 import os
 import re
@@ -146,17 +143,12 @@ def adapter_dir() -> Path:
     raise FileNotFoundError(f"{ADAPTER_DIR} not found above {here}")
 
 
-@functools.lru_cache(maxsize=1)
 def client_root() -> Any:
-    """The adapter's ``client_root.py``: the one place that builds the client's directory."""
+    """:mod:`.robodojo_client_root`: the one place that builds the client's directory."""
 
-    path = adapter_dir() / "client_root.py"
-    spec = importlib.util.spec_from_file_location("pyrualean_xpolicylab_client_root", path)
-    if spec is None or spec.loader is None:  # pragma: no cover - a broken checkout
-        raise ImportError(f"cannot load {path}")
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
+    from . import robodojo_client_root
+
+    return robodojo_client_root
 
 
 def with_depth(env_cfg: Path, suite: str) -> None:

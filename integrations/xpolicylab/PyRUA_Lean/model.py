@@ -26,8 +26,8 @@ from pyrualean.hosts.xpolicylab_bridge import STATUS_KEY, Bridge
 
 #: What the kinematics behind ``robo`` drive: two six-joint arms, one gripper joint each.
 ARM_DIM, EE_DIM = [6, 6], [1, 1]
-#: ``robot: auto`` picks between these two by what the client's observation holds.
-DEPTH_ROBOT, COLOUR_ROBOT = "robodojo_xpl", "robodojo_xpl_rgb"
+#: The robot of this adapter: colour images and the robot's state, no depth image.
+ROBOT = "robodojo_xpl_rgb"
 
 
 def _hold(obs: dict[str, Any]) -> dict[str, list[float]]:
@@ -98,7 +98,7 @@ class Model(ModelTemplate):
             self._seen = obs
             return
         first = self._episode is None
-        robot = self._robot(obs) if first else ""
+        robot = self._robot() if first else ""
         self.bridge.update_obs(obs)
         if first:
             info = (obs.get("additional_info") or {}).get(STATUS_KEY) or {}
@@ -140,20 +140,10 @@ class Model(ModelTemplate):
 
     # -- the episode ---------------------------------------------------------------------------
 
-    def _robot(self, obs: dict[str, Any]) -> str:
-        """The robot the programs are written against: named, or by what the client sends."""
+    def _robot(self) -> str:
+        """The robot the programs are written against (``robot`` of ``deploy.yml``)."""
 
-        robot = str(self.cfg.get("robot") or "auto")
-        if robot != "auto":
-            return robot
-        lacks = host.lacking(obs)
-        robot = COLOUR_ROBOT if lacks else DEPTH_ROBOT
-        print(
-            f"[Model] the observation holds {'no ' + ' / '.join(lacks) if lacks else 'depth'}: "
-            f"robot {robot}",
-            flush=True,
-        )
-        return robot
+        return str(self.cfg.get("robot") or ROBOT)
 
     def _play(self, bridge: Bridge, info: dict[str, Any], robot: str) -> None:
         from pyrualean.play import play_episode

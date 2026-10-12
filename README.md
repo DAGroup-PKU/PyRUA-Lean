@@ -19,8 +19,8 @@ and re-sends everything before it each time. A PyRUA-Lean agent writes code agai
 can find an object, move above it, grasp, check the gripper and try again.
 
 <p align="center">
-  <img src="docs/assets/results-overview.png" width="100%"
-       alt="Tool calling against PyRUA-Lean: success rate on nine sub-suites, equal or higher on every one (63.1% to 71.7% overall), and per solved episode 1.5x to 4.5x fewer input tokens and 1.2x to 3.1x fewer dollars at list price">
+  <img src="docs/assets/overview.png" width="100%"
+       alt="PyRUA-Lean at a glance. Top: against tool calling with the same planner and primitives, success rate 63.1% to 71.7% overall, 65% fewer input tokens and 2.2x cheaper per solved episode. Bottom left: RoboDojo, 52.9% average success rate against 32.3% for the best entry of the public leaderboard. Bottom right: PyRUA-Lean Coder v0.1-4B, 18.8% to 44.1% on unseen task instances after GRPO training on 45 LIBERO-PRO instances">
 </p>
 
 ## What an agent writes
@@ -86,16 +86,14 @@ calls, the token usage and the benchmark's own verdict.
 | `libero` (default) | LIBERO-PRO | Franka arm; scripted servos, Pi0.5 VLA, SAM3 perception |
 | `robotwin` | RoboTwin 2.0 | two arms; LingBot-VLA |
 | `robocasa` | RoboCasa365 | mobile manipulator; RLDX-1 VLA, navigation |
-| `robodojo` | RoboDojo | two ARX-X5 arms; this library's own full-pose motion (IK in the host), gripper and 3D-perception primitives, the Pi0.5 task policy, SAM3 (experimental, as in RPent; the benchmark reports no success during an episode) |
-| `robodojo_xpl` | RoboDojo, under its own evaluation client | the `robodojo` robot (same API, tools and knowledge file) served to RoboDojo's client as an [XPolicyLab](https://github.com/XPolicyLab/XPolicyLab) policy ([integrations/xpolicylab/PyRUA_Lean](integrations/xpolicylab/PyRUA_Lean)): the client owns the simulator and gives the verdict; it must send the depth image and camera matrices (the host switches them on in the client it starts); no RPent runtime, no VLA (`--primitives no-vla`) |
-| `robodojo_xpl_rgb` | the same, on the client's default observation | perception from the three colour images alone (the default configuration sends no depth image): an object is measured from its masks in the cameras that see it |
+| `robodojo_xpl_rgb` | RoboDojo | two ARX-X5 arms; this library's own full-pose motion (IK in the host), gripper and perception primitives, SAM3; perception from the three colour images of the benchmark's default observation. Runs under RoboDojo's own evaluation client as an [XPolicyLab](https://github.com/XPolicyLab/XPolicyLab) policy ([integrations/xpolicylab](integrations/xpolicylab)): the client owns the simulator and gives the verdict; no RPent runtime, no VLA (`--primitives no-vla`) |
 
 [docs/multi-robot.md](docs/multi-robot.md) is the contract for adding a robot.
 
 ## How it works
 
 - **Same primitives, same judge.** Each `robo` method maps one to one onto an RPent tool and runs through RPent
-  (on RoboDojo the motion, gripper and perception tools are this library's own, registered on RPent's toolkit),
+  (on RoboDojo the motion, gripper and perception tools are this library's own and run without RPent),
   so an episode leaves the same records as an RPent episode and is scored by the benchmark's own success check.
 - **Results, not exceptions.** Motion calls block and return what actually happened (`Move.reached`,
   `Pick.success`, ...); misuse raises, and a finished episode stops every further motion.
