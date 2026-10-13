@@ -3,7 +3,8 @@
 RoboDojo's own summary (`bash scripts/robodojo.sh summarize`) of the full protocol: 54 task configurations at
 their native episode counts, eval seeds 0, 1 and 2 (6,300 episodes), GPT-6 Astra, RoboDojo `main` `cb2a37d`.
 In these runs the evaluation client's depth image and camera matrices were enabled. The XPolicyLab policy in
-[`../PyRUA_Lean`](../PyRUA_Lean) reads the default RGB-only observation instead.
+[`../PyRUA_Lean`](../PyRUA_Lean) reads the default RGB-only observation instead; its summary (eval seed 0) is
+[`../PyRUA_Lean/eval/robodojo_summary.md`](../PyRUA_Lean/eval/robodojo_summary.md).
 
 Everything below this line is the script's output, unedited.
 

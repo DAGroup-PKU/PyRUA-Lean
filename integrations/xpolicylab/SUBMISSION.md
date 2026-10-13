@@ -105,6 +105,7 @@ Title: `[policy] PyRUA_Lean: add eval-only RoboDojo adapter`
 ````markdown
 ## Policy
 - Name / paper / upstream repo: PyRUA-Lean / [arXiv 2610.01939](https://arxiv.org/abs/2610.01939) / https://github.com/DAGroup-PKU/PyRUA-Lean
+- Contributor: PKU DAGroup
 - Type: Agent, LLM. A language model writes Python against a robot API while the episode runs; each motion call becomes joint targets.
 - Supported: `bench_name=RoboDojo`, `env_cfg_type=arx_x5`, `action_type=joint`
 - Training support: eval-only (nothing is trained; no policy checkpoint)
@@ -129,12 +130,16 @@ Title: `[policy] PyRUA_Lean: add eval-only RoboDojo adapter`
 [MAIN] eval finished
 ```
 
+- [x] Simulator eval: eval seed 0, all 54 task configs at their native counts (2,100 episodes), stock `arx_x5`
+      observation; `policy/PyRUA_Lean/eval/robodojo_summary.md` is the output of `bash scripts/robodojo.sh summarize`.
+
 ## Checkpoint (required for leaderboard evaluation)
 ```bash
 bash policy/PyRUA_Lean/download_assets.sh    # SAM3 (segmentation); there is no policy checkpoint
 ```
 
 ## Limitations / notes
-- The model is called through an OpenAI-compatible endpoint: `OPENAI_BASE_URL`, `OPENAI_API_KEY`, `PYRUALEAN_MODEL`.
+- The model (GPT-6 Astra, reasoning effort `high`, set in `deploy.yml`) is called through an OpenAI-compatible
+  endpoint: `OPENAI_BASE_URL`, `OPENAI_API_KEY`, `PYRUALEAN_MODEL`.
 - One conversation drives one environment (`eval_batch: false`).
 ````
