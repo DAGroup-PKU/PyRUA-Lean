@@ -1,6 +1,6 @@
 # PyRUA_Lean
 
-**Contributor:** PyRUA-Lean contributors | **Paper:** PyRUA-Lean | **arXiv:** [2610.01939](https://arxiv.org/abs/2610.01939) | **Original code:** https://github.com/DAGroup-PKU/PyRUA-Lean
+**Contributor:** PKU DAGroup | **Paper:** PyRUA-Lean | **arXiv:** [2610.01939](https://arxiv.org/abs/2610.01939) | **Original code:** https://github.com/DAGroup-PKU/PyRUA-Lean
 
 `PyRUA_Lean` runs a code-writing agent on RoboDojo: a language model writes Python against a small robot API (`robo`), one cell at a time, while the episode runs; each motion call becomes native joint actions. The same program-writing loop, the same six primitives and the same prompt serve every task: nothing is tuned, routed or stored per task. There is no VLA and no training entry; SAM3 (segmentation) is the only model the policy side loads. The adapter is evaluation-only and supports `bench_name=RoboDojo`, `env_cfg_type=arx_x5`, `action_type=joint`.
 
