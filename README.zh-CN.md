@@ -18,8 +18,8 @@ Python 对象。工具调用式的 agent 在任务的每一个小步上都要花
 PyRUA-Lean 的 agent 则对着 `robo` 写代码，一次调用就能完成找到物体、移到上方、抓取、检查夹爪、失败重试这一整串动作。
 
 <p align="center">
-  <img src="docs/assets/results-overview.png" width="100%"
-       alt="tool calling 与 PyRUA-Lean 的对比：九个子任务集上成功率都相同或更高（总体 63.1% 到 71.7%）；每个解出的任务输入 token 少 1.5 到 4.5 倍，按官方价格便宜 1.2 到 3.1 倍">
+  <img src="docs/assets/overview.png" width="100%"
+       alt="PyRUA-Lean 一览。上：与同一规划模型、同一套原语的 tool calling 相比，总体成功率 63.1% 到 71.7%，每个解出的任务输入 token 少 65%、费用便宜 2.2 倍。左下：RoboDojo 平均成功率 51.6%，公开榜单最好的条目为 32.3%。右下：PyRUA-Lean Coder v0.1-4B 只在 45 个 LIBERO-PRO 实例上用 GRPO 训练，未见过的任务实例上从 18.8% 到 44.1%">
 </p>
 
 ## agent 写的是什么
@@ -84,12 +84,13 @@ pyrualean summarize runs/demo
 | `libero`（默认） | LIBERO-PRO | Franka 单臂；脚本化伺服、Pi0.5 VLA、SAM3 感知 |
 | `robotwin` | RoboTwin 2.0 | 双臂；LingBot-VLA |
 | `robocasa` | RoboCasa365 | 移动操作机器人；RLDX-1 VLA、导航 |
+| `robodojo_xpl_rgb` | RoboDojo | 双臂 ARX-X5；本库自己的全位姿运动（宿主侧 IK）、夹爪与感知原语，SAM3；感知只用基准默认观测里的三路彩色图。作为 [XPolicyLab](https://github.com/XPolicyLab/XPolicyLab) 策略运行在 RoboDojo 自己的评测端之下（[integrations/xpolicylab](integrations/xpolicylab)）：仿真和裁决都归评测端；不需要 RPent 运行时，不带 VLA（`--primitives no-vla`） |
 
 新增机器人的约定见 [docs/multi-robot.md](docs/multi-robot.md)。
 
 ## 工作方式
 
-- **同样的原语，同样的判分。** `robo` 的每个方法一一对应 RPent 的一个工具，并经由 RPent 执行，所以一局留下的记录和
+- **同样的原语，同样的判分。** `robo` 的每个方法一一对应 RPent 的一个工具，并经由 RPent 执行（RoboDojo 上的运动、夹爪和感知工具是本库自己的，不经过 RPent），所以一局留下的记录和
   RPent 的一局相同，成功与否由基准自己的判定决定。
 - **返回结果，而不是抛异常。** 运动调用会阻塞，并返回实际发生了什么（`Move.reached`、`Pick.success` 等）；
   误用会报错，任务完成后所有后续运动都会被拦下。

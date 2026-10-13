@@ -44,15 +44,22 @@ predicates.
 
 ## Robots
 
-`--robot libero` (default), `--robot robocasa` and `--robot robotwin` select
-the robot: its policy-facing class (`pyrualean/<robot>.py`), the host that
-boots RPent's stack for it (`pyrualean/hosts/rpent_<robot>.py`) and its
-knowledge file.  All three share `pyrualean/_robot.py` (call ledger,
-episode guard, images, world maps, `show`) and are registered through
-`pyrualean.robots`; `docs/multi-robot.md` is the contract for adding one.
-The sections below describe the LIBERO robot; the other two follow the
-same pattern with their own primitives (a mobile base and the RLDX-1 VLA
-on RoboCasa365, two arms and LingBot-VLA on RoboTwin).
+`--robot libero` (default), `--robot robocasa`, `--robot robotwin` and
+`--robot robodojo` select the robot: its policy-facing class
+(`pyrualean/<robot>.py`), the host that boots RPent's stack for it
+(`pyrualean/hosts/rpent_<robot>.py`) and its knowledge file.  All of them
+share `pyrualean/_robot.py` (call ledger, episode guard, images, world maps,
+`show`) and are registered through `pyrualean.robots`; `docs/multi-robot.md`
+is the contract for adding one.  The sections below describe the LIBERO
+robot; the others follow the same pattern with their own primitives (a
+mobile base and the RLDX-1 VLA on RoboCasa365, two arms and LingBot-VLA on
+RoboTwin, two arms with a Pi0.5 policy and SAM3 on RoboDojo).  RoboDojo is
+the one benchmark that reports no success while an episode runs: its robot
+has no `done`, and its contract says the final scene is judged.  It is also
+the one robot whose motion, gripper and perception primitives are this
+library's own rather than RPent's: `move_to` with an orientation (the IK is
+solved in the host), a full-stroke `set_gripper`, `locate` (an object's 3D
+extent from its mask and the depth image) and `home` (`docs/setup.md`).
 
 ## The library
 

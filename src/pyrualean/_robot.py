@@ -8,10 +8,10 @@
 
 """Robot-independent core of a PyRUA-Lean robot class.
 
-A robot class (``LiberoRobot``, ``RobocasaRobot``, ``RobotwinRobot``) is the
-only object a policy sees.  Every public method maps 1:1 onto one RPent tool
-of that robot and returns a frozen dataclass; this module holds what all of
-them share: the backend dispatch with the call ledger, the episode guard
+A robot class (``LiberoRobot``, ``RobocasaRobot``, ``RobotwinRobot``,
+``RobodojoRobot``) is the only object a policy sees.  Every public method maps
+1:1 onto one RPent tool of that robot and returns a frozen dataclass; this
+module holds what all of them share: the backend dispatch with the call ledger, the episode guard
 (``EpisodeFinished`` once the task predicate fired or the host stopped the
 episode), image / world-map / artifact access and the ``show`` request used
 by the ``on-demand`` image policy.
@@ -86,6 +86,11 @@ class RobotBase:
     )
     #: Read-only tool that returns the observation envelope of a recorded step.
     STATE_TOOL: ClassVar[str] = "view_env_state"
+    #: Members of this base class that the robot does not have (``"done"`` when
+    #: its benchmark reports no success while the episode runs, ``"world_map"``
+    #: when it records none).  They are left out of the API reference, and the
+    #: robot class makes them raise instead of answering with a constant.
+    ABSENT_MEMBERS: ClassVar[frozenset[str]] = frozenset()
 
     def __init__(self, backend: Backend, *, ledger: Ledger | None = None, primitives: str = "full"):
         if primitives not in PRIMITIVE_SETS:
@@ -130,6 +135,14 @@ class RobotBase:
             if (camera, self.SHOW_RESOLUTION) in self.IMAGE_ARTIFACTS
         ]
 
+    def _reported_success(self) -> bool:
+        """Whether the benchmark has reported task success during the episode.
+
+        The hosts ask this instead of ``done``: a robot whose benchmark judges
+        only the final scene has no ``done`` at all and answers False here.
+        """
+        return self._done or bool(self._backend.solved())
+
     def _stop_episode(self, reason: str) -> None:
         """Make every further motion call raise ``EpisodeFinished``."""
         self._stop_reason = reason
@@ -157,7 +170,7 @@ class RobotBase:
     @property
     def done(self) -> bool:
         """True once the benchmark's success predicate has fired (sticky)."""
-        return self._done or bool(self._backend.solved())
+        return self._reported_success()
 
     def state(self, step: int = -1) -> Any:
         """Read the recorded proprioceptive state of step ``step`` (``-1`` = latest)."""

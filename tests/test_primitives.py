@@ -14,12 +14,13 @@ from pyrualean.arms import ArmToolkit, robot_words
 from pyrualean.play import build_prompt, play_episode
 from pyrualean.prompt import _public_members, knowledge_stem, vla_hidden
 from pyrualean.robocasa import RobocasaRobot
+from pyrualean.robodojo import RobodojoRobot
 from pyrualean.robots import get_adapter
 from pyrualean.robotwin import RobotwinRobot
 
 #: Any mention of a VLA in model-facing text (Pi0.5, LingBot-VLA, RLDX-1, "VLA").
 VLA_TOKENS = re.compile(r"pi0|lingbot|rldx|vla", re.IGNORECASE)
-ROBOTS = ("libero", "robotwin", "robocasa")
+ROBOTS = ("libero", "robotwin", "robocasa", "robodojo")
 
 
 def _card() -> TaskCard:
@@ -40,11 +41,13 @@ def test_primitive_sets_and_the_vla_names_per_robot():
     assert LiberoRobot.VLA_PRIMITIVES == ("pi0_pick", "pi0_doubled")
     assert RobotwinRobot.VLA_PRIMITIVES == ("lingbot_act",)
     assert RobocasaRobot.VLA_PRIMITIVES == ("rldx_skill", "rldx_arm")
+    assert RobodojoRobot.VLA_PRIMITIVES == ("pi0_pick",)
     assert vla_hidden(LiberoRobot) == (frozenset(), frozenset())
     names, types = vla_hidden(LiberoRobot, "no-vla")
     assert names == {"pi0_pick", "pi0_doubled"} and types == {"Pick", "Contact"}
     assert vla_hidden(RobotwinRobot, "no-vla")[1] == {"VlaRun"}
     assert vla_hidden(RobocasaRobot, "no-vla")[1] == {"Skill"}
+    assert vla_hidden(RobodojoRobot, "no-vla")[1] == {"Pick"}
     with pytest.raises(ValueError, match="primitives"):
         vla_hidden(LiberoRobot, "some")
 
@@ -142,11 +145,14 @@ REWRITTEN = {
         "  Change one meaningful variable and verify; do not repeat the same",
         "  primitive target twice.",
     },
+    # RoboDojo's document mentions the VLA only inside its own section.
+    "robodojo": set(),
 }
 DROPPED_SECTIONS = {
     "libero": "## The VLA skills",
     "robotwin": "## The VLA",
     "robocasa": "## The VLA",
+    "robodojo": "## The VLA",
 }
 
 
@@ -178,6 +184,8 @@ def test_contract_names_only_the_remaining_services():
         assert adapter.services and adapter.services_novla == ""
         assert robot_words(adapter, "no-vla")["svc"] == ""
         assert robot_words(adapter, "no-vla")["svc_nl"] == ""
+    robodojo = get_adapter("robodojo")  # SAM3 stays once the VLA is gone, as on LIBERO
+    assert robot_words(robodojo, "no-vla")["svc"] == ", a SAM3 segmentation service"
 
 
 def test_prompts_without_the_vla():

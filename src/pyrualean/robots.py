@@ -9,11 +9,11 @@
 """Registry of the robots PyRUA-Lean can drive.
 
 Each robot module (``pyrualean.libero``, ``pyrualean.robocasa``,
-``pyrualean.robotwin``) defines a module-level ``ADAPTER`` describing the
-robot class, the host module that boots RPent's stack for it, the knowledge
-file and the words the contract uses for it.  ``get_adapter(name)`` imports
-the module lazily so a robot whose dependencies are missing does not break
-the others.
+``pyrualean.robotwin``, ``pyrualean.robodojo``) defines a module-level
+``ADAPTER`` describing the robot class, the host module that boots RPent's
+stack for it, the knowledge file and the words the contract uses for it.
+``get_adapter(name)`` imports the module lazily so a robot whose dependencies
+are missing does not break the others.
 """
 
 from __future__ import annotations
@@ -22,7 +22,14 @@ import importlib
 from dataclasses import dataclass
 from typing import Any
 
-ROBOTS: tuple[str, ...] = ("libero", "robocasa", "robotwin")
+ROBOTS: tuple[str, ...] = (
+    "libero",
+    "robocasa",
+    "robotwin",
+    "robodojo",
+    "robodojo_xpl",
+    "robodojo_xpl_rgb",
+)
 
 
 @dataclass(frozen=True)
@@ -56,12 +63,23 @@ class RobotAdapter:
     def cameras(self) -> tuple[str, ...]:
         return tuple(getattr(self.robot_cls, "CAMERAS", ()))
 
+    @property
+    def live_success(self) -> bool:
+        """Whether the benchmark reports task success while the episode runs.
+
+        True when the robot class has ``done`` (and ``terminated`` flags on its
+        results).  False for a robot whose success RPent reads only after its
+        planner has finished (RoboDojo declares ``done`` absent): the contract
+        then says that the final scene is judged and nothing reports success.
+        """
+        return "done" not in getattr(self.robot_cls, "ABSENT_MEMBERS", ())
+
     def host_module(self) -> Any:
         return importlib.import_module(self.host)
 
 
 def get_adapter(name: str) -> RobotAdapter:
-    """Return the adapter of robot ``name`` (``libero``, ``robocasa``, ``robotwin``)."""
+    """Return the adapter of robot ``name`` (one of :data:`ROBOTS`)."""
 
     if name not in ROBOTS:
         raise ValueError(f"unknown robot {name!r}; known: {ROBOTS}")

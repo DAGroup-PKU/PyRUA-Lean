@@ -292,7 +292,7 @@ class ArmToolkit:
                     "ok": "error" not in result.result,
                     "moved": bool(result.result.get("moved", moved_flag)),
                     "env_steps": result.result.get("env_steps", steps_delta),
-                    "terminated": bool(self.robo.done),
+                    "terminated": self.robo._reported_success(),
                     "sandbox_flags": flags,
                 }
             )
@@ -306,9 +306,18 @@ class ArmToolkit:
         self.finish = {
             "status": str(args.get("status", "")),
             "summary": str(args.get("summary", "")),
-            "environment_terminated": bool(self.robo.done),
         }
+        if self._live_success():
+            self.finish["environment_terminated"] = self.robo._reported_success()
         return ArmResult({"ok": True, **self.finish})
+
+    def _live_success(self) -> bool:
+        """Whether the robot reports task success during the episode (it has ``done``).
+
+        Without it the feedback carries no success field at all: a constant
+        False would read as "not solved yet".
+        """
+        return "done" not in getattr(self.robo, "ABSENT_MEMBERS", ())
 
     def _snapshot(self) -> tuple[int, int | None]:
         return len(self.robo._ledger), self.robo._backend.env_steps()
@@ -339,7 +348,8 @@ class ArmToolkit:
             else None
         )
         result["state"] = _state_dict(self.robo)
-        result["episode_done"] = bool(self.robo.done)
+        if self._live_success():
+            result["episode_done"] = self.robo._reported_success()
         return self._attach_images(result, moved, result)
 
     def _attach_images(
@@ -513,13 +523,9 @@ workspace; code that reaches for Python internals (`__globals__`,
 
 # How the episode is scored
 
-- Success = the benchmark's own task predicate fires (`terminated`) at any
-  moment.  The simulator checks it, not you; motion results carry a
-  `terminated` field and `robo.done` reports it.
+{scoring_head}
 {ending_note}
-- Once the task terminates, motion calls raise `EpisodeFinished`: call
-  `finish(status="success", ...)` and stop.  If you cannot make progress, call
-  `finish` with `failure` or `stuck`.
+{scoring_tail}
 
 Your working directory is a scratch workspace: you may keep notes or helper
 files there.  Do not read files outside it and do not use the shell to reach
@@ -543,14 +549,11 @@ below.  The tool returns the program's stdout, stderr, the exception if any,
 
 # How the episode is scored
 
-- Success = the benchmark's own task predicate fires (`terminated`) at any
-  moment while a program runs.  The simulator checks it, not you.
+{scoring_head}
 {ending_note}
   A program that raises stops there; the episode continues with the robot
   where it stopped.
-- Once the task terminates, motion calls raise `EpisodeFinished`: call
-  `finish(status="success", ...)` and stop.  If you cannot make progress, call
-  `finish` with `failure` or `stuck`.
+{scoring_tail}
 
 Programs run in a sandbox: they may import `math`, `time`, `numpy`, `json`,
 `re`, `PIL` and other pure-computation modules, but not `os`, `sys`,
@@ -609,6 +612,50 @@ FEEDBACK_NOTES = {
 }
 
 
+#: The scoring bullets around ``{ending_note}``, per arm.  ``live``: the
+#: benchmark reports success while the episode runs.  ``final``: it judges the
+#: scene the episode leaves behind and reports nothing meanwhile (a robot
+#: without ``done``, i.e. RoboDojo, whose success RPent keeps from its own
+#: planner too).
+SCORING_NOTES = {
+    "live": {
+        "cells": (
+            "- Success = the benchmark's own task predicate fires (`terminated`) at any\n"
+            "  moment.  The simulator checks it, not you; motion results carry a\n"
+            "  `terminated` field and `robo.done` reports it.",
+            "- Once the task terminates, motion calls raise `EpisodeFinished`: call\n"
+            '  `finish(status="success", ...)` and stop.  If you cannot make progress, call\n'
+            "  `finish` with `failure` or `stuck`.",
+        ),
+        "program": (
+            "- Success = the benchmark's own task predicate fires (`terminated`) at any\n"
+            "  moment while a program runs.  The simulator checks it, not you.",
+            "- Once the task terminates, motion calls raise `EpisodeFinished`: call\n"
+            '  `finish(status="success", ...)` and stop.  If you cannot make progress, call\n'
+            "  `finish` with `failure` or `stuck`.",
+        ),
+    },
+    "final": {
+        "cells": (
+            "- Success is judged by the benchmark from the final scene, after the episode\n"
+            "  has ended.  Nothing reports it while you work: no result carries a\n"
+            "  task-success flag, so judge progress from the images and the robot state.",
+            "- When the scene shows that the instruction is satisfied, call\n"
+            '  `finish(status="success", ...)` and stop.  If you cannot make progress, call\n'
+            "  `finish` with `failure` or `stuck`.",
+        ),
+        "program": (
+            "- Success is judged by the benchmark from the final scene, after the episode\n"
+            "  has ended.  Nothing reports it while a program runs: no result carries a\n"
+            "  task-success flag.",
+            "- When the scene shows that the instruction is satisfied, call\n"
+            '  `finish(status="success", ...)` and stop.  If you cannot make progress, call\n'
+            "  `finish` with `failure` or `stuck`.",
+        ),
+    },
+}
+
+
 ENDING_NOTES = {
     "wall": (
         "- The episode ends after {budget_s} s of wall clock in total (your thinking\n"
@@ -622,6 +669,21 @@ ENDING_NOTES = {
     ),
 }
 BUDGET_MODES = tuple(ENDING_NOTES)
+#: The same notes for a robot whose benchmark judges the final scene: a limit
+#: ends the episode, and what the scene shows then is what counts.
+ENDING_NOTES_FINAL = {
+    "wall": (
+        "- The episode ends after {budget_s} s of wall clock in total (your thinking\n"
+        "  included) or {max_env_steps} simulator steps; the scene is judged as it is\n"
+        "  then."
+    ),
+    "calls": (
+        "- The number of `{tool}` calls in an episode is limited (every call counts,\n"
+        "  including calls that only look, print or display); the episode also ends\n"
+        "  after {max_env_steps} simulator steps.  At either limit the scene is judged\n"
+        "  as it is, so make every call do purposeful work and verify results in code."
+    ),
+}
 
 
 GUIDES_NOTE = (
@@ -644,6 +706,7 @@ LIBERO_ROBOT = {
     "svc": ", a frozen Pi0.5 VLA and a SAM3 segmentation service",
     "svc_nl": ", a\nfrozen Pi0.5 VLA and a SAM3 segmentation service",
     "show_examples": "`robo.show('agentview')` or `robo.show('wrist')`",
+    "scoring": "live",
 }
 
 
@@ -664,7 +727,8 @@ def arm_contract(
     ``budget_mode="wall"`` states the wall-clock budget; ``"calls"`` states
     that the number of tool calls is limited (without the number, which the
     tool-calling arm's own prompt does not state either).  ``robot`` names
-    the robot for the contract (keys of :data:`LIBERO_ROBOT`; default LIBERO).
+    the robot for the contract (keys of :data:`LIBERO_ROBOT`; default LIBERO);
+    its ``scoring`` key picks the scoring bullets (:data:`SCORING_NOTES`).
     """
 
     if budget_mode not in BUDGET_MODES:
@@ -701,6 +765,7 @@ def robot_words(adapter: Any, primitives: str = "full") -> dict[str, str]:
         # the cells contract breaks the line after the first word of the phrase
         "svc_nl": f", {head}\n{tail}" if tail else (f", {phrase}" if phrase else ""),
         "show_examples": adapter.show_examples,
+        "scoring": "live" if getattr(adapter, "live_success", True) else "final",
     }
 
 
@@ -718,11 +783,13 @@ def _arm_contract(
     words = dict(LIBERO_ROBOT, **(robot or {}))
     image_note = IMAGE_NOTES[images].format(show_examples=words["show_examples"])
     feedback_note = FEEDBACK_NOTES[arm][feedback]
-    ending_note = ENDING_NOTES[budget_mode].format(
+    ending_notes = ENDING_NOTES if words["scoring"] == "live" else ENDING_NOTES_FINAL
+    ending_note = ending_notes[budget_mode].format(
         budget_s=budget_s,
         max_env_steps=max_env_steps,
         tool="python" if arm == "cells" else "run_program",
     )
+    scoring_head, scoring_tail = SCORING_NOTES[words["scoring"]][arm]
     if arm == "cells":
         return CELLS_CONTRACT.format(
             budget_s=budget_s,
@@ -730,6 +797,8 @@ def _arm_contract(
             image_note=image_note,
             feedback_note=feedback_note,
             ending_note=ending_note,
+            scoring_head=scoring_head,
+            scoring_tail=scoring_tail,
             **words,
         )
     if max_programs == 1:
@@ -749,6 +818,8 @@ def _arm_contract(
         image_note=image_note,
         feedback_note=feedback_note,
         ending_note=ending_note,
+        scoring_head=scoring_head,
+        scoring_tail=scoring_tail,
         **words,
     )
 

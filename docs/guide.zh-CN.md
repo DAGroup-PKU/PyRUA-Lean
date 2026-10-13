@@ -34,7 +34,7 @@ def run(robo):
 
 ## 机器人
 
-`--robot libero`（默认）、`--robot robocasa`、`--robot robotwin` 选择机器人：它面向 policy 的类（`pyrualean/<robot>.py`）、为它启动 RPent 服务栈的宿主（`pyrualean/hosts/rpent_<robot>.py`）和它的知识文件。三者共用 `pyrualean/_robot.py`（调用账本、回合守卫、图像、世界坐标图、`show`），通过 `pyrualean.robots` 注册；新增机器人的约定见 `docs/multi-robot.md`。下文以 LIBERO 为例，另外两个机器人结构相同、原语不同（RoboCasa365 是移动底盘加 RLDX-1 VLA，RoboTwin 是双臂加 LingBot-VLA）。
+`--robot libero`（默认）、`--robot robocasa`、`--robot robotwin`、`--robot robodojo` 选择机器人：它面向 policy 的类（`pyrualean/<robot>.py`）、为它启动 RPent 服务栈的宿主（`pyrualean/hosts/rpent_<robot>.py`）和它的知识文件。它们共用 `pyrualean/_robot.py`（调用账本、回合守卫、图像、世界坐标图、`show`），通过 `pyrualean.robots` 注册；新增机器人的约定见 `docs/multi-robot.md`。下文以 LIBERO 为例，其余机器人结构相同、原语不同（RoboCasa365 是移动底盘加 RLDX-1 VLA，RoboTwin 是双臂加 LingBot-VLA，RoboDojo 是双臂加 Pi0.5 策略和 SAM3）。RoboDojo 是唯一一个回合进行中不回报成功的基准：它的机器人没有 `done`，contract 写明由最终场景判定。它也是唯一一个运动、夹爪和感知原语都由本库自己实现、而不是用 RPent 的机器人：能指定朝向的 `move_to`（IK 在宿主侧求解）、整程开合的 `set_gripper`、`locate`（由掩码和深度图得到物体的 3D 尺寸）和 `home`（见 `docs/setup.md`）。
 
 ## 库
 

@@ -39,9 +39,11 @@ STARTUP_ALLOWANCE_S = 900.0
 
 
 def _cell_args(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument("--robot", default="libero", help="libero | robocasa | robotwin")
+    parser.add_argument("--robot", default="libero", help="libero | robocasa | robotwin | robodojo")
     parser.add_argument(
-        "--suite", default=None, help="LIBERO suite / RoboCasa split / RoboTwin task config"
+        "--suite",
+        default=None,
+        help="LIBERO suite / RoboCasa split / RoboTwin task config / RoboDojo env config",
     )
     parser.add_argument("--task", required=True, help="LIBERO task index or the robot's task name")
     parser.add_argument("--seed", type=int, default=0)
@@ -231,6 +233,17 @@ def cmd_play(args: argparse.Namespace) -> int:
         argv += ["--sam3-endpoint", args.sam3_endpoint]
     if args.runtime == "claude":
         argv += ["--runtime", "claude", "--claude-cli", args.claude_cli]
+    elif args.runtime == "openai":
+        argv += ["--runtime", "openai", "--openai-max-tokens", str(args.openai_max_tokens)]
+        argv += ["--image-max-side", str(args.image_max_side)]
+        argv += ["--openai-nudges", str(args.openai_nudges)]
+        argv += ["--openai-tool-choice", args.openai_tool_choice]
+        if args.openai_temperature is not None:
+            argv += ["--openai-temperature", str(args.openai_temperature)]
+        if args.openai_extra_body:
+            argv += ["--openai-extra-body", args.openai_extra_body]
+        if args.openai_timeout_s is not None:
+            argv += ["--openai-timeout-s", str(args.openai_timeout_s)]
     if args.primitives != "full":
         argv += ["--primitives", args.primitives]
     code = run_host(
@@ -370,15 +383,29 @@ def main(argv: list[str] | None = None) -> int:
     play.add_argument("--sam3-endpoint", default=None, help="host:port of a shared SAM3 server")
     play.add_argument(
         "--runtime",
-        choices=("codex", "claude"),
+        choices=("codex", "claude", "openai"),
         default=setting("RUNTIME", "codex"),
-        help="agent runtime: codex (Codex CLI) or claude (Claude Code via the Claude Agent SDK)",
+        help=(
+            "agent runtime: codex (Codex CLI), claude (Claude Code via the Claude Agent SDK) "
+            "or openai (in-process loop against any OpenAI-compatible --base-url)"
+        ),
     )
     play.add_argument(
         "--claude-cli",
         default=setting("CLAUDE_CLI", "claude"),
         help="claude executable for --runtime claude",
     )
+    play.add_argument("--openai-temperature", type=float, default=None)
+    play.add_argument("--openai-max-tokens", type=int, default=4096)
+    play.add_argument(
+        "--openai-extra-body",
+        default=setting("OPENAI_EXTRA_BODY", None),
+        help="JSON merged into every chat request (--runtime openai)",
+    )
+    play.add_argument("--image-max-side", type=int, default=0)
+    play.add_argument("--openai-nudges", type=int, default=2)
+    play.add_argument("--openai-tool-choice", choices=("auto", "required"), default="auto")
+    play.add_argument("--openai-timeout-s", type=float, default=None)
     play.add_argument(
         "--primitives",
         choices=PRIMITIVE_SETS,

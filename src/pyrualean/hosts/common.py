@@ -9,10 +9,10 @@
 """What every RPent-backed host shares: locating the checkout and adapting
 an RPent ``Toolkit`` to the :class:`pyrualean.Backend` contract.
 
-A host module (``rpent_libero``, ``rpent_robocasa``, ``rpent_robotwin``)
-exposes ``Cell``, ``add_cell_args(parser)``, ``add_boot_args(parser)``,
-``cell_from_args(args)``, ``boot_options(args)``, ``boot(cell, out_dir,
-*, rpent_root=None, env_only=False, **options)`` and
+A host module (``rpent_libero``, ``rpent_robocasa``, ``rpent_robotwin``,
+``rpent_robodojo``) exposes ``Cell``, ``add_cell_args(parser)``,
+``add_boot_args(parser)``, ``cell_from_args(args)``, ``boot_options(args)``,
+``boot(cell, out_dir, *, rpent_root=None, env_only=False, **options)`` and
 ``dump_card(toolkit, cell, out_dir)``; ``pyrualean.play`` drives any of
 them through the robot's adapter.  A host may also define
 ``make_backend(toolkit)`` returning a :class:`RpentBackend` subclass when
