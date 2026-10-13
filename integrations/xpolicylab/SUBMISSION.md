@@ -131,7 +131,8 @@ Title: `[policy] PyRUA_Lean: add eval-only RoboDojo adapter`
 ```
 
 - [x] Simulator eval: eval seed 0, all 54 task configs at their native counts (2,100 episodes), stock `arx_x5`
-      observation; `policy/PyRUA_Lean/eval/robodojo_summary.md` is the output of `bash scripts/robodojo.sh summarize`.
+      observation; output of `bash scripts/robodojo.sh summarize`:
+      https://github.com/DAGroup-PKU/PyRUA-Lean/blob/main/integrations/xpolicylab/evaluation/robodojo_summary_rgb.md
 
 ## Checkpoint (required for leaderboard evaluation)
 ```bash
