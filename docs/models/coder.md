@@ -4,8 +4,8 @@
 
     The weights will be released on Hugging Face. This page will then give the model card and a tested command.
 
-**PyRUA-Lean Coder v0.1-4B** is Qwen3.5-4B trained with GRPO on 45 LIBERO-PRO task instances, as the planner of the
-PyRUA-Lean framework: it writes the cells, the primitives do the rest. On 655 task instances it never saw in
+**PyRUA-Lean Coder v0.1-4B** is Qwen3.5-4B trained with GRPO in the PyRUA-Lean framework, on 45 LIBERO-PRO task
+instances, as its planner: it writes the cells, the primitives do the rest. On 655 task instances it never saw in
 training it goes from **18.8% to 44.1%**, above the Qwen3.5-27B base model (29.2%).
 
 ## Results

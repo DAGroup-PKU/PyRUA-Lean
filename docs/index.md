@@ -32,8 +32,9 @@ PyRUA-Lean has three parts so far:
 - **RoboDojo.** With this library's own motion, gripper and perception primitives and the colour images of the
   benchmark's default observation, PyRUA-Lean reaches **51.62% average success rate (Score 58.20)**, first on all
   five dimensions of the public leaderboard (snapshot of October 9, 2026).
-- **PyRUA-Lean Coder v0.1-4B.** Qwen3.5-4B trained with GRPO on 45 LIBERO-PRO instances goes from **18.8% to
-  44.1%** on 655 task instances it never saw in training, above the Qwen3.5-27B base model (29.2%).
+- **PyRUA-Lean Coder v0.1-4B.** Qwen3.5-4B trained with GRPO in the PyRUA-Lean framework, on 45 LIBERO-PRO
+  instances, goes from **18.8% to 44.1%** on 655 task instances it never saw in training, above the Qwen3.5-27B base
+  model (29.2%).
 
 ## Quick Start
 

@@ -44,7 +44,8 @@ jobs:
         run: |
           mkdocs build --strict
       - name: Deploy to GitHub Pages (docs/ subdirectory)
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        # only the public repository publishes; a mirror of main (the team repository) builds and stops here
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main' && github.repository == 'DAGroup-PKU/PyRUA-Lean'
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"

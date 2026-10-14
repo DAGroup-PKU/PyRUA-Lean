@@ -33,6 +33,7 @@ can find an object, move above it, grasp, check the gripper and try again.
 ## 🔥 News
 
 - [Coming soon] 🤗 **PyRUA-Lean Coder v0.1-4B** weights on Hugging Face.
+- [Coming soon] 🦾 **Real robots**.
 - [2026/10/13] 📄 **arXiv v2** is out as a technical report: it adds RoboDojo and PyRUA-Lean Coder v0.1-4B.
   [[Paper]](https://arxiv.org/abs/2610.01939)
 - [2026/10/13] 🤖 **RoboDojo**: without any VLA policy or privileged information, PyRUA-Lean reaches a **51.62%**
@@ -54,8 +55,9 @@ PyRUA-Lean has three parts so far:
 - **RoboDojo.** With this library's own motion, gripper and perception primitives and the colour images of the
   benchmark's default observation, PyRUA-Lean reaches **51.62% average success rate (Score 58.20)**, first on all
   five dimensions of the public leaderboard (snapshot of October 9, 2026).
-- **PyRUA-Lean Coder v0.1-4B.** Qwen3.5-4B trained with GRPO on 45 LIBERO-PRO instances goes from **18.8% to
-  44.1%** on 655 task instances it never saw in training, above the Qwen3.5-27B base model (29.2%).
+- **PyRUA-Lean Coder v0.1-4B.** Qwen3.5-4B trained with GRPO in the PyRUA-Lean framework, on 45 LIBERO-PRO
+  instances, goes from **18.8% to 44.1%** on 655 task instances it never saw in training, above the Qwen3.5-27B base
+  model (29.2%).
 
 ## 🚀 Quick start
 
@@ -88,16 +90,9 @@ calls, the token usage and the benchmark's own verdict.
 | `libero` (default) | [LIBERO-PRO](https://dagroup-pku.github.io/PyRUA-Lean/docs/robots/libero/) | RPent | Franka arm; scripted servos, Pi0.5 VLA, SAM3 perception |
 | `robotwin` | [RoboTwin 2.0](https://dagroup-pku.github.io/PyRUA-Lean/docs/robots/robotwin/) | RPent | two arms; LingBot-VLA |
 | `robocasa` | [RoboCasa365](https://dagroup-pku.github.io/PyRUA-Lean/docs/robots/robocasa/) | RPent | mobile manipulator; RLDX-1 VLA, navigation |
+| *coming soon* | Real robots | | |
 
 New robots are added through XPolicyLab ([Adding a Robot](https://dagroup-pku.github.io/PyRUA-Lean/docs/robots/adding-a-robot/)).
-
-## 📚 Documentation
-
-The documentation is at **[dagroup-pku.github.io/PyRUA-Lean/docs](https://dagroup-pku.github.io/PyRUA-Lean/docs/)**:
-a [quick start](https://dagroup-pku.github.io/PyRUA-Lean/docs/getting-started/quickstart/) and [how it works](https://dagroup-pku.github.io/PyRUA-Lean/docs/getting-started/how-it-works/),
-the user guide ([agent configuration](https://dagroup-pku.github.io/PyRUA-Lean/docs/guide/agents/), [running episodes](https://dagroup-pku.github.io/PyRUA-Lean/docs/guide/running/),
-[output files](https://dagroup-pku.github.io/PyRUA-Lean/docs/guide/outputs/), [command-line reference](https://dagroup-pku.github.io/PyRUA-Lean/docs/guide/cli/)), and a page per robot with the API
-reference its agent reads. Its source is [docs/](docs).
 
 ## 📊 Performance
 
