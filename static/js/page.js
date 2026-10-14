@@ -61,8 +61,13 @@ function fmtTokens(n) {
   return Math.round(n / 1000) + 'k';
 }
 
+// whether the reader has "What it printed" open: it stays open from one LLM call to the next
+let printedOpen = false;
+
 function printedBlock(text, more) {
   const d = el('details', 'printed');
+  d.open = printedOpen;
+  d.addEventListener('toggle', () => { printedOpen = d.open; });
   d.appendChild(el('summary', null, 'What it printed'));
   const pre = el('pre', null, text || '(nothing)');
   d.appendChild(pre);
