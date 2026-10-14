@@ -1,37 +1,49 @@
-/* PyRUA-Lean documentation: the colours of the logo (red into orange, ink into steel blue). */
+/* PyRUA-Lean documentation: the red of the logo for every accent, the ink of the logo for the bars. */
 
+/* ---------- Colours ---------- */
 :root {
-  --pyr-red: #8c0000;
-  --pyr-orange: #d9531e;
   --pyr-ink: #101a2b;
-  --pyr-blue: #3a5f8a;
+  --pyr-rgb: 140, 0, 0;
 
-  --md-primary-fg-color: var(--pyr-red);
+  --md-primary-fg-color: #8c0000;
   --md-primary-fg-color--light: #b3261e;
   --md-primary-fg-color--dark: #6b0000;
-  --md-accent-fg-color: var(--pyr-orange);
-  --md-accent-fg-color--transparent: rgba(217, 83, 30, 0.1);
-  --md-typeset-a-color: var(--pyr-red);
+
+  --md-accent-fg-color: #8c0000;
+  --md-accent-fg-color--transparent: rgba(140, 0, 0, 0.1);
+
+  --md-typeset-a-color: #8c0000;
 }
 
 [data-md-color-scheme="slate"] {
+  --pyr-rgb: 229, 72, 77;
+
   --md-primary-fg-color: #e5484d;
   --md-primary-fg-color--light: #f07178;
   --md-primary-fg-color--dark: #b3261e;
-  --md-accent-fg-color: #f2853a;
-  --md-typeset-a-color: #f2853a;
+
+  --md-accent-fg-color: #e5484d;
+  --md-accent-fg-color--transparent: rgba(229, 72, 77, 0.1);
+
+  --md-typeset-a-color: #e5484d;
 
   --md-default-bg-color: #0d1117;
   --md-default-bg-color--light: #161b22;
   --md-default-bg-color--lighter: #21262d;
   --md-default-bg-color--lightest: #30363d;
+
   --md-code-bg-color: #161b22;
 }
 
-/* ---------- Header: an ink bar in both themes, the name in its own colours ---------- */
+/* ---------- Header ---------- */
 .md-header {
   background: linear-gradient(135deg, var(--pyr-ink) 0%, #0d1117 100%);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.md-header__title {
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .md-header__button.md-logo img,
@@ -45,32 +57,109 @@
   visibility: hidden;
 }
 
-.md-tabs {
-  background: linear-gradient(135deg, #0d1117 0%, var(--pyr-ink) 100%);
+/* ---------- Sidebar ---------- */
+/* the logo in the header names the site; the mobile drawer keeps its title */
+@media screen and (min-width: 76.25em) {
+  .md-nav--primary > .md-nav__title {
+    display: none;
+  }
 }
 
-/* ---------- Content ---------- */
-.md-typeset h1 {
+/* section titles (Get Started, User Guide, ...) */
+.md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__link,
+.md-nav--primary > .md-nav__list > .md-nav__item > label {
   font-weight: 700;
-  letter-spacing: -0.02em;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--md-primary-fg-color) !important;
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(var(--pyr-rgb), 0.3);
 }
 
-.md-typeset h2 {
-  font-weight: 650;
-  border-bottom: 1px solid var(--md-default-fg-color--lightest);
-  padding-bottom: 0.25em;
+/* first section: no top border */
+.md-nav--primary > .md-nav__list > .md-nav__item:first-child > .md-nav__link,
+.md-nav--primary > .md-nav__list > .md-nav__item:first-child > label {
+  border-top: none;
+  margin-top: 0;
+  padding-top: 0;
 }
 
-.md-typeset table:not([class]) {
-  font-size: 0.72rem;
+/* a section with a page of its own (Robots): the link inside carries the padding */
+.md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__container {
+  padding-left: 0;
+  padding-right: 0;
 }
 
-.md-typeset table:not([class]) th {
-  background: var(--md-default-fg-color--lightest);
+/* items */
+.md-nav__item .md-nav__link {
+  padding: 0.15rem 0.6rem;
+  border-radius: 4px;
+  font-weight: 600;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.md-nav__item {
+  margin: 0;
+  padding: 0;
+}
+
+.md-nav__list {
+  margin: 0;
+  padding: 0;
+}
+
+/* the pages of a group inside a section (XPolicyLab, RPent) are indented under it */
+@media screen and (min-width: 76.25em) {
+  .md-nav--primary .md-nav[data-md-level="2"] > .md-nav__list {
+    padding-left: 0.6rem;
+  }
+}
+
+.md-nav__link:hover {
+  color: var(--md-primary-fg-color);
+  background-color: rgba(var(--pyr-rgb), 0.1);
 }
 
 .md-nav__link--active {
+  color: var(--md-primary-fg-color) !important;
   font-weight: 600;
+  background-color: rgba(var(--pyr-rgb), 0.15);
+}
+
+/* table of contents */
+.md-nav--secondary .md-nav__title {
+  font-weight: 600;
+  color: var(--md-primary-fg-color);
+}
+
+[data-md-color-scheme="slate"] .md-sidebar--primary .md-sidebar__scrollwrap {
+  background-color: #0d1117;
+}
+
+/* ---------- Content ---------- */
+.md-content h1,
+.md-typeset h1 {
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: var(--md-primary-fg-color) !important;
+}
+
+.md-content h2 {
+  border-bottom: 2px solid var(--md-primary-fg-color);
+  padding-bottom: 0.3em;
+}
+
+.md-content a:not(.md-button) {
+  color: var(--md-primary-fg-color);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s ease;
+}
+
+.md-content a:not(.md-button):hover {
+  border-bottom-color: var(--md-primary-fg-color);
 }
 
 /* the API references are long; keep them readable without a page of their own */
@@ -82,4 +171,97 @@
 [data-md-color-scheme="default"] .only-dark,
 [data-md-color-scheme="slate"] .only-light {
   display: none;
+}
+
+/* ---------- Code blocks ---------- */
+.highlight code,
+code {
+  border-radius: 6px;
+}
+
+.md-clipboard {
+  color: var(--md-primary-fg-color);
+}
+
+/* ---------- Search ---------- */
+.md-search__input {
+  border-radius: 8px;
+}
+
+.md-search__input::placeholder {
+  color: #888;
+}
+
+/* ---------- Tables ---------- */
+/* overflow stays auto so that a wide table still scrolls on a phone */
+.md-typeset table:not([class]) {
+  font-size: 0.72rem;
+  border-radius: 8px;
+  overflow: auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.md-typeset table:not([class]) th {
+  background: linear-gradient(135deg, var(--md-primary-fg-color) 0%, var(--md-primary-fg-color--dark) 100%);
+  color: white;
+  font-weight: 600;
+}
+
+/* a results table of seven columns fits the text column */
+.md-typeset table:not([class]) :is(th, td) {
+  padding: 0.75em 0.8em;
+}
+
+/* key-value tables (an empty header row) show no header bar */
+.md-typeset table:not([class]) thead:not(:has(th:not(:empty))) {
+  display: none;
+}
+
+.md-typeset table:not([class]):has(thead:not(:has(th:not(:empty)))) tbody tr:first-child td {
+  border-top: none;
+}
+
+/* ---------- Admonitions ---------- */
+.md-typeset .admonition.note,
+.md-typeset details.note {
+  border-color: var(--md-primary-fg-color);
+}
+
+.md-typeset .admonition.note > .admonition-title,
+.md-typeset details.note > summary {
+  background-color: rgba(var(--pyr-rgb), 0.1);
+}
+
+.md-typeset .admonition.note > .admonition-title::before,
+.md-typeset details.note > summary::before {
+  background-color: var(--md-primary-fg-color);
+}
+
+/* ---------- Footer ---------- */
+.md-footer {
+  background: linear-gradient(135deg, #0d1117 0%, var(--pyr-ink) 100%);
+}
+
+/* ---------- Animations ---------- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.md-content {
+  animation: fadeIn 0.3s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .md-content {
+    animation: none;
+  }
+}
+
+/* ---------- Mobile ---------- */
+@media screen and (max-width: 76.1875em) {
+  .md-nav--primary .md-nav__title {
+    background: linear-gradient(135deg, var(--md-primary-fg-color) 0%, var(--md-primary-fg-color--dark) 100%);
+    color: var(--md-primary-bg-color);
+  }
 }
