@@ -1,0 +1,85 @@
+/* PyRUA-Lean documentation: the colours of the logo (red into orange, ink into steel blue). */
+
+:root {
+  --pyr-red: #8c0000;
+  --pyr-orange: #d9531e;
+  --pyr-ink: #101a2b;
+  --pyr-blue: #3a5f8a;
+
+  --md-primary-fg-color: var(--pyr-red);
+  --md-primary-fg-color--light: #b3261e;
+  --md-primary-fg-color--dark: #6b0000;
+  --md-accent-fg-color: var(--pyr-orange);
+  --md-accent-fg-color--transparent: rgba(217, 83, 30, 0.1);
+  --md-typeset-a-color: var(--pyr-red);
+}
+
+[data-md-color-scheme="slate"] {
+  --md-primary-fg-color: #e5484d;
+  --md-primary-fg-color--light: #f07178;
+  --md-primary-fg-color--dark: #b3261e;
+  --md-accent-fg-color: #f2853a;
+  --md-typeset-a-color: #f2853a;
+
+  --md-default-bg-color: #0d1117;
+  --md-default-bg-color--light: #161b22;
+  --md-default-bg-color--lighter: #21262d;
+  --md-default-bg-color--lightest: #30363d;
+  --md-code-bg-color: #161b22;
+}
+
+/* ---------- Header: an ink bar in both themes, the name in its own colours ---------- */
+.md-header {
+  background: linear-gradient(135deg, var(--pyr-ink) 0%, #0d1117 100%);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.md-header__button.md-logo img,
+.md-header__button.md-logo svg {
+  height: 1.55rem;
+  width: auto;
+}
+
+/* the logo already spells the name; the site name appears only in the tab title */
+.md-header__title .md-header__topic:first-child {
+  visibility: hidden;
+}
+
+.md-tabs {
+  background: linear-gradient(135deg, #0d1117 0%, var(--pyr-ink) 100%);
+}
+
+/* ---------- Content ---------- */
+.md-typeset h1 {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.md-typeset h2 {
+  font-weight: 650;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+  padding-bottom: 0.25em;
+}
+
+.md-typeset table:not([class]) {
+  font-size: 0.72rem;
+}
+
+.md-typeset table:not([class]) th {
+  background: var(--md-default-fg-color--lightest);
+}
+
+.md-nav__link--active {
+  font-weight: 600;
+}
+
+/* the API references are long; keep them readable without a page of their own */
+.md-typeset pre > code {
+  max-height: 42rem;
+}
+
+/* the logo on the overview page swaps with the theme */
+[data-md-color-scheme="default"] .only-dark,
+[data-md-color-scheme="slate"] .only-light {
+  display: none;
+}

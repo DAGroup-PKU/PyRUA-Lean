@@ -1,0 +1,67 @@
+name: Deploy Documentation
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - 'src/pyrualean/**'
+      - 'integrations/xpolicylab/PyRUA_Lean/README.md'
+      - '.github/workflows/docs.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'docs/**'
+      - 'mkdocs.yml'
+      - 'src/pyrualean/**'
+      - 'integrations/xpolicylab/PyRUA_Lean/README.md'
+      - '.github/workflows/docs.yml'
+  workflow_dispatch: # Allow manual trigger
+permissions:
+  contents: write
+concurrency:
+  group: docs-deploy
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Setup Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        # the hook (docs/hooks/) renders the API reference pages from the robot classes; numpy and pillow in case a robot
+        # module needs them at import
+        run: |
+          pip install 'mkdocs>=1.6,<2' 'mkdocs-material>=9.7,<10' 'pymdown-extensions>=10' numpy pillow
+      - name: Build documentation
+        run: |
+          mkdocs build --strict
+      - name: Deploy to GitHub Pages (docs/ subdirectory)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Save the built site
+          mv site /tmp/site
+
+          # Switch to page branch (where GitHub Pages is configured); the project page at its root is not touched
+          git fetch origin page:page
+          git checkout page
+
+          # Remove old docs/ and copy new content
+          rm -rf docs/
+          mkdir -p docs/
+          cp -r /tmp/site/* docs/
+
+          # Commit and push
+          git add docs/
+          git commit -m "Deploy documentation to /docs/" || echo "No changes to commit"
+          git push origin page

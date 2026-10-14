@@ -1,0 +1,107 @@
+site_name: PyRUA-Lean Documentation
+site_description: Documentation for PyRUA-Lean - Python for Lean Robot-Use Agents
+site_author: PKU DAGroup
+site_url: https://dagroup-pku.github.io/PyRUA-Lean/docs/
+repo_name: DAGroup-PKU/PyRUA-Lean
+repo_url: https://github.com/DAGroup-PKU/PyRUA-Lean
+theme:
+  name: material
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: custom
+      accent: custom
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  font:
+    text: Inter
+    code: JetBrains Mono
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - navigation.indexes
+    - navigation.footer
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - content.code.copy
+    - content.code.annotate
+  icon:
+    repo: fontawesome/brands/github
+  logo: assets/logo-header.svg
+  favicon: assets/favicon.svg
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+plugins:
+  - search
+hooks:
+  - docs/hooks/api_reference.py
+exclude_docs: |
+  hooks/
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets:
+      base_path: ["."]
+      check_paths: true
+  - pymdownx.superfences
+  - pymdownx.tabbed:
+      alternate_style: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+nav:
+  - Overview: index.md
+  - Get Started:
+      - Quick Start: getting-started/quickstart.md
+      - How It Works: getting-started/how-it-works.md
+  - User Guide:
+      - Agent Configuration: guide/agents.md
+      - Running Episodes: guide/running.md
+      - Output Files: guide/outputs.md
+      - Command-Line Reference: guide/cli.md
+  - Robots:
+      - robots/index.md
+      - XPolicyLab:
+          - RoboDojo: robots/robodojo.md
+      - RPent:
+          - LIBERO-PRO: robots/libero.md
+          - RoboTwin 2.0: robots/robotwin.md
+          - RoboCasa365: robots/robocasa.md
+      - Adding a Robot: robots/adding-a-robot.md
+  - Models:
+      - PyRUA-Lean Coder v0.1-4B: models/coder.md
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/DAGroup-PKU/PyRUA-Lean
+    - icon: simple/arxiv
+      link: https://arxiv.org/abs/2610.01939
+  generator: false
+extra_css:
+  - stylesheets/extra.css
+copyright: Copyright &copy; 2026 PyRUA-Lean Contributors

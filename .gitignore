@@ -15,3 +15,5 @@ runs/*
 !runs/_empty-memory-robocasa/
 results/
 logs/
+# the built documentation (mkdocs build)
+site/

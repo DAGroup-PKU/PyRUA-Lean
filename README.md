@@ -8,7 +8,7 @@
 <h3 align="center">
 <a href="https://dagroup-pku.github.io/PyRUA-Lean/"><b>🌐 Project Page</b></a> |
 <a href="https://arxiv.org/abs/2610.01939"><b>📄 Paper</b></a> |
-<a href="docs/guide.md"><b>📚 Docs</b></a> |
+<a href="https://dagroup-pku.github.io/PyRUA-Lean/docs/"><b>📚 Docs</b></a> |
 <b>🤗 Model (coming soon)</b>
 </h3>
 
@@ -36,8 +36,9 @@ can find an object, move above it, grasp, check the gripper and try again.
 - [2026/10/13] 📄 **arXiv v2** is out as a technical report: it adds RoboDojo and PyRUA-Lean Coder v0.1-4B.
   [[Paper]](https://arxiv.org/abs/2610.01939)
 - [2026/10/13] 🤖 **RoboDojo**: without any VLA policy or privileged information, PyRUA-Lean reaches a **51.62%**
-  average success rate (Score 58.20), 19.4 points above the best entry of the public leaderboard. The policy is
-  submitted to the official evaluation ([XPolicyLab#168](https://github.com/XPolicyLab/XPolicyLab/pull/168)).
+  average success rate (Score 58.20), 19.4 points above the best entry of the public leaderboard (snapshot of October 9, 2026).
+  The adapter is open as a pull request to XPolicyLab for RoboDojo's official evaluation
+  ([XPolicyLab#168](https://github.com/XPolicyLab/XPolicyLab/pull/168)).
   [[Adapter]](integrations/xpolicylab)
 - [2026/10/01] 📄 **arXiv v1** is out. [[Paper]](https://arxiv.org/abs/2610.01939v1)
 
@@ -52,25 +53,27 @@ PyRUA-Lean has three parts so far:
   agents solve.
 - **RoboDojo.** With this library's own motion, gripper and perception primitives and the colour images of the
   benchmark's default observation, PyRUA-Lean reaches **51.62% average success rate (Score 58.20)**, first on all
-  five dimensions.
+  five dimensions of the public leaderboard (snapshot of October 9, 2026).
 - **PyRUA-Lean Coder v0.1-4B.** Qwen3.5-4B trained with GRPO on 45 LIBERO-PRO instances goes from **18.8% to
   44.1%** on 655 task instances it never saw in training, above the Qwen3.5-27B base model (29.2%).
 
 ## 🚀 Quick start
 
-PyRUA-Lean drives the robot stacks of [RPent](https://github.com/RLinf/RPent): install RPent with the robot you
-want first ([docs/setup.md](docs/setup.md) lists versions, checkpoints and environment variables).
-Agents run through the [Codex CLI](https://github.com/openai/codex) 0.155.1 or Claude Code.
+LIBERO-PRO, RoboTwin 2.0 and RoboCasa365 run on the robot stacks of [RPent](https://github.com/RLinf/RPent): install
+RPent with the robot you want first (the [Quick Start](https://dagroup-pku.github.io/PyRUA-Lean/docs/getting-started/quickstart/) goes through it step by step).
+RoboDojo runs through XPolicyLab and needs no RPent ([RoboDojo](https://dagroup-pku.github.io/PyRUA-Lean/docs/robots/robodojo/)). Agents run through the
+[Codex CLI](https://github.com/openai/codex) 0.155.1, Claude Code, or any OpenAI-compatible endpoint.
 
 ```bash
 git clone https://github.com/DAGroup-PKU/PyRUA-Lean.git && cd PyRUA-Lean
-pip install -e .          # into the Python environment of your RPent robot stack
+uv pip install -e .       # into the Python environment of your RPent robot stack (or pip)
 pyrualean api             # the robot API the agent sees; no simulator needed
+npm install -g @openai/codex@0.155.1 && codex login      # the agent runtime
 
-# one LIBERO-PRO episode: GPT-6 Astra writes code against robo, at most 40 LLM calls
+# one LIBERO-PRO episode: GPT-6 Astra writes code against robo, at most 40 code cells
 export RPENT_ROOT=/path/to/rpent
 pyrualean play --arm cells --suite libero_spatial_swap --task 7 --seed 2 \
-    --model gpt-6-astra --max-turns 40 --out runs/demo --cuda-device 0
+    --model gpt-6-astra --max-turns 40 --budget-s 7200 --out runs/demo --cuda-device 0
 pyrualean summarize runs/demo
 ```
 
@@ -79,20 +82,22 @@ calls, the token usage and the benchmark's own verdict.
 
 ## 🦾 Robots
 
-| `--robot` | Benchmark | Robot and skills |
-|---|---|---|
-| `libero` (default) | LIBERO-PRO | Franka arm; scripted servos, Pi0.5 VLA, SAM3 perception |
-| `robotwin` | RoboTwin 2.0 | two arms; LingBot-VLA |
-| `robocasa` | RoboCasa365 | mobile manipulator; RLDX-1 VLA, navigation |
-| `robodojo_xpl_rgb` | RoboDojo | two ARX-X5 arms; this library's own full-pose motion (IK in the host), gripper and perception primitives, SAM3; perception from the three colour images of the benchmark's default observation. Runs under RoboDojo's own evaluation client as an [XPolicyLab](https://github.com/XPolicyLab/XPolicyLab) policy ([integrations/xpolicylab](integrations/xpolicylab)): the client owns the simulator and gives the verdict; no RPent runtime, no VLA (`--primitives no-vla`) |
+| Robot | Benchmark | Runs on | Robot and skills |
+|---|---|---|---|
+| `robodojo_xpl_rgb` | [RoboDojo](https://dagroup-pku.github.io/PyRUA-Lean/docs/robots/robodojo/) | [XPolicyLab](https://github.com/XPolicyLab/XPolicyLab), under RoboDojo's own evaluation client | two ARX-X5 arms; this library's own motion, gripper and perception primitives, SAM3; the three colour images of the default observation; no VLA |
+| `libero` (default) | [LIBERO-PRO](https://dagroup-pku.github.io/PyRUA-Lean/docs/robots/libero/) | RPent | Franka arm; scripted servos, Pi0.5 VLA, SAM3 perception |
+| `robotwin` | [RoboTwin 2.0](https://dagroup-pku.github.io/PyRUA-Lean/docs/robots/robotwin/) | RPent | two arms; LingBot-VLA |
+| `robocasa` | [RoboCasa365](https://dagroup-pku.github.io/PyRUA-Lean/docs/robots/robocasa/) | RPent | mobile manipulator; RLDX-1 VLA, navigation |
 
-[docs/multi-robot.md](docs/multi-robot.md) is the contract for adding a robot.
+New robots are added through XPolicyLab ([Adding a Robot](https://dagroup-pku.github.io/PyRUA-Lean/docs/robots/adding-a-robot/)).
 
 ## 📚 Documentation
 
-- [docs/guide.md](docs/guide.md): what an agent writes and how it works, the `robo` API, the prompt, single-shot and interactive runs, budgets,
-  evaluation and configuration.
-- [docs/setup.md](docs/setup.md): setting up the three robot stacks and the agent runtime.
+The documentation is at **[dagroup-pku.github.io/PyRUA-Lean/docs](https://dagroup-pku.github.io/PyRUA-Lean/docs/)**:
+a [quick start](https://dagroup-pku.github.io/PyRUA-Lean/docs/getting-started/quickstart/) and [how it works](https://dagroup-pku.github.io/PyRUA-Lean/docs/getting-started/how-it-works/),
+the user guide ([agent configuration](https://dagroup-pku.github.io/PyRUA-Lean/docs/guide/agents/), [running episodes](https://dagroup-pku.github.io/PyRUA-Lean/docs/guide/running/),
+[output files](https://dagroup-pku.github.io/PyRUA-Lean/docs/guide/outputs/), [command-line reference](https://dagroup-pku.github.io/PyRUA-Lean/docs/guide/cli/)), and a page per robot with the API
+reference its agent reads. Its source is [docs/](docs).
 
 ## 📊 Performance
 
@@ -107,8 +112,8 @@ the task instances both agents solved):
 | RC365 composite | 34.4 | **39.4** | 28.4 → 14.9 | 1.22M → 603k | $2.01 → $1.25 |
 | **All** | 63.1 | **71.7** | 17.0 → 8.7 | 788k → 276k | $1.63 → $0.74 |
 
-**RoboDojo** (success rate %, the leaderboard's average over its five dimensions; top entries of the public
-board):
+**RoboDojo** (success rate %, the leaderboard's average over its five dimensions; top entries of a snapshot
+of the public leaderboard taken on October 9, 2026):
 
 | Entry | Type | Average | Gen. | Prec. | Long-Hor. | Memory | Open |
 |---|---|---|---|---|---|---|---|
@@ -142,8 +147,9 @@ If you use PyRUA-Lean, please cite our paper:
 ## 🤗 License and acknowledgements
 
 Apache License 2.0 ([LICENSE](LICENSE)). PyRUA-Lean builds on [RPent](https://github.com/RLinf/RPent)
-(Apache-2.0): its robot stacks, services and primitive implementations do the work behind `robo`, the
-tool-calling baseline is RPent itself, and parts of this repository are adapted from it; see `NOTICE`. If you use
+(Apache-2.0): on LIBERO-PRO, RoboTwin 2.0 and RoboCasa365 its robot stacks, services and primitive implementations
+do the work behind `robo`, the tool-calling baseline is RPent itself, and parts of this repository are adapted from
+it; see `NOTICE`. If you use
 RPent, please cite its paper, [Harness VLA: Steering Frozen VLAs into Reliable Manipulation Primitives via
 Memory-Guided Agents](https://arxiv.org/abs/2607.08448).
 
