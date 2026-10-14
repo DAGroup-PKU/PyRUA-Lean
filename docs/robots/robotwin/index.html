@@ -1,0 +1,2090 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for PyRUA-Lean - Python for Lean Robot-Use Agents">
+      
+      
+        <meta name="author" content="PKU DAGroup">
+      
+      
+        <link rel="canonical" href="https://dagroup-pku.github.io/PyRUA-Lean/docs/robots/robotwin/">
+      
+      
+        <link rel="prev" href="../libero/">
+      
+      
+        <link rel="next" href="../robocasa/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
+    
+    
+      
+        <title>RoboTwin 2.0 - PyRUA-Lean Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.ec1eaa64.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#robotwin-20" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="PyRUA-Lean Documentation" class="md-header__button md-logo" aria-label="PyRUA-Lean Documentation" data-md-component="logo">
+      
+  <img src="../../assets/logo-header.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            PyRUA-Lean Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              RoboTwin 2.0
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/DAGroup-PKU/PyRUA-Lean" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    DAGroup-PKU/PyRUA-Lean
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="PyRUA-Lean Documentation" class="md-nav__button md-logo" aria-label="PyRUA-Lean Documentation" data-md-component="logo">
+      
+  <img src="../../assets/logo-header.svg" alt="logo">
+
+    </a>
+    PyRUA-Lean Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/DAGroup-PKU/PyRUA-Lean" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    DAGroup-PKU/PyRUA-Lean
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Get Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Get Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/how-it-works/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How It Works
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/running/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running Episodes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/outputs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output Files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command-Line Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Robots
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Robots
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XPolicyLab
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XPolicyLab
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../robodojo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RoboDojo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RPent
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    RPent
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../libero/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LIBERO-PRO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RoboTwin 2.0
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RoboTwin 2.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#observation-and-action" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observation and Action
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation-and-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation and Resources
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vla-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VLA Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#task-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task Selection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#run-a-task" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run a Task
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#view-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        View Results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-runs-where" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Runs Where
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#primitives-the-agent-can-call" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Primitives the Agent Can Call
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../robocasa/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RoboCasa365
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adding-a-robot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding a Robot
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../models/coder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PyRUA-Lean Coder v0.1-4B
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#observation-and-action" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observation and Action
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation-and-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation and Resources
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#vla-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        VLA Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#task-selection" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Task Selection
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#run-a-task" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run a Task
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#view-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        View Results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-runs-where" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Runs Where
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#primitives-the-agent-can-call" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Primitives the Agent Can Call
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="robotwin-20">RoboTwin 2.0<a class="headerlink" href="#robotwin-20" title="Permanent link">&para;</a></h1>
+<div class="admonition note">
+<p class="admonition-title">Runs on RPent</p>
+<p>RoboTwin 2.0 runs on <a href="https://github.com/RLinf/RPent">RPent</a>'s RoboTwin stack: RPent boots the SAPIEN
+environment and the LingBot-VLA, and every <code>robo</code> call goes through RPent's toolkit. New robots are added
+through XPolicyLab (<a href="../adding-a-robot/">Adding a Robot</a>).</p>
+</div>
+<p>RoboTwin 2.0 is a dual-arm manipulation benchmark in SAPIEN. The robot has two arms with RPent's collision-aware
+motion planning and the frozen LingBot-VLA.</p>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Robot</strong></td>
+<td>Two arms in SAPIEN (headless, Vulkan)</td>
+</tr>
+<tr>
+<td><strong>Action models</strong></td>
+<td>LingBot-VLA (<code>lingbot_act</code>)</td>
+</tr>
+<tr>
+<td><strong>Agent runtimes</strong></td>
+<td><code>codex</code> (default), <code>claude</code>, <code>openai</code> (<a href="../../guide/agents/">Agent Configuration</a>)</td>
+</tr>
+<tr>
+<td><strong>Tasks</strong></td>
+<td>RoboTwin 2.0's 50 dual-arm tasks, in the <code>demo_randomized</code> evaluation setting</td>
+</tr>
+<tr>
+<td><strong>Hardware</strong></td>
+<td>Linux, NVIDIA GPU with Vulkan; Python 3.11</td>
+</tr>
+</tbody>
+</table>
+<h3 id="observation-and-action">Observation and Action<a class="headerlink" href="#observation-and-action" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Observation</td>
+<td>The <code>head</code>, <code>left_wrist</code> and <code>right_wrist</code> images (240 × 320), their depth and per-pixel world coordinates, and the state of both arms.</td>
+</tr>
+<tr>
+<td>Action</td>
+<td>The agent's cells call <code>robo</code>; each call is one RPent tool (a planned arm motion, a gripper command or a LingBot-VLA run) that steps the simulator.</td>
+</tr>
+<tr>
+<td>Success</td>
+<td>RoboTwin's own <code>eval_success</code> predicate. <code>robo.done</code> turns true once it fires, and every further motion is refused.</td>
+</tr>
+<tr>
+<td>Task prompt</td>
+<td>The task instruction, a task card (the step-0 images and the arms' initial poses) and the robot's knowledge text.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="installation-and-resources">Installation and Resources<a class="headerlink" href="#installation-and-resources" title="Permanent link">&para;</a></h2>
+<p>RPent at commit <code>886b3b2</code>, in its own Python 3.11 environment (the same torch build as for LIBERO-PRO), with
+PyRUA-Lean in the same environment:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[rlinf]"</span><span class="w"> </span>rlinf-robotwin-runtime<span class="o">==</span><span class="m">0</span>.1.1<span class="w"> </span>rlinf-lingbotvla<span class="o">==</span><span class="m">0</span>.1.1<span class="w"> </span>imageio-ffmpeg
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>git<span class="w"> </span>clone<span class="w"> </span>--branch<span class="w"> </span>v0.7.8<span class="w"> </span>https://github.com/NVlabs/curobo.git
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>--no-build-isolation<span class="w"> </span>./curobo<span class="w">         </span><span class="c1"># against that torch: CUDA_HOME (12.8) and TORCH_CUDA_ARCH_LIST set</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>uv<span class="w"> </span>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span>/path/to/PyRUA-Lean
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>robotwin-download-assets<span class="w"> </span>--output<span class="w"> </span>/path/to/robotwin-assets<span class="w">      </span><span class="c1"># the Hugging Face dataset TianxingChen/RoboTwin2.0, 16 GB</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a><span class="nb">export</span><span class="w"> </span><span class="nv">ROBOTWIN_ASSETS_PATH</span><span class="o">=</span>/path/to/robotwin-assets
+</code></pre></div>
+<p>Rendering is headless SAPIEN on Vulkan: the NVIDIA ICD must be found; set <code>VK_ICD_FILENAMES</code> when it is not under
+<code>/usr/share/vulkan/icd.d</code>.</p>
+<h2 id="vla-configuration">VLA Configuration<a class="headerlink" href="#vla-configuration" title="Permanent link">&para;</a></h2>
+<p>LingBot-VLA <code>RLinf/LingBot-VLA-RoboTwin-EEF-ckpt1500</code> at revision <code>e727b46cd220b66981ea4d2fd9ba84adc189e2cc</code>,
+including <code>qwen_base/</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>hf<span class="w"> </span>download<span class="w"> </span>RLinf/LingBot-VLA-RoboTwin-EEF-ckpt1500<span class="w"> </span>--revision<span class="w"> </span>e727b46cd220b66981ea4d2fd9ba84adc189e2cc<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span>--local-dir<span class="w"> </span>/path/to/lingbot
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="nb">export</span><span class="w"> </span><span class="nv">LINGBOT_MODEL_PATH</span><span class="o">=</span>/path/to/lingbot
+</code></pre></div>
+<h2 id="task-selection">Task Selection<a class="headerlink" href="#task-selection" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--task</code></td>
+<td>A RoboTwin task name, e.g. <code>beat_block_hammer</code>.</td>
+</tr>
+<tr>
+<td><code>--suite</code></td>
+<td>The task config (default <code>demo_randomized</code>, the evaluation setting).</td>
+</tr>
+<tr>
+<td><code>--seed</code></td>
+<td>The exact scene seed, e.g. <code>100000</code>; RPent lists verified seeds in <code>robots/robotwin/eval/demo_randomized.json</code>. Always pass it: <code>pyrualean play</code> sends <code>0</code> when it is left out.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="run-a-task">Run a Task<a class="headerlink" href="#run-a-task" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">RPENT_ROOT</span><span class="o">=</span>/path/to/rpent
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>pyrualean<span class="w"> </span>play<span class="w"> </span>--robot<span class="w"> </span>robotwin<span class="w"> </span>--arm<span class="w"> </span>cells<span class="w"> </span>--task<span class="w"> </span>beat_block_hammer<span class="w"> </span>--suite<span class="w"> </span>demo_randomized<span class="w"> </span>--seed<span class="w"> </span><span class="m">100000</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">    </span>--model<span class="w"> </span>gpt-6-astra<span class="w"> </span>--max-turns<span class="w"> </span><span class="m">40</span><span class="w"> </span>--budget-s<span class="w"> </span><span class="m">7200</span><span class="w"> </span>--out<span class="w"> </span>runs/robotwin-demo<span class="w"> </span>--cuda-device<span class="w"> </span><span class="m">0</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>pyrualean<span class="w"> </span>summarize<span class="w"> </span>runs/robotwin-demo
+</code></pre></div>
+<p>An episode boots private env and VLA servers (~7 GB + ~9 GB of GPU memory); <code>--vla-endpoint</code> attaches it to a
+running LingBot-VLA server instead.</p>
+<h2 id="view-results">View Results<a class="headerlink" href="#view-results" title="Permanent link">&para;</a></h2>
+<p>The run directory keeps the episode video (<code>episode.mp4</code>), every cell the agent ran (<code>workspace/</code>) and what each
+printed (the runtime's event file, e.g. <code>codex_events.jsonl</code>), the ledger of primitive calls (<code>calls.jsonl</code>), the token
+usage and RoboTwin's verdict
+(<code>result.json</code>), and RPent's own records (<code>states.json</code>, per-step images and world maps).</p>
+<h2 id="results">Results<a class="headerlink" href="#results" title="Permanent link">&para;</a></h2>
+<p>GPT-6 Astra, 50 tasks at five seeds (250 task instances), at most 40 LLM calls and two hours per episode. Against RPent's tool-calling agent
+with the same planner and primitives; LLM calls, input tokens and cost per solved episode on the instances both
+solved:</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Success (%)</th>
+<th>LLM calls</th>
+<th>Input tokens</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tool calling (RPent)</td>
+<td>60.0</td>
+<td>12.2</td>
+<td>415k</td>
+<td>$1.00</td>
+</tr>
+<tr>
+<td><strong>PyRUA-Lean</strong></td>
+<td><strong>69.2</strong></td>
+<td><strong>8.9</strong></td>
+<td><strong>245k</strong></td>
+<td><strong>$0.66</strong></td>
+</tr>
+</tbody>
+</table>
+<h2 id="what-runs-where">What Runs Where<a class="headerlink" href="#what-runs-where" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Env server</strong> (RPent) owns the RoboTwin task environment and its SAPIEN rendering.</li>
+<li><strong>LingBot-VLA server</strong> (RPent) holds the VLA.</li>
+<li><strong>PyRUA-Lean</strong> boots them for the episode, builds RPent's toolkit and serves the agent's cells against <code>robo</code>.</li>
+<li><strong>Agent runtime</strong> (Codex CLI, Claude Code or the <code>openai</code> loop) talks to the model.</li>
+</ul>
+<h2 id="primitives-the-agent-can-call">Primitives the Agent Can Call<a class="headerlink" href="#primitives-the-agent-can-call" title="Permanent link">&para;</a></h2>
+<p>Motion:</p>
+<ul>
+<li><code>move_to(arm, xyz, quat=None, gripper=None)</code>: plan and execute a collision-aware motion of one arm to a world pose.</li>
+<li><code>rotate_wrist(arm, delta_yaw_deg)</code>: rotate one end-effector about the world z axis, keeping its position.</li>
+<li><code>set_gripper(arm, val, steps)</code>, <code>release(arm)</code>: drive one gripper; open it.</li>
+<li><code>lingbot_act(chunks)</code>: let the frozen LingBot-VLA drive both arms for <code>chunks</code> × 50 native actions.</li>
+</ul>
+<p>Perception and state:</p>
+<ul>
+<li><code>sample_world_xyz(view, pixels)</code>, <code>query_world_map(view, bbox)</code>: world points under pixels, statistics of the
+  points inside a pixel box.</li>
+<li><code>state()</code>, <code>image(camera)</code>, <code>depth(camera)</code>, <code>world_map(camera)</code>, <code>render()</code>, <code>show(camera)</code>, <code>camera_meta(camera)</code>,
+  <code>artifact(name)</code>, <code>done</code>.</li>
+</ul>
+<details class="note">
+<summary>API reference: what the agent reads, generated from <code>pyrualean.robotwin</code> when these docs are built</summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>class RobotwinRobot
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    A RoboTwin dual-arm robot (aloha-agilex: two 6-DoF arms with parallel grippers) at a table.
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    World frame: x runs across the table (the robot's LEFT arm is at negative
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    x and appears on the LEFT of the head image), y points away from the robot
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    towards the far edge of the table, z is up; metres and radians.
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    Orientations are unit quaternions ordered [w, x, y, z].  The arms are
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    ``"left"`` and ``"right"`` (``robo.LEFT`` / ``robo.RIGHT``); every motion
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    call names one arm and leaves the other where it is.
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    Two frames per arm: ``move_to`` targets the EEF (wrist link); the TCP
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>    (gripper centre, where an object is held) lies ``EEF_TO_TCP_M`` = 0.12 m
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    beyond the EEF along the gripper's approach axis (``ArmState.approach``),
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>    so to bring the gripper centre onto a point p command
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>    ``p - 0.12 * approach``.  Never send an object's surface point as an EEF
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>    target.  Both frames are reported by ``state()``.
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>    Gripper commands are floats in [0, 1]: ``robo.OPEN`` (1.0) is fully open,
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>    ``robo.CLOSE`` (0.0) fully closed; ``state().left.gripper`` reports the
+<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>    commanded value, not a contact measurement.
+<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>
+<a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>    Every native action (one ``move_to`` substep, one gripper step, one VLA
+<a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>    action) advances ``take_action_cnt`` towards ``step_lim``.  Motion calls
+<a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a>    block until the primitive finishes and return a typed result; nothing is
+<a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a>    queued.
+<a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a>
+<a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a>    Perception is camera based: a fixed ``head`` camera (whole table, 320x240)
+<a id="__codelineno-3-28" name="__codelineno-3-28" href="#__codelineno-3-28"></a>    and one wrist camera per arm (``left_wrist``, ``right_wrist``); every
+<a id="__codelineno-3-29" name="__codelineno-3-29" href="#__codelineno-3-29"></a>    recorded step also carries per-pixel world coordinates for each view
+<a id="__codelineno-3-30" name="__codelineno-3-30" href="#__codelineno-3-30"></a>    (``sample_world_xyz``, ``query_world_map``, ``world_map``).  Object poses
+<a id="__codelineno-3-31" name="__codelineno-3-31" href="#__codelineno-3-31"></a>    are never given.
+<a id="__codelineno-3-32" name="__codelineno-3-32" href="#__codelineno-3-32"></a>
+<a id="__codelineno-3-33" name="__codelineno-3-33" href="#__codelineno-3-33"></a>    The frozen LingBot-VLA (``lingbot_act``) is a learned dual-arm policy for
+<a id="__codelineno-3-34" name="__codelineno-3-34" href="#__codelineno-3-34"></a>    this benchmark.  It always receives the benchmark's own task instruction
+<a id="__codelineno-3-35" name="__codelineno-3-35" href="#__codelineno-3-35"></a>    (``robo.task``), never a prompt of yours.
+<a id="__codelineno-3-36" name="__codelineno-3-36" href="#__codelineno-3-36"></a>
+<a id="__codelineno-3-37" name="__codelineno-3-37" href="#__codelineno-3-37"></a>Constants:
+<a id="__codelineno-3-38" name="__codelineno-3-38" href="#__codelineno-3-38"></a>    robo.ARMS = ('left', 'right')
+<a id="__codelineno-3-39" name="__codelineno-3-39" href="#__codelineno-3-39"></a>    robo.LEFT = 'left'
+<a id="__codelineno-3-40" name="__codelineno-3-40" href="#__codelineno-3-40"></a>    robo.RIGHT = 'right'
+<a id="__codelineno-3-41" name="__codelineno-3-41" href="#__codelineno-3-41"></a>    robo.OPEN = 1.0
+<a id="__codelineno-3-42" name="__codelineno-3-42" href="#__codelineno-3-42"></a>    robo.CLOSE = 0.0
+<a id="__codelineno-3-43" name="__codelineno-3-43" href="#__codelineno-3-43"></a>    robo.EEF_TO_TCP_M = 0.12
+<a id="__codelineno-3-44" name="__codelineno-3-44" href="#__codelineno-3-44"></a>
+<a id="__codelineno-3-45" name="__codelineno-3-45" href="#__codelineno-3-45"></a>Methods and attributes of `robo`:
+<a id="__codelineno-3-46" name="__codelineno-3-46" href="#__codelineno-3-46"></a>
+<a id="__codelineno-3-47" name="__codelineno-3-47" href="#__codelineno-3-47"></a>robo.task -&gt; str  (read-only attribute)
+<a id="__codelineno-3-48" name="__codelineno-3-48" href="#__codelineno-3-48"></a>    The task instruction, e.g. ``"Grab the hammer with the left arm and hit the block"``.
+<a id="__codelineno-3-49" name="__codelineno-3-49" href="#__codelineno-3-49"></a>
+<a id="__codelineno-3-50" name="__codelineno-3-50" href="#__codelineno-3-50"></a>    It is authoritative: it names the arm when one is required and the VLA
+<a id="__codelineno-3-51" name="__codelineno-3-51" href="#__codelineno-3-51"></a>    acts on exactly this text.
+<a id="__codelineno-3-52" name="__codelineno-3-52" href="#__codelineno-3-52"></a>
+<a id="__codelineno-3-53" name="__codelineno-3-53" href="#__codelineno-3-53"></a>robo.done -&gt; bool  (read-only attribute)
+<a id="__codelineno-3-54" name="__codelineno-3-54" href="#__codelineno-3-54"></a>    True once the benchmark's success predicate (``eval_success``) has fired (sticky).
+<a id="__codelineno-3-55" name="__codelineno-3-55" href="#__codelineno-3-55"></a>
+<a id="__codelineno-3-56" name="__codelineno-3-56" href="#__codelineno-3-56"></a>robo.state(step: int = -1) -&gt; State
+<a id="__codelineno-3-57" name="__codelineno-3-57" href="#__codelineno-3-57"></a>    Read the recorded state of both arms and the episode status.
+<a id="__codelineno-3-58" name="__codelineno-3-58" href="#__codelineno-3-58"></a>
+<a id="__codelineno-3-59" name="__codelineno-3-59" href="#__codelineno-3-59"></a>    Args:
+<a id="__codelineno-3-60" name="__codelineno-3-60" href="#__codelineno-3-60"></a>        step: recorded step to read; ``-1`` is the latest, ``0`` the
+<a id="__codelineno-3-61" name="__codelineno-3-61" href="#__codelineno-3-61"></a>            initial scene.  A new step is recorded after every motion call
+<a id="__codelineno-3-62" name="__codelineno-3-62" href="#__codelineno-3-62"></a>            and after ``render``.
+<a id="__codelineno-3-63" name="__codelineno-3-63" href="#__codelineno-3-63"></a>    Returns:
+<a id="__codelineno-3-64" name="__codelineno-3-64" href="#__codelineno-3-64"></a>        State with ``left`` / ``right`` arm poses and gripper values,
+<a id="__codelineno-3-65" name="__codelineno-3-65" href="#__codelineno-3-65"></a>        ``take_action_cnt`` / ``step_lim`` and the episode flags.
+<a id="__codelineno-3-66" name="__codelineno-3-66" href="#__codelineno-3-66"></a>
+<a id="__codelineno-3-67" name="__codelineno-3-67" href="#__codelineno-3-67"></a>robo.image(camera: str = 'head', *, resolution: str = 'high', step: int = -1) -&gt; Any
+<a id="__codelineno-3-68" name="__codelineno-3-68" href="#__codelineno-3-68"></a>    Load a recorded camera image as a ``numpy`` uint8 array (240, 320, 3), RGB.
+<a id="__codelineno-3-69" name="__codelineno-3-69" href="#__codelineno-3-69"></a>
+<a id="__codelineno-3-70" name="__codelineno-3-70" href="#__codelineno-3-70"></a>    Args:
+<a id="__codelineno-3-71" name="__codelineno-3-71" href="#__codelineno-3-71"></a>        camera: ``"head"`` (fixed view of the whole table: identify objects,
+<a id="__codelineno-3-72" name="__codelineno-3-72" href="#__codelineno-3-72"></a>            destinations and the global layout), ``"left_wrist"`` or
+<a id="__codelineno-3-73" name="__codelineno-3-73" href="#__codelineno-3-73"></a>            ``"right_wrist"`` (on the gripper: close-range geometry of the
+<a id="__codelineno-3-74" name="__codelineno-3-74" href="#__codelineno-3-74"></a>            object that arm is working on).
+<a id="__codelineno-3-75" name="__codelineno-3-75" href="#__codelineno-3-75"></a>        resolution: there is one resolution per camera, ``"high"`` (320x240).
+<a id="__codelineno-3-76" name="__codelineno-3-76" href="#__codelineno-3-76"></a>            Pixel coordinates are (row, col) with row 0 at the top and col 0
+<a id="__codelineno-3-77" name="__codelineno-3-77" href="#__codelineno-3-77"></a>            at the left; pass the same camera and step to
+<a id="__codelineno-3-78" name="__codelineno-3-78" href="#__codelineno-3-78"></a>            ``sample_world_xyz`` / ``query_world_map``.
+<a id="__codelineno-3-79" name="__codelineno-3-79" href="#__codelineno-3-79"></a>        step: recorded step, ``-1`` = latest (call ``render()`` first to
+<a id="__codelineno-3-80" name="__codelineno-3-80" href="#__codelineno-3-80"></a>            get a fresh picture after time has passed without motion).
+<a id="__codelineno-3-81" name="__codelineno-3-81" href="#__codelineno-3-81"></a>
+<a id="__codelineno-3-82" name="__codelineno-3-82" href="#__codelineno-3-82"></a>robo.world_map(camera: str = 'head', *, resolution: str = 'high', step: int = -1) -&gt; Any
+<a id="__codelineno-3-83" name="__codelineno-3-83" href="#__codelineno-3-83"></a>    Load the per-pixel world coordinates of a recorded image.
+<a id="__codelineno-3-84" name="__codelineno-3-84" href="#__codelineno-3-84"></a>
+<a id="__codelineno-3-85" name="__codelineno-3-85" href="#__codelineno-3-85"></a>    Returns a ``numpy`` float32 array (240, 320, 3): ``world_map[row, col]``
+<a id="__codelineno-3-86" name="__codelineno-3-86" href="#__codelineno-3-86"></a>    is the [x, y, z] of the surface seen at that pixel, NaN where the
+<a id="__codelineno-3-87" name="__codelineno-3-87" href="#__codelineno-3-87"></a>    camera saw no depth.  This is what ``sample_world_xyz`` and
+<a id="__codelineno-3-88" name="__codelineno-3-88" href="#__codelineno-3-88"></a>    ``query_world_map`` read; load it to reason about many pixels at once
+<a id="__codelineno-3-89" name="__codelineno-3-89" href="#__codelineno-3-89"></a>    (e.g. ``np.nanmedian(world_map[..., 2])`` is the table height).
+<a id="__codelineno-3-90" name="__codelineno-3-90" href="#__codelineno-3-90"></a>
+<a id="__codelineno-3-91" name="__codelineno-3-91" href="#__codelineno-3-91"></a>robo.show(camera: str = 'head') -&gt; None
+<a id="__codelineno-3-92" name="__codelineno-3-92" href="#__codelineno-3-92"></a>    Attach the current image of ``camera`` to the feedback of this turn.
+<a id="__codelineno-3-93" name="__codelineno-3-93" href="#__codelineno-3-93"></a>
+<a id="__codelineno-3-94" name="__codelineno-3-94" href="#__codelineno-3-94"></a>    Images are not returned automatically; call ``show("head")``,
+<a id="__codelineno-3-95" name="__codelineno-3-95" href="#__codelineno-3-95"></a>    ``show("left_wrist")`` or ``show("right_wrist")`` when *you* (the
+<a id="__codelineno-3-96" name="__codelineno-3-96" href="#__codelineno-3-96"></a>    author) need to look at the scene before writing the next turn.  Costs
+<a id="__codelineno-3-97" name="__codelineno-3-97" href="#__codelineno-3-97"></a>    tokens: look only when a decision depends on it.
+<a id="__codelineno-3-98" name="__codelineno-3-98" href="#__codelineno-3-98"></a>
+<a id="__codelineno-3-99" name="__codelineno-3-99" href="#__codelineno-3-99"></a>robo.artifact(name: str, *, step: int = -1) -&gt; bytes
+<a id="__codelineno-3-100" name="__codelineno-3-100" href="#__codelineno-3-100"></a>    Return the raw bytes of a recorded artifact (advanced).
+<a id="__codelineno-3-101" name="__codelineno-3-101" href="#__codelineno-3-101"></a>
+<a id="__codelineno-3-102" name="__codelineno-3-102" href="#__codelineno-3-102"></a>    Names are ``&lt;camera&gt;_rgb.png``, ``&lt;camera&gt;_depth.npy``,
+<a id="__codelineno-3-103" name="__codelineno-3-103" href="#__codelineno-3-103"></a>    ``&lt;camera&gt;_world_xyz.npy`` and ``&lt;camera&gt;_camera_meta.json`` for the
+<a id="__codelineno-3-104" name="__codelineno-3-104" href="#__codelineno-3-104"></a>    three cameras.
+<a id="__codelineno-3-105" name="__codelineno-3-105" href="#__codelineno-3-105"></a>
+<a id="__codelineno-3-106" name="__codelineno-3-106" href="#__codelineno-3-106"></a>robo.depth(camera: str = 'head', *, step: int = -1) -&gt; Any
+<a id="__codelineno-3-107" name="__codelineno-3-107" href="#__codelineno-3-107"></a>    Load the metric depth of a recorded image: float32 (240, 320) metres, NaN if invalid.
+<a id="__codelineno-3-108" name="__codelineno-3-108" href="#__codelineno-3-108"></a>
+<a id="__codelineno-3-109" name="__codelineno-3-109" href="#__codelineno-3-109"></a>robo.camera_meta(camera: str = 'head', *, step: int = -1) -&gt; dict[str, Any]
+<a id="__codelineno-3-110" name="__codelineno-3-110" href="#__codelineno-3-110"></a>    Return the camera calibration of a recorded step as a dict.
+<a id="__codelineno-3-111" name="__codelineno-3-111" href="#__codelineno-3-111"></a>
+<a id="__codelineno-3-112" name="__codelineno-3-112" href="#__codelineno-3-112"></a>    Keys: ``intrinsic_K`` (3x3), ``extrinsic_cv`` (3x4), ``cam2world_gl``
+<a id="__codelineno-3-113" name="__codelineno-3-113" href="#__codelineno-3-113"></a>    (4x4, OpenGL convention: the camera looks down its -z axis), ``width``,
+<a id="__codelineno-3-114" name="__codelineno-3-114" href="#__codelineno-3-114"></a>    ``height``.  The wrist cameras move with their arm.
+<a id="__codelineno-3-115" name="__codelineno-3-115" href="#__codelineno-3-115"></a>
+<a id="__codelineno-3-116" name="__codelineno-3-116" href="#__codelineno-3-116"></a>robo.render() -&gt; State
+<a id="__codelineno-3-117" name="__codelineno-3-117" href="#__codelineno-3-117"></a>    Record a fresh observation (new step with images and world maps) without moving.
+<a id="__codelineno-3-118" name="__codelineno-3-118" href="#__codelineno-3-118"></a>
+<a id="__codelineno-3-119" name="__codelineno-3-119" href="#__codelineno-3-119"></a>    Use it before ``image`` / ``sample_world_xyz`` when the scene may have
+<a id="__codelineno-3-120" name="__codelineno-3-120" href="#__codelineno-3-120"></a>    changed since the last recorded step (an object settling after a
+<a id="__codelineno-3-121" name="__codelineno-3-121" href="#__codelineno-3-121"></a>    release, for instance).  Costs no native action.
+<a id="__codelineno-3-122" name="__codelineno-3-122" href="#__codelineno-3-122"></a>
+<a id="__codelineno-3-123" name="__codelineno-3-123" href="#__codelineno-3-123"></a>robo.sample_world_xyz(
+<a id="__codelineno-3-124" name="__codelineno-3-124" href="#__codelineno-3-124"></a>    view: str,
+<a id="__codelineno-3-125" name="__codelineno-3-125" href="#__codelineno-3-125"></a>    pixels: Sequence[Sequence[int]],
+<a id="__codelineno-3-126" name="__codelineno-3-126" href="#__codelineno-3-126"></a>    *,
+<a id="__codelineno-3-127" name="__codelineno-3-127" href="#__codelineno-3-127"></a>    step: int = -1,
+<a id="__codelineno-3-128" name="__codelineno-3-128" href="#__codelineno-3-128"></a>    neighborhood: int = 1,
+<a id="__codelineno-3-129" name="__codelineno-3-129" href="#__codelineno-3-129"></a>) -&gt; WorldSamples
+<a id="__codelineno-3-130" name="__codelineno-3-130" href="#__codelineno-3-130"></a>    Return the world [x, y, z] under image pixels of a recorded view.
+<a id="__codelineno-3-131" name="__codelineno-3-131" href="#__codelineno-3-131"></a>
+<a id="__codelineno-3-132" name="__codelineno-3-132" href="#__codelineno-3-132"></a>    Args:
+<a id="__codelineno-3-133" name="__codelineno-3-133" href="#__codelineno-3-133"></a>        view: ``"head"``, ``"left_wrist"`` or ``"right_wrist"``; it is also
+<a id="__codelineno-3-134" name="__codelineno-3-134" href="#__codelineno-3-134"></a>            the pixel coordinate space, so use the view whose image the
+<a id="__codelineno-3-135" name="__codelineno-3-135" href="#__codelineno-3-135"></a>            pixels were read from (same ``step``).
+<a id="__codelineno-3-136" name="__codelineno-3-136" href="#__codelineno-3-136"></a>        pixels: 1 to 256 ``[row, col]`` pairs (a single pair is accepted too).
+<a id="__codelineno-3-137" name="__codelineno-3-137" href="#__codelineno-3-137"></a>        step: recorded step, ``-1`` = latest.
+<a id="__codelineno-3-138" name="__codelineno-3-138" href="#__codelineno-3-138"></a>        neighborhood: half-size of the square window (0..32) whose finite
+<a id="__codelineno-3-139" name="__codelineno-3-139" href="#__codelineno-3-139"></a>            points are median-filtered; 1 = a 3x3 window.
+<a id="__codelineno-3-140" name="__codelineno-3-140" href="#__codelineno-3-140"></a>    Returns:
+<a id="__codelineno-3-141" name="__codelineno-3-141" href="#__codelineno-3-141"></a>        WorldSamples; each ``xyz`` is a visible SURFACE point (the top of an
+<a id="__codelineno-3-142" name="__codelineno-3-142" href="#__codelineno-3-142"></a>        object, not its centre): sample several interior pixels and take
+<a id="__codelineno-3-143" name="__codelineno-3-143" href="#__codelineno-3-143"></a>        the median; pixels on edges, shadows or the gap to the table hit
+<a id="__codelineno-3-144" name="__codelineno-3-144" href="#__codelineno-3-144"></a>        the background.
+<a id="__codelineno-3-145" name="__codelineno-3-145" href="#__codelineno-3-145"></a>    Raises:
+<a id="__codelineno-3-146" name="__codelineno-3-146" href="#__codelineno-3-146"></a>        ToolError: pixel out of bounds (images are 240 rows x 320 cols),
+<a id="__codelineno-3-147" name="__codelineno-3-147" href="#__codelineno-3-147"></a>        no finite depth in the window, or no world map for that step.
+<a id="__codelineno-3-148" name="__codelineno-3-148" href="#__codelineno-3-148"></a>
+<a id="__codelineno-3-149" name="__codelineno-3-149" href="#__codelineno-3-149"></a>robo.query_world_map(
+<a id="__codelineno-3-150" name="__codelineno-3-150" href="#__codelineno-3-150"></a>    view: str,
+<a id="__codelineno-3-151" name="__codelineno-3-151" href="#__codelineno-3-151"></a>    bbox: Sequence[int],
+<a id="__codelineno-3-152" name="__codelineno-3-152" href="#__codelineno-3-152"></a>    *,
+<a id="__codelineno-3-153" name="__codelineno-3-153" href="#__codelineno-3-153"></a>    step: int = -1,
+<a id="__codelineno-3-154" name="__codelineno-3-154" href="#__codelineno-3-154"></a>    max_points: int = 256,
+<a id="__codelineno-3-155" name="__codelineno-3-155" href="#__codelineno-3-155"></a>) -&gt; WorldRegion
+<a id="__codelineno-3-156" name="__codelineno-3-156" href="#__codelineno-3-156"></a>    Return statistics of the world points inside a pixel box of a recorded view.
+<a id="__codelineno-3-157" name="__codelineno-3-157" href="#__codelineno-3-157"></a>
+<a id="__codelineno-3-158" name="__codelineno-3-158" href="#__codelineno-3-158"></a>    Args:
+<a id="__codelineno-3-159" name="__codelineno-3-159" href="#__codelineno-3-159"></a>        view: ``"head"``, ``"left_wrist"`` or ``"right_wrist"`` (the box's
+<a id="__codelineno-3-160" name="__codelineno-3-160" href="#__codelineno-3-160"></a>            pixel space; same step as the image you read it from).
+<a id="__codelineno-3-161" name="__codelineno-3-161" href="#__codelineno-3-161"></a>        bbox: half-open ``[row_start, col_start, row_end, col_end]``.
+<a id="__codelineno-3-162" name="__codelineno-3-162" href="#__codelineno-3-162"></a>        step: recorded step, ``-1`` = latest.
+<a id="__codelineno-3-163" name="__codelineno-3-163" href="#__codelineno-3-163"></a>        max_points: how many ``(pixel, xyz)`` samples to return (1..4096).
+<a id="__codelineno-3-164" name="__codelineno-3-164" href="#__codelineno-3-164"></a>    Returns:
+<a id="__codelineno-3-165" name="__codelineno-3-165" href="#__codelineno-3-165"></a>        WorldRegion; ``xyz_median`` is the robust surface height / position
+<a id="__codelineno-3-166" name="__codelineno-3-166" href="#__codelineno-3-166"></a>        of what fills the box, ``xyz_min`` / ``xyz_max`` its extent.
+<a id="__codelineno-3-167" name="__codelineno-3-167" href="#__codelineno-3-167"></a>    Raises:
+<a id="__codelineno-3-168" name="__codelineno-3-168" href="#__codelineno-3-168"></a>        ToolError: box outside the image or no finite depth inside it.
+<a id="__codelineno-3-169" name="__codelineno-3-169" href="#__codelineno-3-169"></a>
+<a id="__codelineno-3-170" name="__codelineno-3-170" href="#__codelineno-3-170"></a>robo.lingbot_act(
+<a id="__codelineno-3-171" name="__codelineno-3-171" href="#__codelineno-3-171"></a>    chunks: int = 4,
+<a id="__codelineno-3-172" name="__codelineno-3-172" href="#__codelineno-3-172"></a>    *,
+<a id="__codelineno-3-173" name="__codelineno-3-173" href="#__codelineno-3-173"></a>    use_length: int = 50,
+<a id="__codelineno-3-174" name="__codelineno-3-174" href="#__codelineno-3-174"></a>    prompt: str | None = None,
+<a id="__codelineno-3-175" name="__codelineno-3-175" href="#__codelineno-3-175"></a>) -&gt; VlaRun
+<a id="__codelineno-3-176" name="__codelineno-3-176" href="#__codelineno-3-176"></a>    Let the frozen LingBot-VLA drive both arms for ``chunks`` x 50 native actions.
+<a id="__codelineno-3-177" name="__codelineno-3-177" href="#__codelineno-3-177"></a>
+<a id="__codelineno-3-178" name="__codelineno-3-178" href="#__codelineno-3-178"></a>    The policy runs on the benchmark's own task instruction (``robo.task``)
+<a id="__codelineno-3-179" name="__codelineno-3-179" href="#__codelineno-3-179"></a>    and the three current camera images; it stops early when the task
+<a id="__codelineno-3-180" name="__codelineno-3-180" href="#__codelineno-3-180"></a>    succeeds or the budget runs out.  It is the tool for grasps and
+<a id="__codelineno-3-181" name="__codelineno-3-181" href="#__codelineno-3-181"></a>    re-grasps, bimanual coordination, insertion, hanging, tool use and
+<a id="__codelineno-3-182" name="__codelineno-3-182" href="#__codelineno-3-182"></a>    other contact-rich motion; script free-space transport, staging and
+<a id="__codelineno-3-183" name="__codelineno-3-183" href="#__codelineno-3-183"></a>    release yourself with the primitives after verifying the state.
+<a id="__codelineno-3-184" name="__codelineno-3-184" href="#__codelineno-3-184"></a>
+<a id="__codelineno-3-185" name="__codelineno-3-185" href="#__codelineno-3-185"></a>    Args:
+<a id="__codelineno-3-186" name="__codelineno-3-186" href="#__codelineno-3-186"></a>        chunks: action chunks to execute (&gt;= 1).  One chunk near contact,
+<a id="__codelineno-3-187" name="__codelineno-3-187" href="#__codelineno-3-187"></a>            near success or for a small correction; two for ordinary
+<a id="__codelineno-3-188" name="__codelineno-3-188" href="#__codelineno-3-188"></a>            stable progress; three only for a continuity-sensitive phase
+<a id="__codelineno-3-189" name="__codelineno-3-189" href="#__codelineno-3-189"></a>            that is already moving correctly.
+<a id="__codelineno-3-190" name="__codelineno-3-190" href="#__codelineno-3-190"></a>        use_length: actions per chunk; the runtime fixes it at 50.
+<a id="__codelineno-3-191" name="__codelineno-3-191" href="#__codelineno-3-191"></a>        prompt: recorded with the call but NOT sent to the policy (the
+<a id="__codelineno-3-192" name="__codelineno-3-192" href="#__codelineno-3-192"></a>            runtime always uses the task instruction); leave it None.
+<a id="__codelineno-3-193" name="__codelineno-3-193" href="#__codelineno-3-193"></a>    Returns:
+<a id="__codelineno-3-194" name="__codelineno-3-194" href="#__codelineno-3-194"></a>        VlaRun; check ``terminated`` / ``robo.done`` and the images
+<a id="__codelineno-3-195" name="__codelineno-3-195" href="#__codelineno-3-195"></a>        afterwards - a completed run is not a solved task.
+<a id="__codelineno-3-196" name="__codelineno-3-196" href="#__codelineno-3-196"></a>
+<a id="__codelineno-3-197" name="__codelineno-3-197" href="#__codelineno-3-197"></a>robo.move_to(
+<a id="__codelineno-3-198" name="__codelineno-3-198" href="#__codelineno-3-198"></a>    arm: str,
+<a id="__codelineno-3-199" name="__codelineno-3-199" href="#__codelineno-3-199"></a>    xyz: Sequence[float],
+<a id="__codelineno-3-200" name="__codelineno-3-200" href="#__codelineno-3-200"></a>    *,
+<a id="__codelineno-3-201" name="__codelineno-3-201" href="#__codelineno-3-201"></a>    quat: Sequence[float] | None = None,
+<a id="__codelineno-3-202" name="__codelineno-3-202" href="#__codelineno-3-202"></a>    gripper: float | None = None,
+<a id="__codelineno-3-203" name="__codelineno-3-203" href="#__codelineno-3-203"></a>    substeps: int = 25,
+<a id="__codelineno-3-204" name="__codelineno-3-204" href="#__codelineno-3-204"></a>) -&gt; Move
+<a id="__codelineno-3-205" name="__codelineno-3-205" href="#__codelineno-3-205"></a>    Plan and execute a collision-aware arm motion to a world-frame EEF pose.
+<a id="__codelineno-3-206" name="__codelineno-3-206" href="#__codelineno-3-206"></a>
+<a id="__codelineno-3-207" name="__codelineno-3-207" href="#__codelineno-3-207"></a>    The motion planner computes a joint path from the current pose to the
+<a id="__codelineno-3-208" name="__codelineno-3-208" href="#__codelineno-3-208"></a>    target; the path is executed as ``substeps`` native actions.  If no
+<a id="__codelineno-3-209" name="__codelineno-3-209" href="#__codelineno-3-209"></a>    path exists (unreachable, in collision, through the other arm or the
+<a id="__codelineno-3-210" name="__codelineno-3-210" href="#__codelineno-3-210"></a>    table) nothing moves and ``Move.planned`` is False.
+<a id="__codelineno-3-211" name="__codelineno-3-211" href="#__codelineno-3-211"></a>
+<a id="__codelineno-3-212" name="__codelineno-3-212" href="#__codelineno-3-212"></a>    Args:
+<a id="__codelineno-3-213" name="__codelineno-3-213" href="#__codelineno-3-213"></a>        arm: ``"left"`` or ``"right"``.
+<a id="__codelineno-3-214" name="__codelineno-3-214" href="#__codelineno-3-214"></a>        xyz: target EEF position [x, y, z] in metres (NOT the gripper centre:
+<a id="__codelineno-3-215" name="__codelineno-3-215" href="#__codelineno-3-215"></a>            subtract 0.12 m along ``ArmState.approach``).
+<a id="__codelineno-3-216" name="__codelineno-3-216" href="#__codelineno-3-216"></a>        quat: target orientation [w, x, y, z]; None keeps the current one.
+<a id="__codelineno-3-217" name="__codelineno-3-217" href="#__codelineno-3-217"></a>        gripper: gripper value in [0, 1] to hold during the motion; None
+<a id="__codelineno-3-218" name="__codelineno-3-218" href="#__codelineno-3-218"></a>            keeps the current command (so a held object stays held).
+<a id="__codelineno-3-219" name="__codelineno-3-219" href="#__codelineno-3-219"></a>        substeps: waypoints executed (1 = jump to the final pose in one
+<a id="__codelineno-3-220" name="__codelineno-3-220" href="#__codelineno-3-220"></a>            action, 0 = every planner waypoint).  Near the table, a rim or
+<a id="__codelineno-3-221" name="__codelineno-3-221" href="#__codelineno-3-221"></a>            the other arm use small motions (z changes of 5-10 mm) with at
+<a id="__codelineno-3-222" name="__codelineno-3-222" href="#__codelineno-3-222"></a>            most 8 substeps and re-observe between them.
+<a id="__codelineno-3-223" name="__codelineno-3-223" href="#__codelineno-3-223"></a>    Returns:
+<a id="__codelineno-3-224" name="__codelineno-3-224" href="#__codelineno-3-224"></a>        Move; always check ``planned`` and ``reached`` and compare
+<a id="__codelineno-3-225" name="__codelineno-3-225" href="#__codelineno-3-225"></a>        ``final_eef_pos`` with the target: a returned call is not proof of
+<a id="__codelineno-3-226" name="__codelineno-3-226" href="#__codelineno-3-226"></a>        arrival.
+<a id="__codelineno-3-227" name="__codelineno-3-227" href="#__codelineno-3-227"></a>
+<a id="__codelineno-3-228" name="__codelineno-3-228" href="#__codelineno-3-228"></a>robo.rotate_wrist(
+<a id="__codelineno-3-229" name="__codelineno-3-229" href="#__codelineno-3-229"></a>    arm: str,
+<a id="__codelineno-3-230" name="__codelineno-3-230" href="#__codelineno-3-230"></a>    delta_yaw_deg: float,
+<a id="__codelineno-3-231" name="__codelineno-3-231" href="#__codelineno-3-231"></a>    *,
+<a id="__codelineno-3-232" name="__codelineno-3-232" href="#__codelineno-3-232"></a>    gripper: float | None = None,
+<a id="__codelineno-3-233" name="__codelineno-3-233" href="#__codelineno-3-233"></a>    substeps: int = 25,
+<a id="__codelineno-3-234" name="__codelineno-3-234" href="#__codelineno-3-234"></a>) -&gt; Move
+<a id="__codelineno-3-235" name="__codelineno-3-235" href="#__codelineno-3-235"></a>    Rotate one EEF about the world z axis by a relative angle, keeping its position.
+<a id="__codelineno-3-236" name="__codelineno-3-236" href="#__codelineno-3-236"></a>
+<a id="__codelineno-3-237" name="__codelineno-3-237" href="#__codelineno-3-237"></a>    Because the TCP sits 0.12 m from the EEF, the gripper (and a held
+<a id="__codelineno-3-238" name="__codelineno-3-238" href="#__codelineno-3-238"></a>    object) sweeps an arc: rotate only with clearance around the gripper,
+<a id="__codelineno-3-239" name="__codelineno-3-239" href="#__codelineno-3-239"></a>    at a safe height, in small increments, after a verified hold.
+<a id="__codelineno-3-240" name="__codelineno-3-240" href="#__codelineno-3-240"></a>
+<a id="__codelineno-3-241" name="__codelineno-3-241" href="#__codelineno-3-241"></a>    Args:
+<a id="__codelineno-3-242" name="__codelineno-3-242" href="#__codelineno-3-242"></a>        arm: ``"left"`` or ``"right"``.
+<a id="__codelineno-3-243" name="__codelineno-3-243" href="#__codelineno-3-243"></a>        delta_yaw_deg: relative yaw in degrees (``state().arm(arm).eef_yaw``
+<a id="__codelineno-3-244" name="__codelineno-3-244" href="#__codelineno-3-244"></a>            reports the current yaw in radians).
+<a id="__codelineno-3-245" name="__codelineno-3-245" href="#__codelineno-3-245"></a>        gripper: value to hold during the motion; None keeps the current.
+<a id="__codelineno-3-246" name="__codelineno-3-246" href="#__codelineno-3-246"></a>        substeps: waypoints executed (see ``move_to``).
+<a id="__codelineno-3-247" name="__codelineno-3-247" href="#__codelineno-3-247"></a>    Returns:
+<a id="__codelineno-3-248" name="__codelineno-3-248" href="#__codelineno-3-248"></a>        Move (``target_xyz`` is the position it was told to keep).
+<a id="__codelineno-3-249" name="__codelineno-3-249" href="#__codelineno-3-249"></a>
+<a id="__codelineno-3-250" name="__codelineno-3-250" href="#__codelineno-3-250"></a>robo.set_gripper(arm: str, val: float, steps: int = 10) -&gt; Gripper
+<a id="__codelineno-3-251" name="__codelineno-3-251" href="#__codelineno-3-251"></a>    Drive one gripper linearly to ``val`` over ``steps`` native actions.
+<a id="__codelineno-3-252" name="__codelineno-3-252" href="#__codelineno-3-252"></a>
+<a id="__codelineno-3-253" name="__codelineno-3-253" href="#__codelineno-3-253"></a>    ``set_gripper("left", robo.CLOSE)`` closes the left gripper; verify a
+<a id="__codelineno-3-254" name="__codelineno-3-254" href="#__codelineno-3-254"></a>    grasp afterwards from the wrist image and from the object moving with
+<a id="__codelineno-3-255" name="__codelineno-3-255" href="#__codelineno-3-255"></a>    the TCP - the reported value is a command, not a contact measurement.
+<a id="__codelineno-3-256" name="__codelineno-3-256" href="#__codelineno-3-256"></a>
+<a id="__codelineno-3-257" name="__codelineno-3-257" href="#__codelineno-3-257"></a>robo.release(arm: str, val: float = 1.0, steps: int = 10) -&gt; Gripper
+<a id="__codelineno-3-258" name="__codelineno-3-258" href="#__codelineno-3-258"></a>    Open one gripper to ``val`` (default fully open) over ``steps`` native actions.
+<a id="__codelineno-3-259" name="__codelineno-3-259" href="#__codelineno-3-259"></a>
+<a id="__codelineno-3-260" name="__codelineno-3-260" href="#__codelineno-3-260"></a>    Release only when the object is supported at its destination; then
+<a id="__codelineno-3-261" name="__codelineno-3-261" href="#__codelineno-3-261"></a>    retreat upwards and check that it stayed put.  Returns
+<a id="__codelineno-3-262" name="__codelineno-3-262" href="#__codelineno-3-262"></a>    ``terminated=True`` when letting go satisfied the task.
+<a id="__codelineno-3-263" name="__codelineno-3-263" href="#__codelineno-3-263"></a>
+<a id="__codelineno-3-264" name="__codelineno-3-264" href="#__codelineno-3-264"></a>Result types (frozen dataclasses; access fields as attributes):
+<a id="__codelineno-3-265" name="__codelineno-3-265" href="#__codelineno-3-265"></a>
+<a id="__codelineno-3-266" name="__codelineno-3-266" href="#__codelineno-3-266"></a>class State(
+<a id="__codelineno-3-267" name="__codelineno-3-267" href="#__codelineno-3-267"></a>    step: int,
+<a id="__codelineno-3-268" name="__codelineno-3-268" href="#__codelineno-3-268"></a>    task: str,
+<a id="__codelineno-3-269" name="__codelineno-3-269" href="#__codelineno-3-269"></a>    left: ArmState,
+<a id="__codelineno-3-270" name="__codelineno-3-270" href="#__codelineno-3-270"></a>    right: ArmState,
+<a id="__codelineno-3-271" name="__codelineno-3-271" href="#__codelineno-3-271"></a>    eval_success: bool,
+<a id="__codelineno-3-272" name="__codelineno-3-272" href="#__codelineno-3-272"></a>    take_action_cnt: int,
+<a id="__codelineno-3-273" name="__codelineno-3-273" href="#__codelineno-3-273"></a>    step_lim: int,
+<a id="__codelineno-3-274" name="__codelineno-3-274" href="#__codelineno-3-274"></a>    terminated: bool,
+<a id="__codelineno-3-275" name="__codelineno-3-275" href="#__codelineno-3-275"></a>    truncated: bool,
+<a id="__codelineno-3-276" name="__codelineno-3-276" href="#__codelineno-3-276"></a>)
+<a id="__codelineno-3-277" name="__codelineno-3-277" href="#__codelineno-3-277"></a>    Snapshot of both arms and of the episode at one recorded step.
+<a id="__codelineno-3-278" name="__codelineno-3-278" href="#__codelineno-3-278"></a>
+<a id="__codelineno-3-279" name="__codelineno-3-279" href="#__codelineno-3-279"></a>    step: index of the recorded step (0 = initial scene).  A new step is
+<a id="__codelineno-3-280" name="__codelineno-3-280" href="#__codelineno-3-280"></a>        recorded after every motion call and after ``render``.
+<a id="__codelineno-3-281" name="__codelineno-3-281" href="#__codelineno-3-281"></a>    task: the task instruction given by the benchmark (authoritative; the VLA
+<a id="__codelineno-3-282" name="__codelineno-3-282" href="#__codelineno-3-282"></a>        acts on exactly this text).
+<a id="__codelineno-3-283" name="__codelineno-3-283" href="#__codelineno-3-283"></a>    left / right: the two arms (``state.arm("left")`` picks one by name).
+<a id="__codelineno-3-284" name="__codelineno-3-284" href="#__codelineno-3-284"></a>    eval_success: the benchmark's success predicate has fired (sticky).  This
+<a id="__codelineno-3-285" name="__codelineno-3-285" href="#__codelineno-3-285"></a>        is the only definition of success; it equals ``terminated``.
+<a id="__codelineno-3-286" name="__codelineno-3-286" href="#__codelineno-3-286"></a>    take_action_cnt: native actions executed so far.  Every ``move_to``
+<a id="__codelineno-3-287" name="__codelineno-3-287" href="#__codelineno-3-287"></a>        substep, every gripper step and every VLA action is one native action.
+<a id="__codelineno-3-288" name="__codelineno-3-288" href="#__codelineno-3-288"></a>    step_lim: native-action budget of the episode.
+<a id="__codelineno-3-289" name="__codelineno-3-289" href="#__codelineno-3-289"></a>    terminated: same as ``eval_success``.
+<a id="__codelineno-3-290" name="__codelineno-3-290" href="#__codelineno-3-290"></a>    truncated: the native-action budget is exhausted (``take_action_cnt &gt;=
+<a id="__codelineno-3-291" name="__codelineno-3-291" href="#__codelineno-3-291"></a>        step_lim``); no further motion is possible.
+<a id="__codelineno-3-292" name="__codelineno-3-292" href="#__codelineno-3-292"></a>    .actions_left -&gt; int: Native actions still available before ``truncated`` fires.
+<a id="__codelineno-3-293" name="__codelineno-3-293" href="#__codelineno-3-293"></a>
+<a id="__codelineno-3-294" name="__codelineno-3-294" href="#__codelineno-3-294"></a>class ArmState(
+<a id="__codelineno-3-295" name="__codelineno-3-295" href="#__codelineno-3-295"></a>    eef_pos: tuple[float, float, float],
+<a id="__codelineno-3-296" name="__codelineno-3-296" href="#__codelineno-3-296"></a>    eef_quat: tuple[float, float, float, float],
+<a id="__codelineno-3-297" name="__codelineno-3-297" href="#__codelineno-3-297"></a>    tcp_pos: tuple[float, float, float],
+<a id="__codelineno-3-298" name="__codelineno-3-298" href="#__codelineno-3-298"></a>    tcp_quat: tuple[float, float, float, float],
+<a id="__codelineno-3-299" name="__codelineno-3-299" href="#__codelineno-3-299"></a>    gripper: float,
+<a id="__codelineno-3-300" name="__codelineno-3-300" href="#__codelineno-3-300"></a>)
+<a id="__codelineno-3-301" name="__codelineno-3-301" href="#__codelineno-3-301"></a>    One arm at a recorded step.
+<a id="__codelineno-3-302" name="__codelineno-3-302" href="#__codelineno-3-302"></a>
+<a id="__codelineno-3-303" name="__codelineno-3-303" href="#__codelineno-3-303"></a>    eef_pos: end-effector position [x, y, z] in the world frame, metres.  The
+<a id="__codelineno-3-304" name="__codelineno-3-304" href="#__codelineno-3-304"></a>        EEF is the wrist link that ``move_to`` targets.
+<a id="__codelineno-3-305" name="__codelineno-3-305" href="#__codelineno-3-305"></a>    eef_quat: EEF orientation as a unit quaternion [w, x, y, z].
+<a id="__codelineno-3-306" name="__codelineno-3-306" href="#__codelineno-3-306"></a>    tcp_pos: tool centre point (the gripper centre, where an object is held):
+<a id="__codelineno-3-307" name="__codelineno-3-307" href="#__codelineno-3-307"></a>        0.12 m beyond the EEF along the gripper's approach axis.
+<a id="__codelineno-3-308" name="__codelineno-3-308" href="#__codelineno-3-308"></a>    tcp_quat: TCP orientation [w, x, y, z] (same as the EEF).
+<a id="__codelineno-3-309" name="__codelineno-3-309" href="#__codelineno-3-309"></a>    gripper: normalised gripper command, 0.0 = closed ... 1.0 = open.  It is
+<a id="__codelineno-3-310" name="__codelineno-3-310" href="#__codelineno-3-310"></a>        the position the fingers were told to hold, not a contact sensor.
+<a id="__codelineno-3-311" name="__codelineno-3-311" href="#__codelineno-3-311"></a>    .approach -&gt; tuple[float, float, float]: Unit vector from the EEF to the TCP: the direction the gripper points (world frame).
+<a id="__codelineno-3-312" name="__codelineno-3-312" href="#__codelineno-3-312"></a>    .eef_yaw -&gt; float: Rotation of the EEF about the world z axis, radians (what ``rotate_wrist`` changes).
+<a id="__codelineno-3-313" name="__codelineno-3-313" href="#__codelineno-3-313"></a>
+<a id="__codelineno-3-314" name="__codelineno-3-314" href="#__codelineno-3-314"></a>class Move(
+<a id="__codelineno-3-315" name="__codelineno-3-315" href="#__codelineno-3-315"></a>    arm: str,
+<a id="__codelineno-3-316" name="__codelineno-3-316" href="#__codelineno-3-316"></a>    target_xyz: tuple[float, float, float],
+<a id="__codelineno-3-317" name="__codelineno-3-317" href="#__codelineno-3-317"></a>    final_eef_pos: tuple[float, float, float] | None,
+<a id="__codelineno-3-318" name="__codelineno-3-318" href="#__codelineno-3-318"></a>    final_dist_m: float,
+<a id="__codelineno-3-319" name="__codelineno-3-319" href="#__codelineno-3-319"></a>    planned: bool,
+<a id="__codelineno-3-320" name="__codelineno-3-320" href="#__codelineno-3-320"></a>    reached: bool,
+<a id="__codelineno-3-321" name="__codelineno-3-321" href="#__codelineno-3-321"></a>    waypoints: int,
+<a id="__codelineno-3-322" name="__codelineno-3-322" href="#__codelineno-3-322"></a>    actions_used: int,
+<a id="__codelineno-3-323" name="__codelineno-3-323" href="#__codelineno-3-323"></a>    stop_reason: str,
+<a id="__codelineno-3-324" name="__codelineno-3-324" href="#__codelineno-3-324"></a>    terminated: bool,
+<a id="__codelineno-3-325" name="__codelineno-3-325" href="#__codelineno-3-325"></a>    truncated: bool,
+<a id="__codelineno-3-326" name="__codelineno-3-326" href="#__codelineno-3-326"></a>)
+<a id="__codelineno-3-327" name="__codelineno-3-327" href="#__codelineno-3-327"></a>    Outcome of ``move_to`` / ``rotate_wrist``.
+<a id="__codelineno-3-328" name="__codelineno-3-328" href="#__codelineno-3-328"></a>
+<a id="__codelineno-3-329" name="__codelineno-3-329" href="#__codelineno-3-329"></a>    planned: the motion planner found a collision-free joint path.  False
+<a id="__codelineno-3-330" name="__codelineno-3-330" href="#__codelineno-3-330"></a>        means NOTHING moved (target unreachable, in collision, or too close to
+<a id="__codelineno-3-331" name="__codelineno-3-331" href="#__codelineno-3-331"></a>        the other arm / the table): change the target, do not repeat it.
+<a id="__codelineno-3-332" name="__codelineno-3-332" href="#__codelineno-3-332"></a>    final_eef_pos: where the EEF actually stopped (metres), None when nothing
+<a id="__codelineno-3-333" name="__codelineno-3-333" href="#__codelineno-3-333"></a>        moved.
+<a id="__codelineno-3-334" name="__codelineno-3-334" href="#__codelineno-3-334"></a>    final_dist_m: distance between the requested xyz and ``final_eef_pos``
+<a id="__codelineno-3-335" name="__codelineno-3-335" href="#__codelineno-3-335"></a>        (``rotate_wrist``: distance from the xyz it was told to hold).
+<a id="__codelineno-3-336" name="__codelineno-3-336" href="#__codelineno-3-336"></a>    reached: ``planned`` and ``final_dist_m &lt;= 0.01``.  A planned motion can
+<a id="__codelineno-3-337" name="__codelineno-3-337" href="#__codelineno-3-337"></a>        still stop short when the episode ended or the budget ran out.
+<a id="__codelineno-3-338" name="__codelineno-3-338" href="#__codelineno-3-338"></a>    waypoints: planner waypoints that were executed.
+<a id="__codelineno-3-339" name="__codelineno-3-339" href="#__codelineno-3-339"></a>    actions_used: native actions consumed (one per waypoint).
+<a id="__codelineno-3-340" name="__codelineno-3-340" href="#__codelineno-3-340"></a>    stop_reason: ``completed`` | ``native_success`` | ``budget_exhausted`` |
+<a id="__codelineno-3-341" name="__codelineno-3-341" href="#__codelineno-3-341"></a>        ``plan_failed`` | ``runtime_failure``.
+<a id="__codelineno-3-342" name="__codelineno-3-342" href="#__codelineno-3-342"></a>    terminated / truncated: episode flags after the motion.
+<a id="__codelineno-3-343" name="__codelineno-3-343" href="#__codelineno-3-343"></a>
+<a id="__codelineno-3-344" name="__codelineno-3-344" href="#__codelineno-3-344"></a>class Gripper(
+<a id="__codelineno-3-345" name="__codelineno-3-345" href="#__codelineno-3-345"></a>    arm: str,
+<a id="__codelineno-3-346" name="__codelineno-3-346" href="#__codelineno-3-346"></a>    target: float,
+<a id="__codelineno-3-347" name="__codelineno-3-347" href="#__codelineno-3-347"></a>    final: float,
+<a id="__codelineno-3-348" name="__codelineno-3-348" href="#__codelineno-3-348"></a>    actions_used: int,
+<a id="__codelineno-3-349" name="__codelineno-3-349" href="#__codelineno-3-349"></a>    stop_reason: str,
+<a id="__codelineno-3-350" name="__codelineno-3-350" href="#__codelineno-3-350"></a>    terminated: bool,
+<a id="__codelineno-3-351" name="__codelineno-3-351" href="#__codelineno-3-351"></a>    truncated: bool,
+<a id="__codelineno-3-352" name="__codelineno-3-352" href="#__codelineno-3-352"></a>)
+<a id="__codelineno-3-353" name="__codelineno-3-353" href="#__codelineno-3-353"></a>    Outcome of ``set_gripper`` / ``release``.
+<a id="__codelineno-3-354" name="__codelineno-3-354" href="#__codelineno-3-354"></a>
+<a id="__codelineno-3-355" name="__codelineno-3-355" href="#__codelineno-3-355"></a>    target: the commanded gripper value; final: the value reported after the
+<a id="__codelineno-3-356" name="__codelineno-3-356" href="#__codelineno-3-356"></a>        motion (a commanded position, not proof of a hold: verify a grasp from
+<a id="__codelineno-3-357" name="__codelineno-3-357" href="#__codelineno-3-357"></a>        the images and from the object moving with the TCP).
+<a id="__codelineno-3-358" name="__codelineno-3-358" href="#__codelineno-3-358"></a>    actions_used: native actions consumed (one per interpolation step).
+<a id="__codelineno-3-359" name="__codelineno-3-359" href="#__codelineno-3-359"></a>
+<a id="__codelineno-3-360" name="__codelineno-3-360" href="#__codelineno-3-360"></a>class VlaRun(
+<a id="__codelineno-3-361" name="__codelineno-3-361" href="#__codelineno-3-361"></a>    chunks_requested: int,
+<a id="__codelineno-3-362" name="__codelineno-3-362" href="#__codelineno-3-362"></a>    actions_requested: int,
+<a id="__codelineno-3-363" name="__codelineno-3-363" href="#__codelineno-3-363"></a>    actions_used: int,
+<a id="__codelineno-3-364" name="__codelineno-3-364" href="#__codelineno-3-364"></a>    stop_reason: str,
+<a id="__codelineno-3-365" name="__codelineno-3-365" href="#__codelineno-3-365"></a>    instruction: str,
+<a id="__codelineno-3-366" name="__codelineno-3-366" href="#__codelineno-3-366"></a>    terminated: bool,
+<a id="__codelineno-3-367" name="__codelineno-3-367" href="#__codelineno-3-367"></a>    truncated: bool,
+<a id="__codelineno-3-368" name="__codelineno-3-368" href="#__codelineno-3-368"></a>)
+<a id="__codelineno-3-369" name="__codelineno-3-369" href="#__codelineno-3-369"></a>    Outcome of ``lingbot_act``.
+<a id="__codelineno-3-370" name="__codelineno-3-370" href="#__codelineno-3-370"></a>
+<a id="__codelineno-3-371" name="__codelineno-3-371" href="#__codelineno-3-371"></a>    chunks_requested / actions_requested: what was asked (50 actions per chunk).
+<a id="__codelineno-3-372" name="__codelineno-3-372" href="#__codelineno-3-372"></a>    actions_used: native actions actually executed; fewer than requested when
+<a id="__codelineno-3-373" name="__codelineno-3-373" href="#__codelineno-3-373"></a>        the task succeeded (``native_success``) or the budget ran out.
+<a id="__codelineno-3-374" name="__codelineno-3-374" href="#__codelineno-3-374"></a>    stop_reason: ``completed`` | ``native_success`` | ``budget_exhausted`` |
+<a id="__codelineno-3-375" name="__codelineno-3-375" href="#__codelineno-3-375"></a>        ``runtime_failure``.
+<a id="__codelineno-3-376" name="__codelineno-3-376" href="#__codelineno-3-376"></a>    instruction: the task text the policy received (always the benchmark's
+<a id="__codelineno-3-377" name="__codelineno-3-377" href="#__codelineno-3-377"></a>        own instruction, i.e. ``robo.task``).
+<a id="__codelineno-3-378" name="__codelineno-3-378" href="#__codelineno-3-378"></a>    terminated / truncated: episode flags after the run.
+<a id="__codelineno-3-379" name="__codelineno-3-379" href="#__codelineno-3-379"></a>
+<a id="__codelineno-3-380" name="__codelineno-3-380" href="#__codelineno-3-380"></a>class WorldSamples(
+<a id="__codelineno-3-381" name="__codelineno-3-381" href="#__codelineno-3-381"></a>    samples: tuple[WorldSample, ...],
+<a id="__codelineno-3-382" name="__codelineno-3-382" href="#__codelineno-3-382"></a>    view: str,
+<a id="__codelineno-3-383" name="__codelineno-3-383" href="#__codelineno-3-383"></a>    step: int,
+<a id="__codelineno-3-384" name="__codelineno-3-384" href="#__codelineno-3-384"></a>    image_shape: tuple[int, int],
+<a id="__codelineno-3-385" name="__codelineno-3-385" href="#__codelineno-3-385"></a>)
+<a id="__codelineno-3-386" name="__codelineno-3-386" href="#__codelineno-3-386"></a>    Outcome of ``sample_world_xyz``: one ``WorldSample`` per requested pixel, in order.
+<a id="__codelineno-3-387" name="__codelineno-3-387" href="#__codelineno-3-387"></a>    .xyz -&gt; tuple[tuple[float, float, float], ...]: The sampled coordinates only, in request order.
+<a id="__codelineno-3-388" name="__codelineno-3-388" href="#__codelineno-3-388"></a>
+<a id="__codelineno-3-389" name="__codelineno-3-389" href="#__codelineno-3-389"></a>class WorldSample(
+<a id="__codelineno-3-390" name="__codelineno-3-390" href="#__codelineno-3-390"></a>    pixel: tuple[int, int],
+<a id="__codelineno-3-391" name="__codelineno-3-391" href="#__codelineno-3-391"></a>    xyz: tuple[float, float, float],
+<a id="__codelineno-3-392" name="__codelineno-3-392" href="#__codelineno-3-392"></a>    valid_points: int,
+<a id="__codelineno-3-393" name="__codelineno-3-393" href="#__codelineno-3-393"></a>)
+<a id="__codelineno-3-394" name="__codelineno-3-394" href="#__codelineno-3-394"></a>    World coordinate of one queried pixel (``sample_world_xyz``).
+<a id="__codelineno-3-395" name="__codelineno-3-395" href="#__codelineno-3-395"></a>
+<a id="__codelineno-3-396" name="__codelineno-3-396" href="#__codelineno-3-396"></a>    xyz: median [x, y, z] (metres) of the finite world points in the pixel's
+<a id="__codelineno-3-397" name="__codelineno-3-397" href="#__codelineno-3-397"></a>        neighbourhood; valid_points: how many neighbourhood pixels had depth.
+<a id="__codelineno-3-398" name="__codelineno-3-398" href="#__codelineno-3-398"></a>
+<a id="__codelineno-3-399" name="__codelineno-3-399" href="#__codelineno-3-399"></a>class WorldRegion(
+<a id="__codelineno-3-400" name="__codelineno-3-400" href="#__codelineno-3-400"></a>    xyz_min: tuple[float, float, float],
+<a id="__codelineno-3-401" name="__codelineno-3-401" href="#__codelineno-3-401"></a>    xyz_max: tuple[float, float, float],
+<a id="__codelineno-3-402" name="__codelineno-3-402" href="#__codelineno-3-402"></a>    xyz_median: tuple[float, float, float],
+<a id="__codelineno-3-403" name="__codelineno-3-403" href="#__codelineno-3-403"></a>    valid_points: int,
+<a id="__codelineno-3-404" name="__codelineno-3-404" href="#__codelineno-3-404"></a>    points: tuple[tuple[tuple[int, int], tuple[float, float, float]], ...],
+<a id="__codelineno-3-405" name="__codelineno-3-405" href="#__codelineno-3-405"></a>    view: str,
+<a id="__codelineno-3-406" name="__codelineno-3-406" href="#__codelineno-3-406"></a>    step: int,
+<a id="__codelineno-3-407" name="__codelineno-3-407" href="#__codelineno-3-407"></a>)
+<a id="__codelineno-3-408" name="__codelineno-3-408" href="#__codelineno-3-408"></a>    Outcome of ``query_world_map``: statistics of the world points inside a pixel box.
+<a id="__codelineno-3-409" name="__codelineno-3-409" href="#__codelineno-3-409"></a>
+<a id="__codelineno-3-410" name="__codelineno-3-410" href="#__codelineno-3-410"></a>    xyz_min / xyz_max / xyz_median: per-axis extremes and median of the
+<a id="__codelineno-3-411" name="__codelineno-3-411" href="#__codelineno-3-411"></a>        finite points (metres); valid_points: how many pixels had depth.
+<a id="__codelineno-3-412" name="__codelineno-3-412" href="#__codelineno-3-412"></a>    points: up to ``max_points`` ``(pixel, xyz)`` samples spread over the box
+<a id="__codelineno-3-413" name="__codelineno-3-413" href="#__codelineno-3-413"></a>        in row-major order, for your own geometry.
+<a id="__codelineno-3-414" name="__codelineno-3-414" href="#__codelineno-3-414"></a>
+<a id="__codelineno-3-415" name="__codelineno-3-415" href="#__codelineno-3-415"></a>Exceptions:
+<a id="__codelineno-3-416" name="__codelineno-3-416" href="#__codelineno-3-416"></a>    ToolError(RuntimeError): a call was rejected or a service failed; catch it if you have a fallback.
+<a id="__codelineno-3-417" name="__codelineno-3-417" href="#__codelineno-3-417"></a>    ValueError: an argument was invalid (e.g. a planar move over 0.30 m) - nothing was executed.
+<a id="__codelineno-3-418" name="__codelineno-3-418" href="#__codelineno-3-418"></a>    EpisodeFinished(BaseException): the episode is over (reason: terminated | truncated | timeout | cancelled); return.
+</code></pre></div>
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../libero/" class="md-footer__link md-footer__link--prev" aria-label="Previous: LIBERO-PRO">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                LIBERO-PRO
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../robocasa/" class="md-footer__link md-footer__link--next" aria-label="Next: RoboCasa365">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                RoboCasa365
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 PyRUA-Lean Contributors
+    </div>
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/DAGroup-PKU/PyRUA-Lean" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://arxiv.org/abs/2610.01939" target="_blank" rel="noopener" title="arxiv.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.842 0a1 1 0 0 0-.922.608c-.153.369-.044.627.294 1.111l6.919 8.36-1.023 1.106a1.04 1.04 0 0 0 .003 1.423l1.23 1.313-5.44 6.444c-.28.3-.453.823-.297 1.199a1.025 1.025 0 0 0 .959.635.91.91 0 0 0 .689-.34l5.783-6.126 7.49 8.005a.85.85 0 0 0 .684.26.96.96 0 0 0 .877-.615c.158-.377-.017-.75-.306-1.14L13.73 13.9l1.064-1.13a.963.963 0 0 0 .009-1.316L4.633.464S4.26.01 3.867 0zm0 .272h.017c.218.005.487.272.564.364l.005.006.005.005 10.17 10.99a.69.69 0 0 1-.008.946l-1.066 1.133-1.498-1.772-8.6-10.39c-.328-.472-.352-.619-.26-.841a.73.73 0 0 1 .671-.44Zm14.341 1.57a.88.88 0 0 0-.655.242l-5.696 6.158 1.694 1.832 5.309-6.514c.325-.433.479-.66.325-1.029a1.12 1.12 0 0 0-.977-.689zm-7.655 12.282 1.318 1.414-5.786 6.13a.65.65 0 0 1-.496.26.75.75 0 0 1-.706-.467c-.112-.269.036-.687.244-.909l.005-.005.005-.006z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "navigation.indexes", "navigation.footer", "search.suggest", "search.highlight", "content.tabs.link", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.d7400e89.min.js"></script>
+      
+    
+  </body>
+</html>
