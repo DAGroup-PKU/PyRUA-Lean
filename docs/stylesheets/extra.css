@@ -58,11 +58,9 @@
 }
 
 /* ---------- Sidebar ---------- */
-/* the logo in the header names the site; the mobile drawer keeps its title */
-@media screen and (min-width: 76.25em) {
-  .md-nav--primary > .md-nav__title {
-    display: none;
-  }
+/* the logo in the header names the site */
+.md-nav--primary > .md-nav__title {
+  display: none;
 }
 
 /* section titles (Get Started, User Guide, ...) */
@@ -86,10 +84,12 @@
   padding-top: 0;
 }
 
-/* a section with a page of its own (Robots): the link inside carries the padding */
-.md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__container {
-  padding-left: 0;
-  padding-right: 0;
+/* a section with a page of its own (Robots): on a wide screen the link inside carries the padding */
+@media screen and (min-width: 76.25em) {
+  .md-nav--primary > .md-nav__list > .md-nav__item > .md-nav__container {
+    padding-left: 0;
+    padding-right: 0;
+  }
 }
 
 /* items */

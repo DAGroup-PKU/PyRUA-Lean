@@ -26,8 +26,11 @@ and re-sends everything before it each time. A PyRUA-Lean agent writes code agai
 can find an object, move above it, grasp, check the gripper and try again.
 
 <p align="center">
-  <img src="docs/assets/overview.png" width="100%"
-       alt="PyRUA-Lean at a glance. Top: against tool calling with the same planner and primitives, success rate 63.1% to 71.7% overall, 65% fewer input tokens and 2.2x cheaper per solved episode. Bottom left: RoboDojo, 51.6% average success rate against 32.3% for the best entry of the public leaderboard. Bottom right: PyRUA-Lean Coder v0.1-4B, 18.8% to 44.1% on unseen task instances after GRPO training on 45 LIBERO-PRO instances">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/overview-dark.png">
+    <img src="docs/assets/overview.png" width="100%"
+         alt="PyRUA-Lean at a glance. Top: against tool calling with the same planner and primitives, success rate 63.1% to 71.7% overall, 65% fewer input tokens and 2.2x cheaper per solved episode. Bottom left: RoboDojo, 51.6% average success rate against 32.3% for the best entry of the public leaderboard. Bottom right: PyRUA-Lean Coder v0.1-4B, 18.8% to 44.1% on unseen task instances after GRPO training on 45 LIBERO-PRO instances">
+  </picture>
 </p>
 
 ## 🔥 News

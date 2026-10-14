@@ -20,7 +20,8 @@ turns a robot into a Python object. A tool-calling agent spends a full LLM call 
 and re-sends everything before it each time. A PyRUA-Lean agent writes code against `robo` instead, so one call
 can find an object, move above it, grasp, check the gripper and try again.
 
-![PyRUA-Lean at a glance](assets/overview.png)
+![PyRUA-Lean at a glance](assets/overview.png#only-light)
+![PyRUA-Lean at a glance](assets/overview-dark.png#only-dark)
 
 PyRUA-Lean has three parts so far:
 
