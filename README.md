@@ -1,17 +1,24 @@
-<div align="center">
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/assets/logo-dark.svg">
+    <img src="docs/assets/logo.svg" width="70%" alt="PyRUA-Lean: Python for Lean Robot-Use Agents"/>
+  </picture>
+</p>
 
-# PyRUA-Lean
+<h3 align="center">
+<a href="https://dagroup-pku.github.io/PyRUA-Lean/"><b>🌐 Project Page</b></a> |
+<a href="https://arxiv.org/abs/2610.01939"><b>📄 Paper</b></a> |
+<a href="docs/guide.md"><b>📚 Docs</b></a> |
+<b>🤗 Model (coming soon)</b>
+</h3>
 
-**Fewer Tokens, Better Action: GPT-6 Astra Robot Agents with 14% Higher Success Rate but 65% Fewer Tokens**
-
-[![Project Page](https://img.shields.io/badge/Project-Page-8C0000.svg)](https://dagroup-pku.github.io/PyRUA-Lean/)
-[![arXiv](https://img.shields.io/badge/arXiv-2610.01939-b31b1b.svg)](https://arxiv.org/abs/2610.01939)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/Python-3.10%2B-3776ab?logo=python&logoColor=white)](pyproject.toml)
-[![English](https://img.shields.io/badge/lang-English-blue.svg)](README.md)
-[![简体中文](https://img.shields.io/badge/语言-简体中文-red.svg)](README.zh-CN.md)
-
-</div>
+<p align="center">
+  <a href="https://dagroup-pku.github.io/PyRUA-Lean/"><img src="https://img.shields.io/badge/Project-Page-8C0000.svg"></a> &ensp;
+  <a href="https://arxiv.org/abs/2610.01939"><img src="https://img.shields.io/badge/arXiv-2610.01939-b31b1b.svg"></a> &ensp;
+  <img src="https://img.shields.io/badge/🤗%20HuggingFace-Coming%20Soon-yellow.svg"> &ensp;
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"></a> &ensp;
+  <a href="pyproject.toml"><img src="https://img.shields.io/badge/Python-3.10%2B-3776ab?logo=python&logoColor=white"></a>
+</p>
 
 **PyRUA-Lean** (*Py*thon for lean *R*obot-*U*se *A*gents, the robot counterpart of computer-use agents)
 turns a robot into a Python object. A tool-calling agent spends a full LLM call on every small step of a task
@@ -23,42 +30,33 @@ can find an object, move above it, grasp, check the gripper and try again.
        alt="PyRUA-Lean at a glance. Top: against tool calling with the same planner and primitives, success rate 63.1% to 71.7% overall, 65% fewer input tokens and 2.2x cheaper per solved episode. Bottom left: RoboDojo, 51.6% average success rate against 32.3% for the best entry of the public leaderboard. Bottom right: PyRUA-Lean Coder v0.1-4B, 18.8% to 44.1% on unseen task instances after GRPO training on 45 LIBERO-PRO instances">
 </p>
 
-## What an agent writes
+## 🔥 News
 
-The agent gets one tool, `python(code)`, over a persistent namespace that holds `robo`. This is one cell exactly as
-GPT-6 Astra wrote it in a LIBERO-PRO episode (Figure 2 of the paper), placing a held bowl on a plate; the three
-comment lines are ours, and `plate` was located by an earlier cell:
+- [Coming soon] 🤗 **PyRUA-Lean Coder v0.1-4B** weights on Hugging Face.
+- [2026/10/13] 📄 **arXiv v2** is out as a technical report: it adds RoboDojo and PyRUA-Lean Coder v0.1-4B.
+  [[Paper]](https://arxiv.org/abs/2610.01939)
+- [2026/10/13] 🤖 **RoboDojo**: without any VLA policy or privileged information, PyRUA-Lean reaches a **51.62%**
+  average success rate (Score 58.20), 19.4 points above the best entry of the public leaderboard. The policy is
+  submitted to the official evaluation ([XPolicyLab#168](https://github.com/XPolicyLab/XPolicyLab/pull/168)).
+  [[Adapter]](integrations/xpolicylab)
+- [2026/10/01] 📄 **arXiv v1** is out. [[Paper]](https://arxiv.org/abs/2610.01939v1)
 
-```python
-# compose: compute a placement target from the scene geometry
-held_at_plate = robo.segment(point=(314, 795))
-print('bowl above plate', held_at_plate)
-assert held_at_plate.found
-correction = np.array(plate.world_xyz[:2]) - np.array(held_at_plate.world_xyz[:2])
-place_xy = np.array(robo.state().eef_pos[:2]) + correction
-surface_map = robo.world_map()
-bowl_patch = surface_map[290:365, 740:850]
-bowl_heights = bowl_patch[:,:,2]
-bowl_heights = bowl_heights[(bowl_heights>1.04) & (bowl_heights<1.17)]
-bottom_z = float(np.quantile(bowl_heights, 0.02))
-placement_z = plate.world_xyz[2] + robo.state().eef_pos[2] - bottom_z + 0.007
-print('correction', correction, 'bottom', bottom_z, 'placement z', placement_z)
-assert np.linalg.norm(correction)<0.07 and 0.95<placement_z<1.05
-# compose: lower, check, and release within the cell
-lower = robo.move_to([*place_xy, placement_z], gripper=+1, step_clip=0.012, tol=0.005, max_steps=100)
-print('lower', lower)
-if lower.reached and not robo.done:
-    print('release', robo.release())
-print('done', robo.done)
-# select: ask for an image only if the task is unfinished
-if not robo.done:
-    robo.show('agentview')
-```
+## 💡 Introduction
 
-The cell printed five lines and asked for no image: the bowl was on the plate and the task was done. With tool
-calling, the same step took four LLM calls, and every move returned three camera images.
+PyRUA-Lean has three parts so far:
 
-## Quick start
+- **The framework.** The agent composes robot primitives, VLA policies among them, into Python cells that check
+  and retry locally and return only the images and state it asks for. On 700 task instances from LIBERO-PRO,
+  RoboTwin 2.0 and RoboCasa365, with the same GPT-6 Astra planner and the same primitives as tool calling, success
+  goes from **63.1% to 71.7%**, with **49% fewer LLM calls** and **65% fewer input tokens** on the instances both
+  agents solve.
+- **RoboDojo.** With this library's own motion, gripper and perception primitives and the colour images of the
+  benchmark's default observation, PyRUA-Lean reaches **51.62% average success rate (Score 58.20)**, first on all
+  five dimensions.
+- **PyRUA-Lean Coder v0.1-4B.** Qwen3.5-4B trained with GRPO on 45 LIBERO-PRO instances goes from **18.8% to
+  44.1%** on 655 task instances it never saw in training, above the Qwen3.5-27B base model (29.2%).
+
+## 🚀 Quick start
 
 PyRUA-Lean drives the robot stacks of [RPent](https://github.com/RLinf/RPent): install RPent with the robot you
 want first ([docs/setup.md](docs/setup.md) lists versions, checkpoints and environment variables).
@@ -79,7 +77,7 @@ pyrualean summarize runs/demo
 The run directory keeps the episode video, every cell the agent ran with its output, the ledger of primitive
 calls, the token usage and the benchmark's own verdict.
 
-## Robots
+## 🦾 Robots
 
 | `--robot` | Benchmark | Robot and skills |
 |---|---|---|
@@ -90,45 +88,65 @@ calls, the token usage and the benchmark's own verdict.
 
 [docs/multi-robot.md](docs/multi-robot.md) is the contract for adding a robot.
 
-## How it works
+## 📚 Documentation
 
-- **Same primitives, same judge.** Each `robo` method maps one to one onto an RPent tool and runs through RPent
-  (on RoboDojo the motion, gripper and perception tools are this library's own and run without RPent),
-  so an episode leaves the same records as an RPent episode and is scored by the benchmark's own success check.
-- **Results, not exceptions.** Motion calls block and return what actually happened (`Move.reached`,
-  `Pick.success`, ...); misuse raises, and a finished episode stops every further motion.
-- **A prompt that cannot drift.** The API reference the agent reads is generated from the live class.
-- **Three ways to run.** `play --arm cells` (one cell per decision), `play --arm program` (whole programs), and a
-  single shot with `generate` + `run`.
-- **Sandboxed.** Agent code runs with a fixed set of imports, file access confined to its workspace and no
-  handle to the backend.
-
-## Documentation
-
-- [docs/guide.md](docs/guide.md): the `robo` API, the prompt, single-shot and interactive runs, budgets,
+- [docs/guide.md](docs/guide.md): what an agent writes and how it works, the `robo` API, the prompt, single-shot and interactive runs, budgets,
   evaluation and configuration.
 - [docs/setup.md](docs/setup.md): setting up the three robot stacks and the agent runtime.
 
-## Citation
+## 📊 Performance
+
+**Code cells against tool calling** (GPT-6 Astra, same primitives; calls, tokens and cost per solved episode on
+the task instances both agents solved):
+
+| Benchmark | Success, tool calling | Success, PyRUA-Lean | LLM calls | Input tokens | Cost |
+|---|---|---|---|---|---|
+| LIBERO-PRO | 83.0 | **94.0** | 21.4 → 8.4 | 1.23M → 273k | $2.49 → $0.79 |
+| RoboTwin 2.0 | 60.0 | **69.2** | 12.2 → 8.9 | 415k → 245k | $1.00 → $0.66 |
+| RC365 atomic | 78.9 | **86.7** | 10.4 → 5.6 | 261k → 171k | $0.62 → $0.54 |
+| RC365 composite | 34.4 | **39.4** | 28.4 → 14.9 | 1.22M → 603k | $2.01 → $1.25 |
+| **All** | 63.1 | **71.7** | 17.0 → 8.7 | 788k → 276k | $1.63 → $0.74 |
+
+**RoboDojo** (success rate %, the leaderboard's average over its five dimensions; top entries of the public
+board):
+
+| Entry | Type | Average | Gen. | Prec. | Long-Hor. | Memory | Open |
+|---|---|---|---|---|---|---|---|
+| **PyRUA-Lean** (GPT-6 Astra) | Agent | **51.62** | **45.83** | **37.25** | **48.00** | **63.00** | **64.00** |
+| VPP2 | WAM | 32.26 | 29.50 | 35.17 | 37.00 | 55.56 | 4.08 |
+| PhysicalRSI | Agent + VLA | 31.38 | 15.62 | 32.50 | 37.33 | 46.56 | 24.92 |
+| Awomo-0.5 | WAM | 29.64 | 23.84 | 33.50 | 26.75 | 41.22 | 22.92 |
+| Simate-beta | VLA | 27.96 | 27.95 | 26.92 | 43.42 | 33.00 | 8.50 |
+
+**PyRUA-Lean Coder v0.1-4B** (success rate %, PyRUA-Lean framework):
+
+| Planner | Trained on (45) | LIBERO-PRO other (155) | RoboTwin 2.0 (250) | RC365 atomic (90) | RC365 composite (160) | All unseen (655) |
+|---|---|---|---|---|---|---|
+| Qwen3.5-4B | 37.8 | 13.5 | 14.0 | 52.2 | 12.5 | 18.8 |
+| Qwen3.5-27B | 64.4 | **38.1** | 20.8 | 65.6 | 13.1 | 29.2 |
+| **PyRUA-Lean Coder v0.1-4B** | **71.1** | 37.4 | **52.4** | **76.7** | **19.4** | **44.1** |
+
+## 📖 Citation
 
 If you use PyRUA-Lean, please cite our paper:
 
 ```bibtex
-@misc{si2026fewer,
-  title={Fewer Tokens, Better Action: GPT-6 Astra Robot Agents with 14\% Higher Success Rate but 65\% Fewer Tokens},
-  author={Ruiyang Si and Jianxin Bi and Shunyu Yang and Rui Ni and Wenbo Huang and Qiang Wang and Shulong Jiang and Duomin Wang and Xiuyu Li and Haiwen Feng and Zhen Dong and Daquan Zhou},
-  year={2026},
-  eprint={2610.01939},
-  archivePrefix={arXiv},
-  primaryClass={cs.CV},
-  url={https://arxiv.org/abs/2610.01939}
+@article{si2026fewer,
+  title={Fewer tokens, better action: GPT-6 Astra robot agents with 14\% higher success rate but 65\% fewer tokens},
+  author={Si, Ruiyang and Bi, Jianxin and Yang, Shunyu and Ni, Rui and Huang, Wenbo and Wang, Qiang and Jiang, Shulong and Zhang, Yintianrun and Ruan, Feixiang and Zhang, Kewei and Wang, Duomin and Li, Xiuyu and Feng, Haiwen and Dong, Zhen and Zhou, Daquan},
+  journal={arXiv preprint arXiv:2610.01939},
+  year={2026}
 }
 ```
 
-## License and acknowledgements
+## 🤗 License and acknowledgements
 
 Apache License 2.0 ([LICENSE](LICENSE)). PyRUA-Lean builds on [RPent](https://github.com/RLinf/RPent)
 (Apache-2.0): its robot stacks, services and primitive implementations do the work behind `robo`, the
 tool-calling baseline is RPent itself, and parts of this repository are adapted from it; see `NOTICE`. If you use
 RPent, please cite its paper, [Harness VLA: Steering Frozen VLAs into Reliable Manipulation Primitives via
 Memory-Guided Agents](https://arxiv.org/abs/2607.08448).
+
+## 🌟 Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=DAGroup-PKU/PyRUA-Lean&type=Date)](https://star-history.com/#DAGroup-PKU/PyRUA-Lean&Date)

@@ -1,6 +1,6 @@
 # PyRUA-Lean guide
 
-The full reference: the robots, the `robo` API, the prompt, single-shot and interactive runs, budgets, zero-shot isolation, evaluation and configuration. The [README](../README.md) is the short introduction.
+The full reference: the robots, the `robo` API, the prompt, single-shot and interactive runs, budgets, zero-shot isolation, evaluation and configuration. The [README](../README.md) is the short introduction; [what an agent writes](#what-an-agent-writes) and [how it works](#how-it-works) come first below.
 
 A policy is one ordinary Python file:
 
@@ -41,6 +41,54 @@ the *same* primitives can be exercised in two interaction forms,
 
 and compared on identical `(suite, task, seed)` cells with identical success
 predicates.
+
+## What an agent writes
+
+The agent gets one tool, `python(code)`, over a persistent namespace that holds `robo`. This is one cell exactly as
+GPT-6 Astra wrote it in a LIBERO-PRO episode (Figure 2 of the paper), placing a held bowl on a plate; the three
+comment lines are ours, and `plate` was located by an earlier cell:
+
+```python
+# compose: compute a placement target from the scene geometry
+held_at_plate = robo.segment(point=(314, 795))
+print('bowl above plate', held_at_plate)
+assert held_at_plate.found
+correction = np.array(plate.world_xyz[:2]) - np.array(held_at_plate.world_xyz[:2])
+place_xy = np.array(robo.state().eef_pos[:2]) + correction
+surface_map = robo.world_map()
+bowl_patch = surface_map[290:365, 740:850]
+bowl_heights = bowl_patch[:,:,2]
+bowl_heights = bowl_heights[(bowl_heights>1.04) & (bowl_heights<1.17)]
+bottom_z = float(np.quantile(bowl_heights, 0.02))
+placement_z = plate.world_xyz[2] + robo.state().eef_pos[2] - bottom_z + 0.007
+print('correction', correction, 'bottom', bottom_z, 'placement z', placement_z)
+assert np.linalg.norm(correction)<0.07 and 0.95<placement_z<1.05
+# compose: lower, check, and release within the cell
+lower = robo.move_to([*place_xy, placement_z], gripper=+1, step_clip=0.012, tol=0.005, max_steps=100)
+print('lower', lower)
+if lower.reached and not robo.done:
+    print('release', robo.release())
+print('done', robo.done)
+# select: ask for an image only if the task is unfinished
+if not robo.done:
+    robo.show('agentview')
+```
+
+The cell printed five lines and asked for no image: the bowl was on the plate and the task was done. With tool
+calling, the same step took four LLM calls, and every move returned three camera images.
+
+## How it works
+
+- **Same primitives, same judge.** Each `robo` method maps one to one onto an RPent tool and runs through RPent
+  (on RoboDojo the motion, gripper and perception tools are this library's own and run without RPent),
+  so an episode leaves the same records as an RPent episode and is scored by the benchmark's own success check.
+- **Results, not exceptions.** Motion calls block and return what actually happened (`Move.reached`,
+  `Pick.success`, ...); misuse raises, and a finished episode stops every further motion.
+- **A prompt that cannot drift.** The API reference the agent reads is generated from the live class.
+- **Three ways to run.** `play --arm cells` (one cell per decision), `play --arm program` (whole programs), and a
+  single shot with `generate` + `run`.
+- **Sandboxed.** Agent code runs with a fixed set of imports, file access confined to its workspace and no
+  handle to the backend.
 
 ## Robots
 

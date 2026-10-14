@@ -1,6 +1,6 @@
 # PyRUA-Lean 使用指南
 
-完整参考：支持的机器人、`robo` 接口、prompt、单次生成与交互式运行、预算、零样本隔离、评测与配置。简短介绍见 [README](../README.zh-CN.md)。
+完整参考：支持的机器人、`robo` 接口、prompt、单次生成与交互式运行、预算、零样本隔离、评测与配置。简短介绍见 [README](../README.md)。
 
 一个 policy 就是一个普通的 Python 文件：
 
