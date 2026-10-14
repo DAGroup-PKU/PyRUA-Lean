@@ -357,7 +357,7 @@
       const xa = x0 + plotW * head4[0].average.sr / max, xb = x0 + plotW;
       svgEl('path', { d: `M${xa},72V80M${xa},76H${xb}M${xb},72V80`, stroke: F.red, 'stroke-width': 1.6, fill: 'none' }, svg);
       ftext(svg, (xa + xb) / 2, 64, '+' + (ours.average.sr - head4[0].average.sr).toFixed(1) + ' pp', { 'text-anchor': 'middle', fill: F.red, 'font-weight': 700, 'font-size': 17 });
-      ftext(svg, 452 + 60, 336, 'average SR (%), the board of ' + (([y, m, dd]) => ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][m - 1] + ' ' + dd + ', ' + y)(data.board.stamp.split('.').map(Number)), { 'text-anchor': 'middle', 'font-style': 'italic', fill: F.muted, 'font-size': 13 });
+      ftext(svg, 452 + 60, 336, 'average SR (%), board snapshot of ' + (([y, m, dd]) => ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][m - 1] + ' ' + dd + ', ' + y)(data.board.stamp.split('.').map(Number)), { 'text-anchor': 'middle', 'font-style': 'italic', fill: F.muted, 'font-size': 13 });
     }
     const lgd = htmlEl('div', 'f1-legend', null, d);
     [['Best board entry', 'base'], ['PyRUA-Lean (ours)', 'ours']].forEach(([t, c]) => { const e = htmlEl('span', 'f1-key ' + c, null, lgd); htmlEl('i', null, null, e); htmlEl('span', null, t, e); });
@@ -408,7 +408,7 @@
                   { label: 'GPT-6 Astra, direct control', color: C.third },
                   { label: 'Other board entries', color: C.base }]);
     const body = htmlEl('div', 'chart-body', null, root);
-    htmlEl('p', 'chart-note', `RoboDojo's public board (${board.stamp}; 33 entries) and PyRUA-Lean on seed 0. SR: success rate (%). The board's average is the mean of its five dimensions.`, root);
+    htmlEl('p', 'chart-note', `A snapshot of RoboDojo's public leaderboard taken on ${(([y, m, dd]) => ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'][m - 1] + ' ' + dd + ', ' + y)(board.stamp.split('.').map(Number))} (33 entries), and PyRUA-Lean on seed 0. SR: success rate (%). The board's average is the mean of its five dimensions.`, root);
     const colorOf = e => e.ours ? C.ours : e.name === 'GPT-6-Astra' ? C.third : C.base;
     const nameOf = e => e.name === 'GPT-6-Astra' ? 'GPT-6 Astra, direct control' : e.name;
 
