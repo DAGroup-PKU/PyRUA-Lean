@@ -183,6 +183,20 @@ code {
   color: var(--md-primary-fg-color);
 }
 
+/* ---------- Buttons ---------- */
+.md-typeset .md-button--primary {
+  background: linear-gradient(135deg, var(--md-primary-fg-color) 0%, var(--md-primary-fg-color--dark) 100%);
+  border: none;
+  color: var(--md-primary-bg-color) !important;
+  box-shadow: 0 4px 12px rgba(var(--pyr-rgb), 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.md-typeset .md-button--primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(var(--pyr-rgb), 0.4);
+}
+
 /* ---------- Search ---------- */
 .md-search__input {
   border-radius: 8px;

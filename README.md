@@ -9,13 +9,13 @@
 <a href="https://dagroup-pku.github.io/PyRUA-Lean/"><b>🌐 Project Page</b></a> |
 <a href="https://arxiv.org/abs/2610.01939"><b>📄 Paper</b></a> |
 <a href="https://dagroup-pku.github.io/PyRUA-Lean/docs/"><b>📚 Docs</b></a> |
-<b>🤗 Model (coming soon)</b>
+<a href="https://huggingface.co/DAGroup-PKU/PyRUA-Lean-Coder-v0.1-4B"><b>🤗 Model</b></a>
 </h3>
 
 <p align="center">
   <a href="https://dagroup-pku.github.io/PyRUA-Lean/"><img src="https://img.shields.io/badge/Project-Page-8C0000.svg"></a> &ensp;
   <a href="https://arxiv.org/abs/2610.01939"><img src="https://img.shields.io/badge/arXiv-2610.01939-b31b1b.svg"></a> &ensp;
-  <img src="https://img.shields.io/badge/🤗%20HuggingFace-Coming%20Soon-yellow.svg"> &ensp;
+  <a href="https://huggingface.co/DAGroup-PKU/PyRUA-Lean-Coder-v0.1-4B"><img src="https://img.shields.io/badge/🤗%20HuggingFace-Model-yellow.svg"></a> &ensp;
   <a href="LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg"></a> &ensp;
   <a href="pyproject.toml"><img src="https://img.shields.io/badge/Python-3.10%2B-3776ab?logo=python&logoColor=white"></a>
 </p>
@@ -32,8 +32,8 @@ can find an object, move above it, grasp, check the gripper and try again.
 
 ## 🔥 News
 
-- [Coming soon] 🤗 **PyRUA-Lean Coder v0.1-4B** weights on Hugging Face.
 - [Coming soon] 🦾 **Real robots**.
+- [2026/10/15] 🤗 **PyRUA-Lean Coder v0.1-4B** is on Hugging Face. [[Model]](https://huggingface.co/DAGroup-PKU/PyRUA-Lean-Coder-v0.1-4B)
 - [2026/10/13] 📄 **arXiv v2** is out as a technical report: it adds RoboDojo and PyRUA-Lean Coder v0.1-4B.
   [[Paper]](https://arxiv.org/abs/2610.01939)
 - [2026/10/13] 🤖 **RoboDojo**: without any VLA policy or privileged information, PyRUA-Lean reaches a **51.62%**
@@ -55,7 +55,7 @@ PyRUA-Lean has three parts so far:
 - **RoboDojo.** With this library's own motion, gripper and perception primitives and the colour images of the
   benchmark's default observation, PyRUA-Lean reaches **51.62% average success rate (Score 58.20)**, first on all
   five dimensions of the public leaderboard (snapshot of October 9, 2026).
-- **PyRUA-Lean Coder v0.1-4B.** Qwen3.5-4B trained with GRPO in the PyRUA-Lean framework, on 45 LIBERO-PRO
+- **[PyRUA-Lean Coder v0.1-4B](https://huggingface.co/DAGroup-PKU/PyRUA-Lean-Coder-v0.1-4B).** Qwen3.5-4B trained with GRPO in the PyRUA-Lean framework, on 45 LIBERO-PRO
   instances, goes from **18.8% to 44.1%** on 655 task instances it never saw in training, above the Qwen3.5-27B base
   model (29.2%).
 

@@ -7,7 +7,7 @@
   <a href="https://dagroup-pku.github.io/PyRUA-Lean/"><img src="https://img.shields.io/badge/Project-Page-8C0000.svg" alt="Project page"></a>
   <a href="https://arxiv.org/abs/2610.01939"><img src="https://img.shields.io/badge/arXiv-2610.01939-b31b1b.svg" alt="arXiv"></a>
   <a href="https://github.com/DAGroup-PKU/PyRUA-Lean"><img src="https://img.shields.io/badge/GitHub-PyRUA--Lean-101A2B.svg?logo=github" alt="GitHub"></a>
-  <img src="https://img.shields.io/badge/🤗%20HuggingFace-Coming%20Soon-yellow.svg" alt="Hugging Face: coming soon">
+  <a href="https://huggingface.co/DAGroup-PKU/PyRUA-Lean-Coder-v0.1-4B"><img src="https://img.shields.io/badge/🤗%20HuggingFace-Model-yellow.svg" alt="Hugging Face model"></a>
   <a href="https://github.com/DAGroup-PKU/PyRUA-Lean/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License"></a>
 </p>
 
@@ -72,7 +72,7 @@ RPent ([RoboDojo](robots/robodojo.md)).
 
 -   :material-brain: **[PyRUA-Lean Coder v0.1-4B](models/coder.md)**
 
-    An open 4B model trained to write the cells; weights coming soon.
+    An open 4B model trained to write the cells, on Hugging Face.
 
 </div>
 
