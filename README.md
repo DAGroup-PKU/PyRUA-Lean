@@ -35,6 +35,7 @@ can find an object, move above it, grasp, check the gripper and try again.
 
 ## 🔥 News
 
+- [Coming soon] 🔁 **PyRUA-Lean RSI**.
 - [2026/10/21] 🦾 **Real robot**: on an AF8 dual-arm robot, GPT-6 Astra writes every Python cell and puts all five
   tabletop blocks into a bowl, in two independent uncut episodes (41 and 42 cells, about 22 minutes each).
   [[Videos]](https://dagroup-pku.github.io/PyRUA-Lean/#real-robot)
