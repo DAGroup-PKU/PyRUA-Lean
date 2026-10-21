@@ -35,7 +35,9 @@ can find an object, move above it, grasp, check the gripper and try again.
 
 ## 🔥 News
 
-- [Coming soon] 🦾 **Real robots**.
+- [2026/10/21] 🦾 **Real robot**: on an AF8 dual-arm robot, GPT-6 Astra writes every Python cell and puts all five
+  tabletop blocks into a bowl, in two independent uncut episodes (41 and 42 cells, about 22 minutes each).
+  [[Videos]](https://dagroup-pku.github.io/PyRUA-Lean/#real-robot)
 - [2026/10/15] 🤗 **PyRUA-Lean Coder v0.1-4B** is on Hugging Face. [[Model]](https://huggingface.co/DAGroup-PKU/PyRUA-Lean-Coder-v0.1-4B)
 - [2026/10/13] 📄 **arXiv v2** is out as a technical report: it adds RoboDojo and PyRUA-Lean Coder v0.1-4B.
   [[Paper]](https://arxiv.org/abs/2610.01939)
@@ -93,7 +95,7 @@ calls, the token usage and the benchmark's own verdict.
 | `libero` (default) | [LIBERO-PRO](https://dagroup-pku.github.io/PyRUA-Lean/docs/robots/libero/) | RPent | Franka arm; scripted servos, Pi0.5 VLA, SAM3 perception |
 | `robotwin` | [RoboTwin 2.0](https://dagroup-pku.github.io/PyRUA-Lean/docs/robots/robotwin/) | RPent | two arms; LingBot-VLA |
 | `robocasa` | [RoboCasa365](https://dagroup-pku.github.io/PyRUA-Lean/docs/robots/robocasa/) | RPent | mobile manipulator; RLDX-1 VLA, navigation |
-| *coming soon* | Real robots | | |
+| *real robot* | [Demos](https://dagroup-pku.github.io/PyRUA-Lean/#real-robot) | AF8 dual-arm robot | two arms, a head camera and two RGB-D wrist cameras; motion planning, gripper and perception primitives with force and torque guards; no VLA; integration coming soon |
 
 New robots are added through XPolicyLab ([Adding a Robot](https://dagroup-pku.github.io/PyRUA-Lean/docs/robots/adding-a-robot/)).
 
