@@ -19,11 +19,11 @@
   <link rel="icon" type="image/png" sizes="32x32" href="static/images/favicon-32.png">
   <link rel="apple-touch-icon" href="static/images/apple-touch-icon.png">
   <link rel="stylesheet" href="static/css/bulma.min.css">
-  <link rel="stylesheet" href="static/css/index.css?v=20261015a">
-  <link rel="stylesheet" href="static/css/pyrualean.css?v=20261015a">
+  <link rel="stylesheet" href="static/css/index.css?v=20261021a">
+  <link rel="stylesheet" href="static/css/pyrualean.css?v=20261021a">
   <script defer src="static/js/fontawesome.all.min.js"></script>
-  <script defer src="static/js/page.js?v=20261015a"></script>
-  <script defer src="static/js/charts.js?v=20261015a"></script>
+  <script defer src="static/js/page.js?v=20261021a"></script>
+  <script defer src="static/js/charts.js?v=20261021a"></script>
 </head>
 <body>
 
@@ -120,6 +120,7 @@
       <a href="#idea">Framework</a>
       <a href="#robodojo">SOTA on RoboDojo</a>
       <a href="#coder">Model</a>
+      <a href="#real-robot">Real robot</a>
       <a href="#BibTeX">BibTeX</a>
     </div>
   </nav>
@@ -330,6 +331,28 @@ lower = <span class="robo">robo</span>.move_to([*place_xy, placement_z], gripper
         </table>
       </div>
       <p class="pipeline-caption figure-caption">Success rate (%) of Qwen3.5-4B before and after training (PyRUA-Lean Coder v0.1-4B), and of Qwen3.5-27B, on the 700 task instances of the comparison with tool calling, one episode per instance. Training used 45 LIBERO-PRO instances only. <em>Last row:</em> GPT-6 Astra with PyRUA-Lean, with its LIBERO-PRO result split in the same way, run in a different agent loop, for reference. Bold: the highest value of a column among the first three rows. RC365: RoboCasa365.</p>
+    </div>
+  </section>
+
+  <!-- Real robot: two complete, uncut episodes on the AF8 dual-arm robot -->
+  <section class="section real-section" id="real-robot">
+    <div class="container is-max-widescreen">
+      <h2 class="title is-3 has-text-centered">Real robot</h2>
+      <p class="section-sub">&ldquo;Put every tabletop block into the central teal bowl.&rdquo; Two independent episodes on an AF8 dual-arm robot, each shown from start to finish with every Python cell the agent wrote.</p>
+      <div class="real-grid">
+        <figure class="real-item">
+          <video controls muted playsinline preload="metadata" poster="static/videos/real-01_run_A_5of5.jpg">
+            <source src="static/videos/real-01_run_A_5of5.mp4" type="video/mp4">
+          </video>
+          <figcaption><strong>Run A</strong><span>5 / 5 &middot; 41 cells &middot; 21:34</span></figcaption>
+        </figure>
+        <figure class="real-item">
+          <video controls muted playsinline preload="metadata" poster="static/videos/real-02_run_B_5of5.jpg">
+            <source src="static/videos/real-02_run_B_5of5.mp4" type="video/mp4">
+          </video>
+          <figcaption><strong>Run B</strong><span>5 / 5 &middot; 42 cells &middot; 22:39</span></figcaption>
+        </figure>
+      </div>
     </div>
   </section>
 

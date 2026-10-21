@@ -889,3 +889,59 @@ table.paper-table thead tr:last-child th { border-bottom: 1px solid #1e293b !imp
 /* the name in its colours, above the title */
 .hero-logo { margin: 0 auto 1.4rem; }
 .hero-logo img { width: min(520px, 86%); height: auto; }
+
+/* ---- 2026-10-21: real-robot demos, contents as a left sidebar on wide screens ------------------------------------- */
+.real-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6rem; margin-top: 1.4rem; }
+.real-item { margin: 0; }
+.real-item video { display: block; width: 100%; aspect-ratio: 16 / 9; background: #F4F6F8; border-radius: 10px; border: 1px solid #E6E9ED; }
+.real-item figcaption { display: flex; justify-content: space-between; align-items: baseline; padding: 0.6rem 0.2rem 0; font-size: 0.95rem; color: var(--text-secondary); }
+.real-item figcaption strong { color: #8C0000; font-size: 1.05rem; }
+@media (max-width: 960px) { .real-grid { grid-template-columns: 1fr; } }
+
+/* wide screens: the contents move to a quiet list at the top left (as on thinkingmachines.ai), shown after the title block */
+@media (min-width: 1480px) {
+  .toc {
+    position: fixed;
+    top: 5.5rem;
+    left: 1rem;
+    width: 140px;
+    background: transparent;
+    backdrop-filter: none;
+    border-bottom: none;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .toc.shown { opacity: 1; pointer-events: auto; }
+  .toc-inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.1rem;
+    padding: 0;
+    overflow: visible;
+    white-space: normal;
+  }
+  .toc a {
+    position: relative;
+    font-size: 13px;
+    line-height: 1.4;
+    font-weight: 400;
+    color: #676767;
+    padding: 0.32rem 0 0.32rem 0.9rem;
+    border-radius: 0;
+  }
+  .toc a:hover { color: #101A2B; background: none; }
+  .toc a.active { color: #101A2B; background: none; font-weight: 500; }
+  .toc a.active::before {
+    content: "";
+    position: absolute;
+    left: 0.15rem;
+    top: 50%;
+    width: 4px;
+    height: 4px;
+    margin-top: -2px;
+    border-radius: 50%;
+    background: #8C0000;
+  }
+  section[id] { scroll-margin-top: 1.5rem; }
+}

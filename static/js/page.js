@@ -386,7 +386,11 @@ function setupToc() {
   const sections = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
   if (!sections.length) return;
   let last = null;
+  const toc = document.querySelector('.toc');
+  const hero = document.querySelector('.hero');
   function update() {
+    // the sidebar appears once the title block has scrolled away
+    if (toc && hero) toc.classList.toggle('shown', hero.getBoundingClientRect().bottom < window.innerHeight * 0.4);
     // the last section whose top has passed a line a third of the way down the window
     const line = window.innerHeight / 3;
     let current = null;
