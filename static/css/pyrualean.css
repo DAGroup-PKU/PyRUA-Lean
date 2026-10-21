@@ -822,6 +822,10 @@ section[id] { scroll-margin-top: 3.2rem; }
                        font-size: 0.72rem; font-weight: 600; color: #334155; }
 @media (prefers-reduced-motion: reduce) { .rx-b, .rx-d, .rx-b b { transition: none; } }
 @media (max-width: 768px) { .rx { --plot-h: 200px; } .rx-plot { gap: 8px; } .rx-x strong { font-size: 0.78rem; } .rx-x small { display: none; } .rx-d { font-size: 0.7rem; padding: 2px 6px; } }
+/* phones: a group is too narrow for '2.5× fewer' on one line; stack the ratio over the word so the pills stay inside the card */
+@media (max-width: 480px) { .rx-plot { gap: 4px; padding-left: 4px; padding-right: 4px; } .rx-g { gap: 3px; }
+  .rx-b { width: 46%; } .rx-b b { font-size: 0.62rem; transform: translate(-50%, -3px); } .rx-b.ours b { font-size: 0.7rem; }
+  .rx-d { white-space: normal; width: min-content; text-align: center; line-height: 1.1; padding: 3px 6px; border-radius: 8px; font-size: 0.66rem; } }
 
 /* a one-line subtitle under a section's heading */
 .section-sub { text-align: center; color: #64748b; font-size: 1.05rem; margin: -0.4rem auto 1.4rem; max-width: 46rem; }
@@ -944,4 +948,16 @@ table.paper-table thead tr:last-child th { border-bottom: 1px solid #1e293b !imp
     background: #8C0000;
   }
   section[id] { scroll-margin-top: 1.5rem; }
+}
+
+/* ---- 2026-10-21: phones -------------------------------------------------------------------------------------------- */
+/* sections that are also .hero are flex columns; without this their container grows to the widest code line or table */
+.section.hero > .container { min-width: 0; width: 100%; }
+@media (max-width: 768px) {
+  pre.code-block { font-size: 0.72rem !important; }
+  .paper-table { font-size: 0.82rem; }
+  .paper-table th, .paper-table td { padding: 0.4rem 0.45rem; }
+  /* the table scrolls sideways: keep the planner names in view */
+  .paper-table th.left, .paper-table td.left { position: sticky; left: 0; z-index: 1; background: #fff; }
+  .paper-table tr.ours td.left { background: #FBF2F3; }
 }
