@@ -36,6 +36,9 @@ can find an object, move above it, grasp, check the gripper and try again.
 ## 🔥 News
 
 - [Coming soon] 🔁 **PyRUA-Lean RSI**.
+- [2026/10/21] 🏆 **RoboDojo official evaluation**: run by the RoboDojo team, PyRUA-Lean reaches a **50.35%** average
+  success rate (Score 55.26) on all 42 tasks, **rank 1** against the current RoboDojo-Sim leaderboard.
+  [[Official results]](integrations/xpolicylab/evaluation/robodojo_summary_official.md)
 - [2026/10/21] 🦾 **Real robot**: on an AF8 dual-arm robot, GPT-6 Astra writes every Python cell and puts all five
   tabletop blocks into a bowl, in two independent uncut episodes (41 and 42 cells, about 22 minutes each).
   [[Videos]](https://dagroup-pku.github.io/PyRUA-Lean/#real-robot)
@@ -114,11 +117,13 @@ the task instances both agents solved):
 | **All** | 63.1 | **71.7** | 17.0 → 8.7 | 788k → 276k | $1.63 → $0.74 |
 
 **RoboDojo** (success rate %, the leaderboard's average over its five dimensions; top entries of a snapshot
-of the public leaderboard taken on October 9, 2026):
+of the public leaderboard taken on October 9, 2026; the official evaluation was run by the RoboDojo team,
+[full results](integrations/xpolicylab/evaluation/robodojo_summary_official.md)):
 
 | Entry | Type | Average | Gen. | Prec. | Long-Hor. | Memory | Open |
 |---|---|---|---|---|---|---|---|
-| **PyRUA-Lean** (GPT-6 Astra) | Agent | **51.62** | **45.83** | **37.25** | **48.00** | **63.00** | **64.00** |
+| **PyRUA-Lean** (GPT-6 Astra), official evaluation | Agent | **50.35** | 43.17 | **38.25** | 43.75 | **68.33** | 58.25 |
+| **PyRUA-Lean** (GPT-6 Astra), our run | Agent | **51.62** | **45.83** | 37.25 | **48.00** | 63.00 | **64.00** |
 | VPP2 | WAM | 32.26 | 29.50 | 35.17 | 37.00 | 55.56 | 4.08 |
 | PhysicalRSI | Agent + VLA | 31.38 | 15.62 | 32.50 | 37.33 | 46.56 | 24.92 |
 | Awomo-0.5 | WAM | 29.64 | 23.84 | 33.50 | 26.75 | 41.22 | 22.92 |
