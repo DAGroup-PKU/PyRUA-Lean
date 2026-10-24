@@ -35,7 +35,7 @@ can find an object, move above it, grasp, check the gripper and try again.
 
 ## 🔥 News
 
-- [Coming soon] 🔁 **PyRUA-Lean RSI**.
+- [Coming soon] 🔁 **PyRUA-RSI**.
 - [2026/10/24] 🏔️ **#1 on the RoboDojo-Sim leaderboard**: PyRUA-Lean is now listed on the official leaderboard with
   Score 55.26 and a **50.35%** average success rate, the first entry above 50%.
   [[Leaderboard]](https://robodojo-benchmark.com/leaderboard)
