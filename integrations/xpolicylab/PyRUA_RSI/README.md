@@ -78,3 +78,7 @@ Extra `deploy.yml` keys beyond the shared set:
 | `poll_s`, `wrap_up_s`, `result_dir` | as in `PyRUA_Lean` |
 
 Environment variables: `SAM3_CHECKPOINT_PATH` (default `./checkpoints/sam3.pt`); `PYRUALEAN_RESULT_DIR` overrides `result_dir`. `OPENAI_*` variables are not needed and are overridden inside the policy server.
+
+## Results
+
+RoboDojo's own summary (`bash scripts/robodojo.sh summarize`) of our run on eval seed 0, all 54 task configurations at their native episode counts (2,100 episodes), one `robodojo.sh eval` per task name: [`eval/robodojo_summary.md`](eval/robodojo_summary.md) (Avg SR 82.82 / Avg Score 87.16; the same programs on the held-out eval seed 2: 80.73 / 85.36).
