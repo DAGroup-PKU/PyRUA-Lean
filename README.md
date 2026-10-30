@@ -35,6 +35,8 @@ can find an object, move above it, grasp, check the gripper and try again.
 
 ## 🔥 News
 
+- [Incoming] 🔜 **PyRUA-Coder v1.0** and **PyRUA-RSI**: the next release of the trained coder, and a technical report
+  on both.
 - [2026/10/30] 🔁 **PyRUA-RSI, offline version, open-sourced**: one fixed Python program per RoboDojo task, written
   ahead of time against the same `robo` API and run with no model call at evaluation time. On RoboDojo eval seed 0
   (54 task configurations, 2,100 episodes) it reaches an **82.82%** average success rate (Score 87.16); on the held-out
