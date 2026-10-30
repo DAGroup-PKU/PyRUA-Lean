@@ -35,7 +35,11 @@ can find an object, move above it, grasp, check the gripper and try again.
 
 ## 🔥 News
 
-- [Coming soon] 🔁 **PyRUA-RSI**.
+- [2026/10/30] 🔁 **PyRUA-RSI, offline version, open-sourced**: one fixed Python program per RoboDojo task, written
+  ahead of time against the same `robo` API and run with no model call at evaluation time. On RoboDojo eval seed 0
+  (54 task configurations, 2,100 episodes) it reaches an **82.82%** average success rate (Score 87.16); on the held-out
+  seed 2, 80.73% (85.36). [[Programs]](integrations/xpolicylab/PyRUA_RSI)
+  [[Results]](integrations/xpolicylab/evaluation/robodojo_summary_rsi.md). Details in a forthcoming technical report.
 - [2026/10/24] 🏔️ **#1 on the RoboDojo-Sim leaderboard**: PyRUA-Lean is now listed on the official leaderboard with
   Score 55.26 and a **50.35%** average success rate, the first entry above 50%.
   [[Leaderboard]](https://robodojo-benchmark.com/leaderboard)
@@ -129,6 +133,7 @@ of the public leaderboard taken on October 9, 2026; the official evaluation was 
 |---|---|---|---|---|---|---|---|
 | **PyRUA-Lean** (GPT-6 Astra), official evaluation | Agent | **50.35** | 43.17 | **38.25** | 43.75 | **68.33** | 58.25 |
 | **PyRUA-Lean** (GPT-6 Astra), our run | Agent | **51.62** | **45.83** | 37.25 | **48.00** | 63.00 | **64.00** |
+| **PyRUA-RSI** (fixed programs), our run, seed 0 | Code | 82.82 | 72.33 | 83.50 | 80.00 | 95.00 | 83.25 |
 | VPP2 | WAM | 32.26 | 29.50 | 35.17 | 37.00 | 55.56 | 4.08 |
 | PhysicalRSI | Agent + VLA | 31.38 | 15.62 | 32.50 | 37.33 | 46.56 | 24.92 |
 | Awomo-0.5 | WAM | 29.64 | 23.84 | 33.50 | 26.75 | 41.22 | 22.92 |
