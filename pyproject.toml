@@ -25,6 +25,18 @@ classifiers = [
 dependencies = []
 
 [project.optional-dependencies]
+# The RoboColiseum robot (GenieSim's G2): its bridge, perception and the benchmark's own arm
+# IK, ik_solver, which is not on PyPI: its wheels from genie_sim's 3rdparty/, at a fixed commit
+# (Linux x86_64, Python 3.11 or 3.12).
+robocoliseum = [
+    "numpy",
+    "pillow",
+    "scipy",
+    "msgpack",
+    "websockets>=13",
+    "ik_solver @ https://github.com/AgibotTech/genie_sim/raw/a2bbec0c0e2d05f7cb5c13c9a75bcbc16ea229be/3rdparty/ik_solver-0.4.3-cp311-cp311-linux_x86_64.whl ; python_version == '3.11' and platform_machine == 'x86_64' and sys_platform == 'linux'",
+    "ik_solver @ https://github.com/AgibotTech/genie_sim/raw/a2bbec0c0e2d05f7cb5c13c9a75bcbc16ea229be/3rdparty/ik_solver-0.4.3-cp312-cp312-linux_x86_64.whl ; python_version == '3.12' and platform_machine == 'x86_64' and sys_platform == 'linux'",
+]
 dev = [
     "build>=1.2",
     "pytest>=8.0",
@@ -50,7 +62,7 @@ pyrualean = "pyrualean.cli:main"
 where = ["src"]
 
 [tool.setuptools.package-data]
-pyrualean = ["knowledge/*.md", "codex-catalog-gpt-6-astra-fallback.json"]
+pyrualean = ["knowledge/*.md", "codex-catalog-gpt-6-astra-fallback.json", "hosts/robocoliseum_ik/*"]
 
 [tool.pytest.ini_options]
 addopts = ["--import-mode=importlib"]

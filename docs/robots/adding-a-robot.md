@@ -3,7 +3,9 @@
 Robots are added through [XPolicyLab](https://github.com/XPolicyLab/XPolicyLab). The benchmark's own evaluation
 client keeps the simulator, the observation and the verdict; PyRUA-Lean answers it as a policy, through the
 adapter that every benchmark XPolicyLab integrates already talks to. [RoboDojo](robodojo.md) is the reference
-implementation.
+implementation. A benchmark that calls its policy over a protocol of its own is answered on that protocol instead:
+[RoboColiseum](robocoliseum.md) serves GenieSim's inference requests (`hosts/geniesim_bridge.py`), with the same
+robot class, primitives, toolkit, host and knowledge text as below.
 
 ## How an episode runs
 

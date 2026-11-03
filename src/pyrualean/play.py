@@ -891,13 +891,13 @@ def _openai_options(args: argparse.Namespace) -> dict[str, Any]:
     return options
 
 
-def main(argv: list[str] | None = None) -> int:
-    pre = argparse.ArgumentParser(add_help=False)
-    pre.add_argument("--robot", default="libero", choices=ROBOTS)
-    known, _ = pre.parse_known_args(argv)
-    adapter = get_adapter(known.robot)
-    host = adapter.host_module()
-    parser = argparse.ArgumentParser(prog="python -m pyrualean.play", description=__doc__)
+def build_parser(
+    robot: str, prog: str = "python -m pyrualean.play"
+) -> tuple[argparse.ArgumentParser, Any]:
+    """The ``play`` command line for ``robot``, and the robot's host module."""
+
+    host = get_adapter(robot).host_module()
+    parser = argparse.ArgumentParser(prog=prog, description=__doc__)
     parser.add_argument("--robot", default="libero", help="libero | robocasa | robotwin | robodojo")
     parser.add_argument("--arm", choices=ARMS, required=True)
     host.add_cell_args(parser)
@@ -1009,11 +1009,13 @@ def main(argv: list[str] | None = None) -> int:
         default=setting("PRIMITIVES", "full"),
         help="primitive set: full, or no-vla (the VLA primitives hidden and refused)",
     )
-    args = parser.parse_args(argv)
-    cell = host.cell_from_args(args)
-    result = play_episode(
-        cell,
-        args.out.resolve(),
+    return parser, host
+
+
+def episode_options(args: argparse.Namespace, robot: str, host: Any) -> dict[str, Any]:
+    """The :func:`play_episode` keywords a parsed ``play`` command line asks for."""
+
+    return dict(
         arm=args.arm,
         model=args.model,
         reasoning_effort=args.reasoning,
@@ -1029,13 +1031,23 @@ def main(argv: list[str] | None = None) -> int:
         guides=args.guides,
         guides_dir=args.guides_dir,
         max_turns=args.max_turns,
-        robot=known.robot,
+        robot=robot,
         boot_options=host.boot_options(args),
         runtime=args.runtime,
         claude_cli=args.claude_cli,
         primitives=args.primitives,
         openai_options=_openai_options(args) if args.runtime == "openai" else None,
     )
+
+
+def main(argv: list[str] | None = None) -> int:
+    pre = argparse.ArgumentParser(add_help=False)
+    pre.add_argument("--robot", default="libero", choices=ROBOTS)
+    known, _ = pre.parse_known_args(argv)
+    parser, host = build_parser(known.robot)
+    args = parser.parse_args(argv)
+    cell = host.cell_from_args(args)
+    result = play_episode(cell, args.out.resolve(), **episode_options(args, known.robot, host))
     print(
         json.dumps(
             {

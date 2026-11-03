@@ -92,6 +92,8 @@ nav:
           - LIBERO-PRO: robots/libero.md
           - RoboTwin 2.0: robots/robotwin.md
           - RoboCasa365: robots/robocasa.md
+      - GenieSim:
+          - RoboColiseum: robots/robocoliseum.md
       - Adding a Robot: robots/adding-a-robot.md
   - Models:
       - PyRUA-Lean Coder v0.1-4B: models/coder.md

@@ -63,6 +63,7 @@ def test_registry_knows_libero_and_lists_the_other_robots():
         "robodojo",
         "robodojo_xpl",
         "robodojo_xpl_rgb",
+        "robocoliseum",
     )
     with pytest.raises(ValueError):
         get_adapter("nao")
