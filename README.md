@@ -35,8 +35,8 @@ can find an object, move above it, grasp, check the gripper and try again.
 
 ## 🔥 News
 
-- [Incoming] 🔜 **PyRUA-Coder v1.0** and **PyRUA-RSI**: the next release of the trained coder, and a technical report
-  on both.
+- [Incoming] 🔜 **PyRUA-Coder v1.0** (the next release of the trained coder) and **PyRUA-RSI**, each with its own
+  technical report.
 - [2026/11/03] 🏟️ **Rank 1 on the RoboColiseum leaderboard**: on [RoboColiseum](https://robocoliseum.ai/leaderboard),
   AgiBot's GenieSim challenge for the G2 humanoid, PyRUA-Lean with GPT-6.1 Sol and no VLA policy is **rank 1** of 26 entries
   overall (0.8276), with Instruction Following 0.9925, Spatial Reasoning 0.9792, Robustness 0.8492 and General
