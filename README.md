@@ -37,6 +37,14 @@ can find an object, move above it, grasp, check the gripper and try again.
 
 - [Incoming] 🔜 **PyRUA-Coder v1.0** and **PyRUA-RSI**: the next release of the trained coder, and a technical report
   on both.
+- [2026/11/03] 🏟️ **Rank 1 on the RoboColiseum leaderboard**: on [RoboColiseum](https://robocoliseum.ai/leaderboard),
+  AgiBot's GenieSim challenge for the G2 humanoid, PyRUA-Lean with GPT-6.1 Sol and no VLA policy is **rank 1** of 26 entries
+  overall (0.8276), with Instruction Following 0.9925, Spatial Reasoning 0.9792, Robustness 0.8492 and General
+  Manipulation 0.4897. Thanks to the RoboColiseum team, who adapted PyRUA-Lean to GenieSim and contributed the
+  integration ([#5](https://github.com/DAGroup-PKU/PyRUA-Lean/pull/5)).
+  [[Leaderboard]](https://robocoliseum.ai/leaderboard) [[Docs]](https://dagroup-pku.github.io/PyRUA-Lean/docs/robots/robocoliseum/)
+  <br><img src="docs/assets/robocoliseum-leaderboard.jpg" width="90%"
+       alt="RoboColiseum leaderboard on November 3, 2026: PyRUA-Lean is rank 1 on the overall board">
 - [2026/10/30] 🔁 **PyRUA-RSI, offline version, open-sourced**: one fixed Python program per RoboDojo task, written
   ahead of time against the same `robo` API and run with no model call at evaluation time. On RoboDojo eval seed 0
   (54 task configurations, 2,100 episodes) it reaches an **82.82%** average success rate (Score 87.16); on the held-out
