@@ -1,0 +1,2297 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Documentation for PyRUA-Lean - Python for Lean Robot-Use Agents">
+      
+      
+        <meta name="author" content="PKU DAGroup">
+      
+      
+        <link rel="canonical" href="https://dagroup-pku.github.io/PyRUA-Lean/docs/robots/robocoliseum/">
+      
+      
+        <link rel="prev" href="../robocasa/">
+      
+      
+        <link rel="next" href="../adding-a-robot/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/favicon.svg">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>RoboColiseum - PyRUA-Lean Documentation</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#robocoliseum" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="PyRUA-Lean Documentation" class="md-header__button md-logo" aria-label="PyRUA-Lean Documentation" data-md-component="logo">
+      
+  <img src="../../assets/logo-header.svg" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            PyRUA-Lean Documentation
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              RoboColiseum
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="custom" data-md-color-accent="custom"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/DAGroup-PKU/PyRUA-Lean" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    DAGroup-PKU/PyRUA-Lean
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="PyRUA-Lean Documentation" class="md-nav__button md-logo" aria-label="PyRUA-Lean Documentation" data-md-component="logo">
+      
+  <img src="../../assets/logo-header.svg" alt="logo">
+
+    </a>
+    PyRUA-Lean Documentation
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/DAGroup-PKU/PyRUA-Lean" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+  </div>
+  <div class="md-source__repository">
+    DAGroup-PKU/PyRUA-Lean
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Get Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Get Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Quick Start
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/how-it-works/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    How It Works
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    User Guide
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    User Guide
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/agents/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Agent Configuration
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/running/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Running Episodes
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/outputs/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Output Files
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../guide/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Command-Line Reference
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+          
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <div class="md-nav__link md-nav__container">
+            <a href="../" class="md-nav__link ">
+              
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Robots
+  
+
+    
+  </span>
+  
+  
+
+            </a>
+            
+              
+              <label class="md-nav__link " for="__nav_4" id="__nav_4_label" tabindex="">
+                <span class="md-nav__icon md-icon"></span>
+              </label>
+            
+          </div>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Robots
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_2" id="__nav_4_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    XPolicyLab
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    XPolicyLab
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../robodojo/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RoboDojo
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_3" id="__nav_4_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RPent
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_3">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    RPent
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../libero/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    LIBERO-PRO
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../robotwin/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RoboTwin 2.0
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../robocasa/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RoboCasa365
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GenieSim
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    GenieSim
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RoboColiseum
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RoboColiseum
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#observation-and-action" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observation and Action
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation-and-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation and Resources
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#model-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Model Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#run-a-task" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run a Task
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#view-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        View Results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-runs-where" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Runs Where
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#primitives-the-agent-can-call" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Primitives the Agent Can Call
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../adding-a-robot/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Adding a Robot
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../models/coder/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    PyRUA-Lean Coder v0.1-4B
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Overview
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Overview">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#observation-and-action" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Observation and Action
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#installation-and-resources" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Installation and Resources
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#model-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Model Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#run-a-task" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run a Task
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#view-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        View Results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#what-runs-where" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What Runs Where
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#primitives-the-agent-can-call" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Primitives the Agent Can Call
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="robocoliseum">RoboColiseum<a class="headerlink" href="#robocoliseum" title="Permanent link">&para;</a></h1>
+<p><a href="https://robocoliseum.ai/leaderboard">RoboColiseum</a> is AgiBot's simulation challenge on
+<a href="https://github.com/AgibotTech/genie_sim">GenieSim</a>: the G2 robot in Isaac Sim, on four boards (instruction following,
+spatial reasoning, general manipulation and robustness). GenieSim's own benchmark runs the simulator and judges every
+episode, and asks a policy for actions over its inference protocol; PyRUA-Lean answers it as that policy. A language
+model writes Python against <code>robo</code>, one cell at a time, while the episode runs. No VLA policy, no privileged
+information.</p>
+<h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Robot</strong></td>
+<td>AgiBot G2 (<code>G2_omnipicker</code>): two 7-joint arms with one gripper each, a 5-joint waist and a wheeled base</td>
+</tr>
+<tr>
+<td><strong>Agent runtime</strong></td>
+<td><code>openai</code>: any OpenAI-compatible chat endpoint (GPT-6.1 Sol, reasoning effort <code>high</code>, in our runs)</td>
+</tr>
+<tr>
+<td><strong>Models on the policy side</strong></td>
+<td>SAM3 (segmentation), as one HTTP service for every policy process; no VLA</td>
+</tr>
+<tr>
+<td><strong>Boards</strong></td>
+<td><code>instruction</code>, <code>spatial</code>, <code>manip</code>, <code>robust</code></td>
+</tr>
+<tr>
+<td><strong>Hardware</strong></td>
+<td>Linux x86_64, Python 3.11 or 3.12 (the arm IK's wheels); an NVIDIA GPU for SAM3 (about 10 GB). The simulator runs on the platform, or wherever you run GenieSim</td>
+</tr>
+</tbody>
+</table>
+<h3 id="observation-and-action">Observation and Action<a class="headerlink" href="#observation-and-action" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Observation</td>
+<td>GenieSim's inference request: three colour images (<code>head</code>, <code>hand_left</code>, <code>hand_right</code>), each camera's depth image and calibration (intrinsics and pose; the benchmark withholds the calibration while it degrades the images, as the robustness board's camera-quality cases do), the joints of both arms, the grippers and the waist, both end-effector poses, and the instruction. No object poses, and the task's progress is not read.</td>
+</tr>
+<tr>
+<td>Action</td>
+<td>One action per request: arm motions are solved in the library on the benchmark's own IK (<code>ik_solver</code>) and sent as joint targets (<code>JOINT_ABS</code>), with the gripper commands; the waist as joint targets, the base as a relative pose.</td>
+</tr>
+<tr>
+<td>Success</td>
+<td>The benchmark's own checks of the scene, stage by stage, every 30 actions. The agent never sees them; when a program finishes, the robot holds still until the benchmark ends the episode.</td>
+</tr>
+<tr>
+<td>Task prompt</td>
+<td>The instruction, and one knowledge text for every task: how the tools behave and how the benchmark judges a stage (which state counts, when it is checked). No task recipes.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="installation-and-resources">Installation and Resources<a class="headerlink" href="#installation-and-resources" title="Permanent link">&para;</a></h2>
+<ol>
+<li>
+<p>The policy environment, from a PyRUA-Lean checkout:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>pip<span class="w"> </span>install<span class="w"> </span>-e<span class="w"> </span><span class="s2">".[robocoliseum]"</span>
+</code></pre></div>
+<p>The extra installs the bridge's and perception's packages and the benchmark's arm IK, <code>ik_solver</code>, which is not
+on PyPI: its wheel comes from GenieSim's <code>3rdparty/</code> at a fixed commit. The robot's URDF and the solver's
+configuration are GenieSim's own, shipped in <code>pyrualean/hosts/robocoliseum_ik/</code>; <code>GENIESIM_IK_SDK</code> names another
+directory holding them (<code>G2_NO_GRIPPER.urdf</code>, <code>g2_solver.yaml</code>) when GenieSim's robot description changes.</p>
+</li>
+<li>
+<p>SAM3, as one service for every policy process on the machine. Its environment needs a CUDA build of <code>torch</code>, the
+   <code>sam3</code> package (it pins <code>numpy&lt;2</code>, so a separate environment is simplest) and the checkpoint:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>pip<span class="w"> </span>install<span class="w"> </span><span class="s2">"sam3 @ git+https://github.com/RLinf/sam3.git@c1f6b1e83967c912f675d8975d437ccdc41e17d8"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">    </span>einops<span class="w"> </span>pycocotools<span class="w"> </span>psutil
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>bash<span class="w"> </span>integrations/xpolicylab/PyRUA_Lean/download_assets.sh<span class="w">   </span><span class="c1"># sam3.pt (3.4 GB), into that directory's checkpoints/</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>python<span class="w"> </span>src/pyrualean/hosts/sam3_http.py<span class="w"> </span>--port<span class="w"> </span><span class="m">8790</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span>--checkpoint<span class="w"> </span>integrations/xpolicylab/PyRUA_Lean/checkpoints/sam3.pt
+</code></pre></div>
+<p>It prints <code>SAM3 ready on http://127.0.0.1:8790</code> once loaded. <code>PYRUA_SAM3_ENDPOINT</code> points the policy processes at
+another address. Without the service, finding an object by name reports that SAM3 is not running; measuring the
+object at a pixel still works.</p>
+</li>
+</ol>
+<h2 id="model-configuration">Model Configuration<a class="headerlink" href="#model-configuration" title="Permanent link">&para;</a></h2>
+<p>The cells are written by a model behind an OpenAI-compatible chat endpoint, with <code>play</code>'s options:</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Our runs</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--runtime openai</code></td>
+<td></td>
+<td>the in-process agent loop</td>
+</tr>
+<tr>
+<td><code>--base-url</code>, <code>--api-key-env</code>, <code>--model</code></td>
+<td>the endpoint, the variable holding its key, <code>gpt-6.1-sol</code></td>
+<td></td>
+</tr>
+<tr>
+<td><code>--openai-extra-body</code></td>
+<td><code>'{"reasoning_effort": "high"}'</code></td>
+<td>JSON merged into every request</td>
+</tr>
+<tr>
+<td><code>--openai-max-tokens</code></td>
+<td><code>32000</code></td>
+<td>the longest reply</td>
+</tr>
+<tr>
+<td><code>--images</code></td>
+<td><code>on-demand</code></td>
+<td>the model sees a camera only when its code asks for it (<code>robo.show</code>)</td>
+</tr>
+<tr>
+<td><code>--budget-s</code></td>
+<td><code>1800</code></td>
+<td>wall-clock limit of an episode, in seconds</td>
+</tr>
+</tbody>
+</table>
+<h2 id="run-a-task">Run a Task<a class="headerlink" href="#run-a-task" title="Permanent link">&para;</a></h2>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">Online (RoboColiseum)</label><label for="__tabbed_1_2">Your own GenieSim run</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>Submit a job for one board on the platform first; it gives the job's <code>uuid</code>, its tunnel endpoint, a job token
+and its <code>parallelism</code>. Each agent process dials the platform's gateway and serves one tunnel: start up to
+<code>parallelism</code> of them, and they play the cases the platform sends until it drains the job.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="nb">export</span><span class="w"> </span><span class="nv">JOB_UUID</span><span class="o">=</span>...<span class="w"> </span><span class="nv">TUNNEL_ENDPOINT</span><span class="o">=</span>ws://.../api/challenge/tunnel<span class="w"> </span><span class="nv">JOB_TOKEN</span><span class="o">=</span>...
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nb">export</span><span class="w"> </span><span class="nv">OPENAI_API_KEY</span><span class="o">=</span>...
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="k">for</span><span class="w"> </span>i<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="k">$(</span>seq<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="s2">"</span><span class="nv">$PARALLELISM</span><span class="s2">"</span><span class="k">)</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span>python<span class="w"> </span>-m<span class="w"> </span>pyrualean.hosts.geniesim_robocoliseum<span class="w"> </span>agent<span class="w"> </span>--arm<span class="w"> </span>cells<span class="w"> </span>--out<span class="w"> </span><span class="s2">"runs/</span><span class="nv">$JOB_UUID</span><span class="s2">/agent_</span><span class="nv">$i</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">      </span>--runtime<span class="w"> </span>openai<span class="w"> </span>--base-url<span class="w"> </span>https://YOUR_API_HOST/v1<span class="w"> </span>--api-key-env<span class="w"> </span>OPENAI_API_KEY<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">      </span>--model<span class="w"> </span>gpt-6.1-sol<span class="w"> </span>--openai-extra-body<span class="w"> </span><span class="s1">'{"reasoning_effort": "high"}'</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">      </span>--openai-max-tokens<span class="w"> </span><span class="m">32000</span><span class="w"> </span>--images<span class="w"> </span>on-demand<span class="w"> </span>--budget-s<span class="w"> </span><span class="m">1800</span><span class="w"> </span><span class="p">&amp;</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="k">done</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="nb">wait</span>
+</code></pre></div>
+<p>An agent exits 0 once the job is drained, 1 when its tunnel is refused or stays lost past the gateway's
+30-second reconnect window, 130 on Ctrl-C. The platform keeps the scores.</p>
+</div>
+<div class="tabbed-block">
+<p>Start the policy first, then the benchmark with its inference host pointing at it:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>python<span class="w"> </span>-m<span class="w"> </span>pyrualean.play<span class="w"> </span>--robot<span class="w"> </span>robocoliseum<span class="w"> </span>--arm<span class="w"> </span>cells<span class="w"> </span>--out<span class="w"> </span>runs/pick_block_color<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">    </span>--task<span class="w"> </span>g2op_if_pick_block_color<span class="w"> </span>--port<span class="w"> </span><span class="m">8999</span><span class="w"> </span>--output-root<span class="w"> </span>&lt;genie_sim&gt;/output<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span>--runtime<span class="w"> </span>openai<span class="w"> </span>--base-url<span class="w"> </span>https://YOUR_API_HOST/v1<span class="w"> </span>--api-key-env<span class="w"> </span>OPENAI_API_KEY<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span>--model<span class="w"> </span>gpt-6.1-sol<span class="w"> </span>--openai-extra-body<span class="w"> </span><span class="s1">'{"reasoning_effort": "high"}'</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span>--openai-max-tokens<span class="w"> </span><span class="m">32000</span><span class="w"> </span>--images<span class="w"> </span>on-demand
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># in GenieSim's simulator environment, from its checkout</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>python<span class="w"> </span>source/geniesim_benchmark/src/geniesim_benchmark/app/app.py<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">    </span>--config<span class="w"> </span>source/geniesim_benchmark/src/geniesim_benchmark/config/g2op_if_pick_block_color.yaml<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">    </span>--benchmark.infer_host<span class="w"> </span><span class="m">127</span>.0.0.1:8999<span class="w"> </span>--benchmark.model_arc<span class="w"> </span>corobot
+</code></pre></div>
+<p><code>play</code> plays the run's first episode and ends the rest. <code>--output-root</code>, the benchmark's output directory, lets
+it read the episode's scores.</p>
+</div>
+</div>
+</div>
+<h2 id="view-results">View Results<a class="headerlink" href="#view-results" title="Permanent link">&para;</a></h2>
+<ul>
+<li>Each episode's card, prompt, programs, tool calls, transcript and every recorded step (the three images and the
+  state) are kept under <code>--out</code>: <code>episode_NNN/</code> of each session for an agent, the directory itself for <code>play</code>.</li>
+<li>An agent appends one line per episode to <code>online.jsonl</code> (session, task, instruction, status, actions).</li>
+<li>With <code>--output-root</code>, <code>benchmark_verdict.json</code> holds the benchmark's scores of the episode: one per stage
+  (<code>STEPS</code>) and <code>E2E</code>.</li>
+</ul>
+<h2 id="what-runs-where">What Runs Where<a class="headerlink" href="#what-runs-where" title="Permanent link">&para;</a></h2>
+<ul>
+<li><strong>Benchmark</strong> (GenieSim, in Isaac Sim: on the platform online, or in your simulator environment) owns the
+  simulator: it builds every request, counts each stage's action budget and judges the episode.</li>
+<li><strong>Policy process</strong> (this library) answers the benchmark's requests: as a WebSocket server the benchmark connects
+  to, or online through the platform's tunnel, which it dials. It runs the agent loop, the sandboxed cells and the
+  primitives (inverse kinematics, gripper, perception).</li>
+<li><strong>SAM3 service</strong> segments for every policy process on the machine.</li>
+<li><strong>Model endpoint</strong> writes the cells.</li>
+</ul>
+<p>One request is answered with one action, so a primitive sees the result of every native action. The benchmark does
+not step the simulator while the model thinks.</p>
+<h2 id="primitives-the-agent-can-call">Primitives the Agent Can Call<a class="headerlink" href="#primitives-the-agent-can-call" title="Permanent link">&para;</a></h2>
+<p>Motion:</p>
+<ul>
+<li><code>move_to(xyz, arm, gripper, pitch, yaw, roll, path)</code>: move one arm's grasp point to a position, with an
+  orientation. A pose out of reach moves nothing, and the result names reachable poses nearby.</li>
+<li><code>move_both(left, right)</code>: both arms' grasp points at once, each to a position.</li>
+<li><code>set_gripper(arm, command)</code>: close or open one gripper until the fingers stop; the result says whether something
+  is held.</li>
+<li><code>move_waist(forward, up, turn_deg, lean_deg)</code>, <code>move_base(forward, left, turn_deg)</code>: the waist and the wheeled
+  base.</li>
+<li><code>home(arm="both")</code>: return an arm to the joint angles it had when the episode started.</li>
+<li><code>wait_for_check(checks=1)</code>: hold still until the benchmark's next stage check has seen the scene.</li>
+</ul>
+<p>Perception and state:</p>
+<ul>
+<li><code>locate(target, camera)</code>: find an object by words (SAM3) or at a pixel and measure it in 3D from the depth image:
+  centre, top, the surface it stands on, extent, tilt, and the yaw of a top grasp across it.</li>
+<li><code>segment(camera, text=..., row=..., col=...)</code>: the object's region in the current image.</li>
+<li><code>back_project(row, col, camera)</code>: the point seen at one pixel.</li>
+<li><code>state()</code>, <code>image(camera)</code>, <code>show(camera)</code>, <code>artifact(name)</code>: the recorded state of both arms, the images, and
+  what the model looks at.</li>
+</ul>
+<details class="note">
+<summary>API reference: what the agent reads, generated from <code>pyrualean.robocoliseum</code> when these docs are built</summary>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>class RobocoliseumRobot
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    The G2 dual-arm humanoid with two-finger grippers, in the GenieSim benchmark.
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    Frame: ``robo.FRAME`` is ``base_link``, fixed to the robot's base: +x forward, +y the
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    robot's left, +z up; metres and degrees.  The upper body may start turned on its waist:
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    ``state().torso_heading_deg`` says where the chest (and the work surface) faces.  The
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    arms are ``"left"`` and ``"right"``; a motion names one arm and the other holds.
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>    Orientation is three angles (``state().right.pitch``, ``.yaw``, ``.roll``): ``pitch`` 0
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>    points level, 90 straight down; ``yaw`` is the heading of the pointing direction, 0 along
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a>    +x, +90 towards +y; ``roll`` turns the fingers about the pointing direction (0: they close
+<a id="__codelineno-4-12" name="__codelineno-4-12" href="#__codelineno-4-12"></a>    horizontally).  Pointing straight down, ``yaw = locate(...).grasp_yaw`` closes the fingers
+<a id="__codelineno-4-13" name="__codelineno-4-13" href="#__codelineno-4-13"></a>    across an object's narrow side.
+<a id="__codelineno-4-14" name="__codelineno-4-14" href="#__codelineno-4-14"></a>
+<a id="__codelineno-4-15" name="__codelineno-4-15" href="#__codelineno-4-15"></a>    ``move_to`` drives the GRASP POINT (the gripper's centre, 0.143 m out from the wrist
+<a id="__codelineno-4-16" name="__codelineno-4-16" href="#__codelineno-4-16"></a>    flange): it solves the arm's inverse kinematics for the whole pose, refuses one out of
+<a id="__codelineno-4-17" name="__codelineno-4-17" href="#__codelineno-4-17"></a>    reach without moving (and names reachable ones), and follows a straight line
+<a id="__codelineno-4-18" name="__codelineno-4-18" href="#__codelineno-4-18"></a>    (``path="line"``) or a joint swing.
+<a id="__codelineno-4-19" name="__codelineno-4-19" href="#__codelineno-4-19"></a>
+<a id="__codelineno-4-20" name="__codelineno-4-20" href="#__codelineno-4-20"></a>    Gripper: COMMANDS are ``robo.CLOSE``, ``robo.OPEN`` and ``robo.KEEP`` (None);
+<a id="__codelineno-4-21" name="__codelineno-4-21" href="#__codelineno-4-21"></a>    MEASUREMENTS (``state().right.opening``, ``Gripper.opening``) are openings, 1.0 open and
+<a id="__codelineno-4-22" name="__codelineno-4-22" href="#__codelineno-4-22"></a>    0.0 closed on nothing.
+<a id="__codelineno-4-23" name="__codelineno-4-23" href="#__codelineno-4-23"></a>
+<a id="__codelineno-4-24" name="__codelineno-4-24" href="#__codelineno-4-24"></a>    Perception: ``locate("words")`` finds an object by description and measures it in 3D from
+<a id="__codelineno-4-25" name="__codelineno-4-25" href="#__codelineno-4-25"></a>    the depth image; ``locate(row, col)`` measures the object at a pixel.  Object poses are
+<a id="__codelineno-4-26" name="__codelineno-4-26" href="#__codelineno-4-26"></a>    never given.  Every native action counts against the stage's budget (on the card when
+<a id="__codelineno-4-27" name="__codelineno-4-27" href="#__codelineno-4-27"></a>    known).
+<a id="__codelineno-4-28" name="__codelineno-4-28" href="#__codelineno-4-28"></a>
+<a id="__codelineno-4-29" name="__codelineno-4-29" href="#__codelineno-4-29"></a>Constants:
+<a id="__codelineno-4-30" name="__codelineno-4-30" href="#__codelineno-4-30"></a>    robo.ARMS = ('left', 'right')
+<a id="__codelineno-4-31" name="__codelineno-4-31" href="#__codelineno-4-31"></a>    robo.LEFT = 'left'
+<a id="__codelineno-4-32" name="__codelineno-4-32" href="#__codelineno-4-32"></a>    robo.RIGHT = 'right'
+<a id="__codelineno-4-33" name="__codelineno-4-33" href="#__codelineno-4-33"></a>    robo.CLOSE = 0.0
+<a id="__codelineno-4-34" name="__codelineno-4-34" href="#__codelineno-4-34"></a>    robo.OPEN = -0.785
+<a id="__codelineno-4-35" name="__codelineno-4-35" href="#__codelineno-4-35"></a>    robo.KEEP = None
+<a id="__codelineno-4-36" name="__codelineno-4-36" href="#__codelineno-4-36"></a>    robo.FRAME = 'base_link'
+<a id="__codelineno-4-37" name="__codelineno-4-37" href="#__codelineno-4-37"></a>
+<a id="__codelineno-4-38" name="__codelineno-4-38" href="#__codelineno-4-38"></a>Methods and attributes of `robo`:
+<a id="__codelineno-4-39" name="__codelineno-4-39" href="#__codelineno-4-39"></a>
+<a id="__codelineno-4-40" name="__codelineno-4-40" href="#__codelineno-4-40"></a>robo.task -&gt; str  (read-only attribute)
+<a id="__codelineno-4-41" name="__codelineno-4-41" href="#__codelineno-4-41"></a>    The task instruction given by the benchmark (authoritative).
+<a id="__codelineno-4-42" name="__codelineno-4-42" href="#__codelineno-4-42"></a>
+<a id="__codelineno-4-43" name="__codelineno-4-43" href="#__codelineno-4-43"></a>robo.state(step: int = -1) -&gt; State
+<a id="__codelineno-4-44" name="__codelineno-4-44" href="#__codelineno-4-44"></a>    Read the recorded state of both arms.
+<a id="__codelineno-4-45" name="__codelineno-4-45" href="#__codelineno-4-45"></a>
+<a id="__codelineno-4-46" name="__codelineno-4-46" href="#__codelineno-4-46"></a>    Args:
+<a id="__codelineno-4-47" name="__codelineno-4-47" href="#__codelineno-4-47"></a>        step: recorded step to read; ``-1`` is the latest, ``0`` the initial scene.
+<a id="__codelineno-4-48" name="__codelineno-4-48" href="#__codelineno-4-48"></a>    Returns:
+<a id="__codelineno-4-49" name="__codelineno-4-49" href="#__codelineno-4-49"></a>        State with both arms' tool centres, pointing directions and gripper openings.
+<a id="__codelineno-4-50" name="__codelineno-4-50" href="#__codelineno-4-50"></a>
+<a id="__codelineno-4-51" name="__codelineno-4-51" href="#__codelineno-4-51"></a>robo.image(camera: str = 'head', *, resolution: str = 'high', step: int = -1) -&gt; Any
+<a id="__codelineno-4-52" name="__codelineno-4-52" href="#__codelineno-4-52"></a>    Load a camera image as a ``numpy`` uint8 array (H, W, 3), RGB.
+<a id="__codelineno-4-53" name="__codelineno-4-53" href="#__codelineno-4-53"></a>
+<a id="__codelineno-4-54" name="__codelineno-4-54" href="#__codelineno-4-54"></a>    Args:
+<a id="__codelineno-4-55" name="__codelineno-4-55" href="#__codelineno-4-55"></a>        camera: ``"head"`` (the whole scene), ``"hand_left"`` or ``"hand_right"`` (on
+<a id="__codelineno-4-56" name="__codelineno-4-56" href="#__codelineno-4-56"></a>            the gripper). Pixel coordinates are (row, col), row 0 at the top.
+<a id="__codelineno-4-57" name="__codelineno-4-57" href="#__codelineno-4-57"></a>        resolution: there is one resolution per camera, ``"high"``.
+<a id="__codelineno-4-58" name="__codelineno-4-58" href="#__codelineno-4-58"></a>        step: recorded step, ``-1`` = latest.
+<a id="__codelineno-4-59" name="__codelineno-4-59" href="#__codelineno-4-59"></a>
+<a id="__codelineno-4-60" name="__codelineno-4-60" href="#__codelineno-4-60"></a>robo.show(camera: str) -&gt; None
+<a id="__codelineno-4-61" name="__codelineno-4-61" href="#__codelineno-4-61"></a>    Attach the current image of ``camera`` to the feedback of this turn.
+<a id="__codelineno-4-62" name="__codelineno-4-62" href="#__codelineno-4-62"></a>
+<a id="__codelineno-4-63" name="__codelineno-4-63" href="#__codelineno-4-63"></a>    Images are not returned automatically: call ``show(&lt;camera&gt;)`` when
+<a id="__codelineno-4-64" name="__codelineno-4-64" href="#__codelineno-4-64"></a>    *you* (the author) need to look at the scene before writing the next
+<a id="__codelineno-4-65" name="__codelineno-4-65" href="#__codelineno-4-65"></a>    turn.  Costs tokens: look only when a decision depends on it.
+<a id="__codelineno-4-66" name="__codelineno-4-66" href="#__codelineno-4-66"></a>
+<a id="__codelineno-4-67" name="__codelineno-4-67" href="#__codelineno-4-67"></a>robo.artifact(name: str, *, step: int = -1) -&gt; bytes
+<a id="__codelineno-4-68" name="__codelineno-4-68" href="#__codelineno-4-68"></a>    Return the raw bytes of a recorded artifact (advanced).
+<a id="__codelineno-4-69" name="__codelineno-4-69" href="#__codelineno-4-69"></a>
+<a id="__codelineno-4-70" name="__codelineno-4-70" href="#__codelineno-4-70"></a>    Names are ``head.png``, ``hand_left.png`` and ``hand_right.png``.
+<a id="__codelineno-4-71" name="__codelineno-4-71" href="#__codelineno-4-71"></a>
+<a id="__codelineno-4-72" name="__codelineno-4-72" href="#__codelineno-4-72"></a>robo.move_to(
+<a id="__codelineno-4-73" name="__codelineno-4-73" href="#__codelineno-4-73"></a>    xyz: Sequence[float] | None = None,
+<a id="__codelineno-4-74" name="__codelineno-4-74" href="#__codelineno-4-74"></a>    arm: str = 'right',
+<a id="__codelineno-4-75" name="__codelineno-4-75" href="#__codelineno-4-75"></a>    gripper: float | None = None,
+<a id="__codelineno-4-76" name="__codelineno-4-76" href="#__codelineno-4-76"></a>    pitch: float | None = None,
+<a id="__codelineno-4-77" name="__codelineno-4-77" href="#__codelineno-4-77"></a>    yaw: float | None = None,
+<a id="__codelineno-4-78" name="__codelineno-4-78" href="#__codelineno-4-78"></a>    roll: float | None = None,
+<a id="__codelineno-4-79" name="__codelineno-4-79" href="#__codelineno-4-79"></a>    path: str = 'auto',
+<a id="__codelineno-4-80" name="__codelineno-4-80" href="#__codelineno-4-80"></a>    max_actions: int = 60,
+<a id="__codelineno-4-81" name="__codelineno-4-81" href="#__codelineno-4-81"></a>) -&gt; Move
+<a id="__codelineno-4-82" name="__codelineno-4-82" href="#__codelineno-4-82"></a>    Move one arm's grasp point to a position in ``robo.FRAME``, with an orientation.
+<a id="__codelineno-4-83" name="__codelineno-4-83" href="#__codelineno-4-83"></a>
+<a id="__codelineno-4-84" name="__codelineno-4-84" href="#__codelineno-4-84"></a>    The arm's inverse kinematics is solved for the whole pose first (the same solver
+<a id="__codelineno-4-85" name="__codelineno-4-85" href="#__codelineno-4-85"></a>    the benchmark uses), and the arm follows a planned path commanded as joint angles.
+<a id="__codelineno-4-86" name="__codelineno-4-86" href="#__codelineno-4-86"></a>    Nothing moves when the pose is out of reach: ``stop_reason == "out_of_reach"``,
+<a id="__codelineno-4-87" name="__codelineno-4-87" href="#__codelineno-4-87"></a>    ``steps_used == 0``, and ``alternatives`` names nearby poses that ARE reachable.
+<a id="__codelineno-4-88" name="__codelineno-4-88" href="#__codelineno-4-88"></a>    A pose missed by at most 2 cm / 8 degrees is taken anyway: the arm goes to the
+<a id="__codelineno-4-89" name="__codelineno-4-89" href="#__codelineno-4-89"></a>    closest one and ``note`` says how far off it is.
+<a id="__codelineno-4-90" name="__codelineno-4-90" href="#__codelineno-4-90"></a>
+<a id="__codelineno-4-91" name="__codelineno-4-91" href="#__codelineno-4-91"></a>    Args:
+<a id="__codelineno-4-92" name="__codelineno-4-92" href="#__codelineno-4-92"></a>        xyz: target grasp point [x, y, z], metres; None keeps the position.
+<a id="__codelineno-4-93" name="__codelineno-4-93" href="#__codelineno-4-93"></a>        arm: ``"left"`` or ``"right"``.  The other arm holds its joints.
+<a id="__codelineno-4-94" name="__codelineno-4-94" href="#__codelineno-4-94"></a>        gripper: ``robo.CLOSE`` / ``robo.OPEN`` to command the moving arm's gripper on
+<a id="__codelineno-4-95" name="__codelineno-4-95" href="#__codelineno-4-95"></a>            every action, ``robo.KEEP`` (None) to keep commanding what it was last told
+<a id="__codelineno-4-96" name="__codelineno-4-96" href="#__codelineno-4-96"></a>            (a held object stays squeezed).
+<a id="__codelineno-4-97" name="__codelineno-4-97" href="#__codelineno-4-97"></a>        pitch / yaw / roll: the orientation to arrive with, degrees (the class
+<a id="__codelineno-4-98" name="__codelineno-4-98" href="#__codelineno-4-98"></a>            docstring defines them).  An angle left None keeps its current value, so
+<a id="__codelineno-4-99" name="__codelineno-4-99" href="#__codelineno-4-99"></a>            a plain position move does not turn the gripper.
+<a id="__codelineno-4-100" name="__codelineno-4-100" href="#__codelineno-4-100"></a>        path: ``"auto"`` (a straight line of the grasp point where it can be followed,
+<a id="__codelineno-4-101" name="__codelineno-4-101" href="#__codelineno-4-101"></a>            else a joint swing), ``"line"`` (the line or nothing: every approach,
+<a id="__codelineno-4-102" name="__codelineno-4-102" href="#__codelineno-4-102"></a>            descent and lift near objects) or ``"joint"`` (swing the joints: fewer
+<a id="__codelineno-4-103" name="__codelineno-4-103" href="#__codelineno-4-103"></a>            actions, the grasp point does not follow a line — away from objects only).
+<a id="__codelineno-4-104" name="__codelineno-4-104" href="#__codelineno-4-104"></a>        max_actions: native actions this call may spend.
+<a id="__codelineno-4-105" name="__codelineno-4-105" href="#__codelineno-4-105"></a>    Returns:
+<a id="__codelineno-4-106" name="__codelineno-4-106" href="#__codelineno-4-106"></a>        Move; test ``reached`` (within 0.01 m and 5 degrees).
+<a id="__codelineno-4-107" name="__codelineno-4-107" href="#__codelineno-4-107"></a>    Raises:
+<a id="__codelineno-4-108" name="__codelineno-4-108" href="#__codelineno-4-108"></a>        ValueError: a malformed argument (nothing is sent).
+<a id="__codelineno-4-109" name="__codelineno-4-109" href="#__codelineno-4-109"></a>
+<a id="__codelineno-4-110" name="__codelineno-4-110" href="#__codelineno-4-110"></a>robo.set_gripper(
+<a id="__codelineno-4-111" name="__codelineno-4-111" href="#__codelineno-4-111"></a>    arm: str = 'right',
+<a id="__codelineno-4-112" name="__codelineno-4-112" href="#__codelineno-4-112"></a>    command: float | None = None,
+<a id="__codelineno-4-113" name="__codelineno-4-113" href="#__codelineno-4-113"></a>    wait_for_check: bool = True,
+<a id="__codelineno-4-114" name="__codelineno-4-114" href="#__codelineno-4-114"></a>) -&gt; Gripper
+<a id="__codelineno-4-115" name="__codelineno-4-115" href="#__codelineno-4-115"></a>    Close or open one gripper, without moving the arms.
+<a id="__codelineno-4-116" name="__codelineno-4-116" href="#__codelineno-4-116"></a>
+<a id="__codelineno-4-117" name="__codelineno-4-117" href="#__codelineno-4-117"></a>    The command is repeated for a few actions until the fingers stop.  After a close,
+<a id="__codelineno-4-118" name="__codelineno-4-118" href="#__codelineno-4-118"></a>    ``holding`` tells whether something stopped them apart.  A close that holds something
+<a id="__codelineno-4-119" name="__codelineno-4-119" href="#__codelineno-4-119"></a>    then keeps the robot still for up to 30 more actions, until the benchmark's progress
+<a id="__codelineno-4-120" name="__codelineno-4-120" href="#__codelineno-4-120"></a>    check has seen the grasp: a lift only counts when it starts after that check.  Later
+<a id="__codelineno-4-121" name="__codelineno-4-121" href="#__codelineno-4-121"></a>    motions with ``robo.KEEP`` keep commanding what was commanded last, so a held object stays
+<a id="__codelineno-4-122" name="__codelineno-4-122" href="#__codelineno-4-122"></a>    squeezed.
+<a id="__codelineno-4-123" name="__codelineno-4-123" href="#__codelineno-4-123"></a>
+<a id="__codelineno-4-124" name="__codelineno-4-124" href="#__codelineno-4-124"></a>    Args:
+<a id="__codelineno-4-125" name="__codelineno-4-125" href="#__codelineno-4-125"></a>        arm: ``"left"`` or ``"right"``.
+<a id="__codelineno-4-126" name="__codelineno-4-126" href="#__codelineno-4-126"></a>        command: ``robo.CLOSE`` or ``robo.OPEN``.  ``robo.KEEP`` is refused: this
+<a id="__codelineno-4-127" name="__codelineno-4-127" href="#__codelineno-4-127"></a>            call exists to change the gripper.
+<a id="__codelineno-4-128" name="__codelineno-4-128" href="#__codelineno-4-128"></a>        wait_for_check: after a close that holds something, keep still until the
+<a id="__codelineno-4-129" name="__codelineno-4-129" href="#__codelineno-4-129"></a>            progress check has seen it (up to 30 actions).  Keep True when the next
+<a id="__codelineno-4-130" name="__codelineno-4-130" href="#__codelineno-4-130"></a>            stage is graded on LIFTING the object (a pick-up).  False skips the wait:
+<a id="__codelineno-4-131" name="__codelineno-4-131" href="#__codelineno-4-131"></a>            for a re-grasp, or a grasp whose next stage is not judged on the lift.
+<a id="__codelineno-4-132" name="__codelineno-4-132" href="#__codelineno-4-132"></a>    Returns:
+<a id="__codelineno-4-133" name="__codelineno-4-133" href="#__codelineno-4-133"></a>        Gripper.  ``holding`` is not proof that the INTENDED object is held: lift,
+<a id="__codelineno-4-134" name="__codelineno-4-134" href="#__codelineno-4-134"></a>        then look at the wrist camera or ``locate`` it again.
+<a id="__codelineno-4-135" name="__codelineno-4-135" href="#__codelineno-4-135"></a>    Raises:
+<a id="__codelineno-4-136" name="__codelineno-4-136" href="#__codelineno-4-136"></a>        ValueError: a malformed argument (nothing is sent).
+<a id="__codelineno-4-137" name="__codelineno-4-137" href="#__codelineno-4-137"></a>
+<a id="__codelineno-4-138" name="__codelineno-4-138" href="#__codelineno-4-138"></a>robo.move_both(
+<a id="__codelineno-4-139" name="__codelineno-4-139" href="#__codelineno-4-139"></a>    left: Sequence[float] | None = None,
+<a id="__codelineno-4-140" name="__codelineno-4-140" href="#__codelineno-4-140"></a>    right: Sequence[float] | None = None,
+<a id="__codelineno-4-141" name="__codelineno-4-141" href="#__codelineno-4-141"></a>    max_actions: int = 60,
+<a id="__codelineno-4-142" name="__codelineno-4-142" href="#__codelineno-4-142"></a>) -&gt; BothMove
+<a id="__codelineno-4-143" name="__codelineno-4-143" href="#__codelineno-4-143"></a>    Move both grasp points at the same time — to carry one object with two hands.
+<a id="__codelineno-4-144" name="__codelineno-4-144" href="#__codelineno-4-144"></a>
+<a id="__codelineno-4-145" name="__codelineno-4-145" href="#__codelineno-4-145"></a>    Each tool keeps its orientation and each gripper its last command.  The two hands
+<a id="__codelineno-4-146" name="__codelineno-4-146" href="#__codelineno-4-146"></a>    cover the same fraction of their remaining way on every action, so they start and
+<a id="__codelineno-4-147" name="__codelineno-4-147" href="#__codelineno-4-147"></a>    arrive together and keep their offset in between (move them by the same vector to
+<a id="__codelineno-4-148" name="__codelineno-4-148" href="#__codelineno-4-148"></a>    carry something rigid).  None holds that arm.
+<a id="__codelineno-4-149" name="__codelineno-4-149" href="#__codelineno-4-149"></a>
+<a id="__codelineno-4-150" name="__codelineno-4-150" href="#__codelineno-4-150"></a>    Args:
+<a id="__codelineno-4-151" name="__codelineno-4-151" href="#__codelineno-4-151"></a>        left / right: target grasp point [x, y, z] in ``robo.FRAME``, or None.
+<a id="__codelineno-4-152" name="__codelineno-4-152" href="#__codelineno-4-152"></a>        max_actions: native actions this call may spend.
+<a id="__codelineno-4-153" name="__codelineno-4-153" href="#__codelineno-4-153"></a>    Returns:
+<a id="__codelineno-4-154" name="__codelineno-4-154" href="#__codelineno-4-154"></a>        BothMove; ``reached`` when every moved arm arrived (1.5 cm).
+<a id="__codelineno-4-155" name="__codelineno-4-155" href="#__codelineno-4-155"></a>    Raises:
+<a id="__codelineno-4-156" name="__codelineno-4-156" href="#__codelineno-4-156"></a>        ValueError: a malformed argument (nothing is sent).
+<a id="__codelineno-4-157" name="__codelineno-4-157" href="#__codelineno-4-157"></a>
+<a id="__codelineno-4-158" name="__codelineno-4-158" href="#__codelineno-4-158"></a>robo.move_base(
+<a id="__codelineno-4-159" name="__codelineno-4-159" href="#__codelineno-4-159"></a>    forward: float = 0.0,
+<a id="__codelineno-4-160" name="__codelineno-4-160" href="#__codelineno-4-160"></a>    left: float = 0.0,
+<a id="__codelineno-4-161" name="__codelineno-4-161" href="#__codelineno-4-161"></a>    turn_deg: float = 0.0,
+<a id="__codelineno-4-162" name="__codelineno-4-162" href="#__codelineno-4-162"></a>) -&gt; BaseMove
+<a id="__codelineno-4-163" name="__codelineno-4-163" href="#__codelineno-4-163"></a>    Drive the wheeled base — only in tasks where the base is free (the ``agent_*``
+<a id="__codelineno-4-164" name="__codelineno-4-164" href="#__codelineno-4-164"></a>    scenes); elsewhere it is fixed to the floor and nothing moves.
+<a id="__codelineno-4-165" name="__codelineno-4-165" href="#__codelineno-4-165"></a>
+<a id="__codelineno-4-166" name="__codelineno-4-166" href="#__codelineno-4-166"></a>    ``forward`` / ``left`` are metres along the base's own axes (``robo.FRAME`` x / y),
+<a id="__codelineno-4-167" name="__codelineno-4-167" href="#__codelineno-4-167"></a>    ``turn_deg`` counter-clockwise.  At most 2 m and 180 degrees per call.  The arms keep
+<a id="__codelineno-4-168" name="__codelineno-4-168" href="#__codelineno-4-168"></a>    their joints.  ``robo.FRAME`` travels with the base, so arm poses stay valid, but
+<a id="__codelineno-4-169" name="__codelineno-4-169" href="#__codelineno-4-169"></a>    every object position measured before the move is stale: look again.
+<a id="__codelineno-4-170" name="__codelineno-4-170" href="#__codelineno-4-170"></a>
+<a id="__codelineno-4-171" name="__codelineno-4-171" href="#__codelineno-4-171"></a>    Returns:
+<a id="__codelineno-4-172" name="__codelineno-4-172" href="#__codelineno-4-172"></a>        BaseMove.  Open loop — the benchmark reports no base pose.
+<a id="__codelineno-4-173" name="__codelineno-4-173" href="#__codelineno-4-173"></a>
+<a id="__codelineno-4-174" name="__codelineno-4-174" href="#__codelineno-4-174"></a>robo.move_waist(
+<a id="__codelineno-4-175" name="__codelineno-4-175" href="#__codelineno-4-175"></a>    forward: float = 0.0,
+<a id="__codelineno-4-176" name="__codelineno-4-176" href="#__codelineno-4-176"></a>    up: float = 0.0,
+<a id="__codelineno-4-177" name="__codelineno-4-177" href="#__codelineno-4-177"></a>    turn_deg: float = 0.0,
+<a id="__codelineno-4-178" name="__codelineno-4-178" href="#__codelineno-4-178"></a>    lean_deg: float = 0.0,
+<a id="__codelineno-4-179" name="__codelineno-4-179" href="#__codelineno-4-179"></a>    reset: bool = False,
+<a id="__codelineno-4-180" name="__codelineno-4-180" href="#__codelineno-4-180"></a>    max_actions: int = 60,
+<a id="__codelineno-4-181" name="__codelineno-4-181" href="#__codelineno-4-181"></a>) -&gt; Waist
+<a id="__codelineno-4-182" name="__codelineno-4-182" href="#__codelineno-4-182"></a>    Move the upper body: the chest forward/back and up/down, or turn it.
+<a id="__codelineno-4-183" name="__codelineno-4-183" href="#__codelineno-4-183"></a>
+<a id="__codelineno-4-184" name="__codelineno-4-184" href="#__codelineno-4-184"></a>    The G2 stands on a knee-hip-waist chain.  This moves the chest by ``forward`` and
+<a id="__codelineno-4-185" name="__codelineno-4-185" href="#__codelineno-4-185"></a>    ``up`` metres in ``robo.FRAME`` while keeping the torso's lean (``lean_deg`` adds to
+<a id="__codelineno-4-186" name="__codelineno-4-186" href="#__codelineno-4-186"></a>    it), and turns the upper body by ``turn_deg`` (+ to the robot's left).  The arms keep
+<a id="__codelineno-4-187" name="__codelineno-4-187" href="#__codelineno-4-187"></a>    their joint angles, so BOTH hands — and anything held — move along with the chest.
+<a id="__codelineno-4-188" name="__codelineno-4-188" href="#__codelineno-4-188"></a>    Keep the waist still by default and reach with the arms: move it only when an arm
+<a id="__codelineno-4-189" name="__codelineno-4-189" href="#__codelineno-4-189"></a>    cannot reach (``move_to`` returned ``reach_hint``), because every hand position and
+<a id="__codelineno-4-190" name="__codelineno-4-190" href="#__codelineno-4-190"></a>    every earlier measurement relative to the hands changes, and a waist move costs 10-30
+<a id="__codelineno-4-191" name="__codelineno-4-191" href="#__codelineno-4-191"></a>    actions.  ``forward`` and ``up`` move the chest along robo.FRAME +x and +z — the plane
+<a id="__codelineno-4-192" name="__codelineno-4-192" href="#__codelineno-4-192"></a>    the legs bend in — whichever way the torso faces; when the torso is turned (see
+<a id="__codelineno-4-193" name="__codelineno-4-193" href="#__codelineno-4-193"></a>    ``state().torso_forward``), ``forward`` moves the chest sideways relative to it.
+<a id="__codelineno-4-194" name="__codelineno-4-194" href="#__codelineno-4-194"></a>    ``reset=True`` returns to the starting waist.
+<a id="__codelineno-4-195" name="__codelineno-4-195" href="#__codelineno-4-195"></a>
+<a id="__codelineno-4-196" name="__codelineno-4-196" href="#__codelineno-4-196"></a>    Args:
+<a id="__codelineno-4-197" name="__codelineno-4-197" href="#__codelineno-4-197"></a>        forward / up: chest displacement, metres (the chest can come forward about
+<a id="__codelineno-4-198" name="__codelineno-4-198" href="#__codelineno-4-198"></a>            0.3 m; going straight down is limited, forward-and-down goes further).
+<a id="__codelineno-4-199" name="__codelineno-4-199" href="#__codelineno-4-199"></a>        turn_deg: upper-body turn, degrees.
+<a id="__codelineno-4-200" name="__codelineno-4-200" href="#__codelineno-4-200"></a>        lean_deg: extra forward lean of the torso, degrees (tilts both arms with it).
+<a id="__codelineno-4-201" name="__codelineno-4-201" href="#__codelineno-4-201"></a>        reset: back to the waist angles the episode started with.
+<a id="__codelineno-4-202" name="__codelineno-4-202" href="#__codelineno-4-202"></a>        max_actions: native actions this call may spend (a move takes 10-30).
+<a id="__codelineno-4-203" name="__codelineno-4-203" href="#__codelineno-4-203"></a>    Returns:
+<a id="__codelineno-4-204" name="__codelineno-4-204" href="#__codelineno-4-204"></a>        Waist; when ``moved`` is False the pose is out of range and nothing moved.
+<a id="__codelineno-4-205" name="__codelineno-4-205" href="#__codelineno-4-205"></a>        Re-read ``state()`` afterwards: every hand position has changed.
+<a id="__codelineno-4-206" name="__codelineno-4-206" href="#__codelineno-4-206"></a>
+<a id="__codelineno-4-207" name="__codelineno-4-207" href="#__codelineno-4-207"></a>robo.wait_for_check(checks: int = 1) -&gt; int
+<a id="__codelineno-4-208" name="__codelineno-4-208" href="#__codelineno-4-208"></a>    Hold both arms and grippers still until the benchmark's stage check has run.
+<a id="__codelineno-4-209" name="__codelineno-4-209" href="#__codelineno-4-209"></a>
+<a id="__codelineno-4-210" name="__codelineno-4-210" href="#__codelineno-4-210"></a>    The benchmark looks at the scene only once every 30 native actions, and a stage
+<a id="__codelineno-4-211" name="__codelineno-4-211" href="#__codelineno-4-211"></a>    passes only on what it sees at such a check (some stages need two checks in a row).
+<a id="__codelineno-4-212" name="__codelineno-4-212" href="#__codelineno-4-212"></a>    A state that is reached and then left between two checks — an object lifted and put
+<a id="__codelineno-4-213" name="__codelineno-4-213" href="#__codelineno-4-213"></a>    down again — is never seen.  Call this right after reaching what a stage asks, before
+<a id="__codelineno-4-214" name="__codelineno-4-214" href="#__codelineno-4-214"></a>    the next motion changes it: it spends at most 30 actions per check.
+<a id="__codelineno-4-215" name="__codelineno-4-215" href="#__codelineno-4-215"></a>
+<a id="__codelineno-4-216" name="__codelineno-4-216" href="#__codelineno-4-216"></a>    Args:
+<a id="__codelineno-4-217" name="__codelineno-4-217" href="#__codelineno-4-217"></a>        checks: how many checks to wait for (1-5); 2 for a stage that needs the state
+<a id="__codelineno-4-218" name="__codelineno-4-218" href="#__codelineno-4-218"></a>            on two checks in a row (putting inside, stacking, beside).
+<a id="__codelineno-4-219" name="__codelineno-4-219" href="#__codelineno-4-219"></a>    Returns:
+<a id="__codelineno-4-220" name="__codelineno-4-220" href="#__codelineno-4-220"></a>        the native actions spent.
+<a id="__codelineno-4-221" name="__codelineno-4-221" href="#__codelineno-4-221"></a>
+<a id="__codelineno-4-222" name="__codelineno-4-222" href="#__codelineno-4-222"></a>robo.home(arm: str = 'both', max_actions: int = 25) -&gt; Home
+<a id="__codelineno-4-223" name="__codelineno-4-223" href="#__codelineno-4-223"></a>    Return one arm or both to the joint angles the episode started with.
+<a id="__codelineno-4-224" name="__codelineno-4-224" href="#__codelineno-4-224"></a>
+<a id="__codelineno-4-225" name="__codelineno-4-225" href="#__codelineno-4-225"></a>    Args:
+<a id="__codelineno-4-226" name="__codelineno-4-226" href="#__codelineno-4-226"></a>        arm: ``"left"``, ``"right"`` or ``"both"``.
+<a id="__codelineno-4-227" name="__codelineno-4-227" href="#__codelineno-4-227"></a>        max_actions: native actions this call may spend.
+<a id="__codelineno-4-228" name="__codelineno-4-228" href="#__codelineno-4-228"></a>    Returns:
+<a id="__codelineno-4-229" name="__codelineno-4-229" href="#__codelineno-4-229"></a>        Home; ``reached`` says whether every joint came within 0.02 rad of its start
+<a id="__codelineno-4-230" name="__codelineno-4-230" href="#__codelineno-4-230"></a>        angle, ``max_joint_error_rad`` what remains.
+<a id="__codelineno-4-231" name="__codelineno-4-231" href="#__codelineno-4-231"></a>    Raises:
+<a id="__codelineno-4-232" name="__codelineno-4-232" href="#__codelineno-4-232"></a>        ValueError: a malformed argument (nothing is sent).
+<a id="__codelineno-4-233" name="__codelineno-4-233" href="#__codelineno-4-233"></a>
+<a id="__codelineno-4-234" name="__codelineno-4-234" href="#__codelineno-4-234"></a>robo.segment(
+<a id="__codelineno-4-235" name="__codelineno-4-235" href="#__codelineno-4-235"></a>    camera: str = 'head',
+<a id="__codelineno-4-236" name="__codelineno-4-236" href="#__codelineno-4-236"></a>    *,
+<a id="__codelineno-4-237" name="__codelineno-4-237" href="#__codelineno-4-237"></a>    row: int | None = None,
+<a id="__codelineno-4-238" name="__codelineno-4-238" href="#__codelineno-4-238"></a>    col: int | None = None,
+<a id="__codelineno-4-239" name="__codelineno-4-239" href="#__codelineno-4-239"></a>    text: str | None = None,
+<a id="__codelineno-4-240" name="__codelineno-4-240" href="#__codelineno-4-240"></a>    min_score: float = 0.2,
+<a id="__codelineno-4-241" name="__codelineno-4-241" href="#__codelineno-4-241"></a>) -&gt; Segment
+<a id="__codelineno-4-242" name="__codelineno-4-242" href="#__codelineno-4-242"></a>    Find one object's region in a camera image: by name, or by a pixel inside it.
+<a id="__codelineno-4-243" name="__codelineno-4-243" href="#__codelineno-4-243"></a>
+<a id="__codelineno-4-244" name="__codelineno-4-244" href="#__codelineno-4-244"></a>    Args:
+<a id="__codelineno-4-245" name="__codelineno-4-245" href="#__codelineno-4-245"></a>        camera: ``"head"``, ``"hand_left"`` or ``"hand_right"``.
+<a id="__codelineno-4-246" name="__codelineno-4-246" href="#__codelineno-4-246"></a>        text: what to find, in a few words ("the black pen", "orange juice bottle"):
+<a id="__codelineno-4-247" name="__codelineno-4-247" href="#__codelineno-4-247"></a>            SAM3 segments it, and its best mask scoring at least ``min_score`` is
+<a id="__codelineno-4-248" name="__codelineno-4-248" href="#__codelineno-4-248"></a>            returned.  Name one object; a colour or position in the words helps.
+<a id="__codelineno-4-249" name="__codelineno-4-249" href="#__codelineno-4-249"></a>        row / col: a pixel INSIDE the region to find; both None (and no text) takes
+<a id="__codelineno-4-250" name="__codelineno-4-250" href="#__codelineno-4-250"></a>            the largest colour region in the image.
+<a id="__codelineno-4-251" name="__codelineno-4-251" href="#__codelineno-4-251"></a>    Returns:
+<a id="__codelineno-4-252" name="__codelineno-4-252" href="#__codelineno-4-252"></a>        Segment; when ``found``, pass ``centroid`` to ``back_project`` with the same
+<a id="__codelineno-4-253" name="__codelineno-4-253" href="#__codelineno-4-253"></a>        camera.
+<a id="__codelineno-4-254" name="__codelineno-4-254" href="#__codelineno-4-254"></a>    Raises:
+<a id="__codelineno-4-255" name="__codelineno-4-255" href="#__codelineno-4-255"></a>        ValueError: an unknown camera, or only one of row / col.
+<a id="__codelineno-4-256" name="__codelineno-4-256" href="#__codelineno-4-256"></a>
+<a id="__codelineno-4-257" name="__codelineno-4-257" href="#__codelineno-4-257"></a>robo.back_project(row: int, col: int, camera: str = 'head') -&gt; WorldPoint
+<a id="__codelineno-4-258" name="__codelineno-4-258" href="#__codelineno-4-258"></a>    Return the point seen at one pixel of the current image of ``camera``.
+<a id="__codelineno-4-259" name="__codelineno-4-259" href="#__codelineno-4-259"></a>
+<a id="__codelineno-4-260" name="__codelineno-4-260" href="#__codelineno-4-260"></a>    Args:
+<a id="__codelineno-4-261" name="__codelineno-4-261" href="#__codelineno-4-261"></a>        row / col: pixel, row 0 at the top, col 0 at the left.
+<a id="__codelineno-4-262" name="__codelineno-4-262" href="#__codelineno-4-262"></a>        camera: the camera the pixel was read from (default ``"head"``).
+<a id="__codelineno-4-263" name="__codelineno-4-263" href="#__codelineno-4-263"></a>    Returns:
+<a id="__codelineno-4-264" name="__codelineno-4-264" href="#__codelineno-4-264"></a>        WorldPoint; ``xyz`` is where the camera ray meets the first surface.  A pixel
+<a id="__codelineno-4-265" name="__codelineno-4-265" href="#__codelineno-4-265"></a>        on an edge or a thin part lands behind the object: prefer a region's centroid.
+<a id="__codelineno-4-266" name="__codelineno-4-266" href="#__codelineno-4-266"></a>    Raises:
+<a id="__codelineno-4-267" name="__codelineno-4-267" href="#__codelineno-4-267"></a>        ToolError: pixel out of range, no valid depth there, or no calibration.
+<a id="__codelineno-4-268" name="__codelineno-4-268" href="#__codelineno-4-268"></a>
+<a id="__codelineno-4-269" name="__codelineno-4-269" href="#__codelineno-4-269"></a>robo.locate(
+<a id="__codelineno-4-270" name="__codelineno-4-270" href="#__codelineno-4-270"></a>    target: str | int | None = None,
+<a id="__codelineno-4-271" name="__codelineno-4-271" href="#__codelineno-4-271"></a>    col: int | None = None,
+<a id="__codelineno-4-272" name="__codelineno-4-272" href="#__codelineno-4-272"></a>    camera: str = 'head',
+<a id="__codelineno-4-273" name="__codelineno-4-273" href="#__codelineno-4-273"></a>    *,
+<a id="__codelineno-4-274" name="__codelineno-4-274" href="#__codelineno-4-274"></a>    row: int | None = None,
+<a id="__codelineno-4-275" name="__codelineno-4-275" href="#__codelineno-4-275"></a>    min_score: float = 0.2,
+<a id="__codelineno-4-276" name="__codelineno-4-276" href="#__codelineno-4-276"></a>    near: tuple[int, int] | None = None,
+<a id="__codelineno-4-277" name="__codelineno-4-277" href="#__codelineno-4-277"></a>) -&gt; ObjectPose
+<a id="__codelineno-4-278" name="__codelineno-4-278" href="#__codelineno-4-278"></a>    Measure one object in 3D: name it, or point at a pixel inside it.
+<a id="__codelineno-4-279" name="__codelineno-4-279" href="#__codelineno-4-279"></a>
+<a id="__codelineno-4-280" name="__codelineno-4-280" href="#__codelineno-4-280"></a>    ``robo.locate("the black pen")`` — SAM3 finds what the words describe in the image
+<a id="__codelineno-4-281" name="__codelineno-4-281" href="#__codelineno-4-281"></a>    and the depth image measures it.  ``robo.locate(row, col)`` — the object at that
+<a id="__codelineno-4-282" name="__codelineno-4-282" href="#__codelineno-4-282"></a>    pixel, cut out by its shape above the surface it stands on (then SAM3's mask at the
+<a id="__codelineno-4-283" name="__codelineno-4-283" href="#__codelineno-4-283"></a>    pixel, then the pixel's colour region).  Naming is the way for thin, small, or
+<a id="__codelineno-4-284" name="__codelineno-4-284" href="#__codelineno-4-284"></a>    same-coloured objects and for objects inside containers; check ``method`` and
+<a id="__codelineno-4-285" name="__codelineno-4-285" href="#__codelineno-4-285"></a>    ``score`` and the returned ``pixel_uv`` against the image.
+<a id="__codelineno-4-286" name="__codelineno-4-286" href="#__codelineno-4-286"></a>
+<a id="__codelineno-4-287" name="__codelineno-4-287" href="#__codelineno-4-287"></a>    Args:
+<a id="__codelineno-4-288" name="__codelineno-4-288" href="#__codelineno-4-288"></a>        target: what to find, in a few words (a string), or the pixel's row (an int,
+<a id="__codelineno-4-289" name="__codelineno-4-289" href="#__codelineno-4-289"></a>            with ``col``).  None with no pixel takes the largest colour region.
+<a id="__codelineno-4-290" name="__codelineno-4-290" href="#__codelineno-4-290"></a>        col: the pixel's column, with an int ``target`` (or ``row=``).
+<a id="__codelineno-4-291" name="__codelineno-4-291" href="#__codelineno-4-291"></a>        camera: ``"head"`` (default) or a wrist camera; the head camera sees the
+<a id="__codelineno-4-292" name="__codelineno-4-292" href="#__codelineno-4-292"></a>            whole scene, a wrist camera is close up.
+<a id="__codelineno-4-293" name="__codelineno-4-293" href="#__codelineno-4-293"></a>        min_score: the lowest SAM3 confidence accepted for a named object.
+<a id="__codelineno-4-294" name="__codelineno-4-294" href="#__codelineno-4-294"></a>        near: (row, col) — with a name, measure the instance of it at (or nearest)
+<a id="__codelineno-4-295" name="__codelineno-4-295" href="#__codelineno-4-295"></a>            that pixel rather than the best-scoring one.  SAM3 ranks by what a thing
+<a id="__codelineno-4-296" name="__codelineno-4-296" href="#__codelineno-4-296"></a>            is, not where: "the juice in the basket" can score a bottle on the shelf
+<a id="__codelineno-4-297" name="__codelineno-4-297" href="#__codelineno-4-297"></a>            highest.  Read ``candidates``, or the image, and pass the one you mean.
+<a id="__codelineno-4-298" name="__codelineno-4-298" href="#__codelineno-4-298"></a>    Returns:
+<a id="__codelineno-4-299" name="__codelineno-4-299" href="#__codelineno-4-299"></a>        ObjectPose.  To grasp: hop to ``[x, y, top_z + 0.06]`` with
+<a id="__codelineno-4-300" name="__codelineno-4-300" href="#__codelineno-4-300"></a>        ``gripper=robo.OPEN`` (keeping the orientation), descend to
+<a id="__codelineno-4-301" name="__codelineno-4-301" href="#__codelineno-4-301"></a>        ``top_z - 0.02``, then ``set_gripper(arm, robo.CLOSE)``.
+<a id="__codelineno-4-302" name="__codelineno-4-302" href="#__codelineno-4-302"></a>    Raises:
+<a id="__codelineno-4-303" name="__codelineno-4-303" href="#__codelineno-4-303"></a>        ValueError: an unknown camera, or only one of row / col.
+<a id="__codelineno-4-304" name="__codelineno-4-304" href="#__codelineno-4-304"></a>
+<a id="__codelineno-4-305" name="__codelineno-4-305" href="#__codelineno-4-305"></a>Result types (frozen dataclasses; access fields as attributes):
+<a id="__codelineno-4-306" name="__codelineno-4-306" href="#__codelineno-4-306"></a>
+<a id="__codelineno-4-307" name="__codelineno-4-307" href="#__codelineno-4-307"></a>class State(
+<a id="__codelineno-4-308" name="__codelineno-4-308" href="#__codelineno-4-308"></a>    step: int,
+<a id="__codelineno-4-309" name="__codelineno-4-309" href="#__codelineno-4-309"></a>    task: str,
+<a id="__codelineno-4-310" name="__codelineno-4-310" href="#__codelineno-4-310"></a>    left: ArmState,
+<a id="__codelineno-4-311" name="__codelineno-4-311" href="#__codelineno-4-311"></a>    right: ArmState,
+<a id="__codelineno-4-312" name="__codelineno-4-312" href="#__codelineno-4-312"></a>    torso_heading_deg: float,
+<a id="__codelineno-4-313" name="__codelineno-4-313" href="#__codelineno-4-313"></a>    torso_forward: tuple[float, float, float],
+<a id="__codelineno-4-314" name="__codelineno-4-314" href="#__codelineno-4-314"></a>)
+<a id="__codelineno-4-315" name="__codelineno-4-315" href="#__codelineno-4-315"></a>    Snapshot of both arms at one recorded step.
+<a id="__codelineno-4-316" name="__codelineno-4-316" href="#__codelineno-4-316"></a>
+<a id="__codelineno-4-317" name="__codelineno-4-317" href="#__codelineno-4-317"></a>    step: index of the recorded step (0 = the scene the episode started in).  A new step
+<a id="__codelineno-4-318" name="__codelineno-4-318" href="#__codelineno-4-318"></a>        is recorded after every tool call that acted.
+<a id="__codelineno-4-319" name="__codelineno-4-319" href="#__codelineno-4-319"></a>    task: the task instruction the benchmark generated (authoritative).
+<a id="__codelineno-4-320" name="__codelineno-4-320" href="#__codelineno-4-320"></a>    left / right: the two arms.
+<a id="__codelineno-4-321" name="__codelineno-4-321" href="#__codelineno-4-321"></a>    torso_heading_deg / torso_forward: where the upper body faces.  ``robo.FRAME`` is fixed
+<a id="__codelineno-4-322" name="__codelineno-4-322" href="#__codelineno-4-322"></a>        to the robot's base and some tasks start with the torso TURNED (the warehouse ones
+<a id="__codelineno-4-323" name="__codelineno-4-323" href="#__codelineno-4-323"></a>        by 90 degrees): the table is then along ``torso_forward``, not along +x.
+<a id="__codelineno-4-324" name="__codelineno-4-324" href="#__codelineno-4-324"></a>        ``point="forward"`` / ``"left"`` / ``"right"`` follow the torso.
+<a id="__codelineno-4-325" name="__codelineno-4-325" href="#__codelineno-4-325"></a>
+<a id="__codelineno-4-326" name="__codelineno-4-326" href="#__codelineno-4-326"></a>class ArmState(
+<a id="__codelineno-4-327" name="__codelineno-4-327" href="#__codelineno-4-327"></a>    tool_centre: tuple[float, float, float],
+<a id="__codelineno-4-328" name="__codelineno-4-328" href="#__codelineno-4-328"></a>    pointing: tuple[float, float, float],
+<a id="__codelineno-4-329" name="__codelineno-4-329" href="#__codelineno-4-329"></a>    finger_axis: tuple[float, float, float],
+<a id="__codelineno-4-330" name="__codelineno-4-330" href="#__codelineno-4-330"></a>    flange: tuple[float, float, float],
+<a id="__codelineno-4-331" name="__codelineno-4-331" href="#__codelineno-4-331"></a>    opening: float,
+<a id="__codelineno-4-332" name="__codelineno-4-332" href="#__codelineno-4-332"></a>    pitch: float | None,
+<a id="__codelineno-4-333" name="__codelineno-4-333" href="#__codelineno-4-333"></a>    yaw: float | None,
+<a id="__codelineno-4-334" name="__codelineno-4-334" href="#__codelineno-4-334"></a>    roll: float | None,
+<a id="__codelineno-4-335" name="__codelineno-4-335" href="#__codelineno-4-335"></a>)
+<a id="__codelineno-4-336" name="__codelineno-4-336" href="#__codelineno-4-336"></a>    One arm at a recorded step.
+<a id="__codelineno-4-337" name="__codelineno-4-337" href="#__codelineno-4-337"></a>
+<a id="__codelineno-4-338" name="__codelineno-4-338" href="#__codelineno-4-338"></a>    tool_centre: [x, y, z] of the middle of the jaw plane, metres, in ``robo.FRAME``
+<a id="__codelineno-4-339" name="__codelineno-4-339" href="#__codelineno-4-339"></a>        (``base_link``): this is what ``move_to`` drives.
+<a id="__codelineno-4-340" name="__codelineno-4-340" href="#__codelineno-4-340"></a>    pointing: the unit direction the tool points, in ``robo.FRAME``.
+<a id="__codelineno-4-341" name="__codelineno-4-341" href="#__codelineno-4-341"></a>    finger_axis: the unit line the fingers close along.
+<a id="__codelineno-4-342" name="__codelineno-4-342" href="#__codelineno-4-342"></a>    pitch / yaw / roll: the tool's orientation in degrees, as ``move_to`` takes it.
+<a id="__codelineno-4-343" name="__codelineno-4-343" href="#__codelineno-4-343"></a>    flange: position of the end-effector link (the wrist flange), metres.
+<a id="__codelineno-4-344" name="__codelineno-4-344" href="#__codelineno-4-344"></a>    opening: measured gripper opening, NORMALISED here: 1.0 = open, 0.0 = closed.
+<a id="__codelineno-4-345" name="__codelineno-4-345" href="#__codelineno-4-345"></a>        (``set_gripper``'s COMMANDS use the library's convention, see the class
+<a id="__codelineno-4-346" name="__codelineno-4-346" href="#__codelineno-4-346"></a>        docstring.)
+<a id="__codelineno-4-347" name="__codelineno-4-347" href="#__codelineno-4-347"></a>
+<a id="__codelineno-4-348" name="__codelineno-4-348" href="#__codelineno-4-348"></a>class Move(
+<a id="__codelineno-4-349" name="__codelineno-4-349" href="#__codelineno-4-349"></a>    arm: str,
+<a id="__codelineno-4-350" name="__codelineno-4-350" href="#__codelineno-4-350"></a>    target_tool_centre: tuple[float, float, float],
+<a id="__codelineno-4-351" name="__codelineno-4-351" href="#__codelineno-4-351"></a>    final_tool_centre: tuple[float, float, float],
+<a id="__codelineno-4-352" name="__codelineno-4-352" href="#__codelineno-4-352"></a>    dist_to_target_m: float,
+<a id="__codelineno-4-353" name="__codelineno-4-353" href="#__codelineno-4-353"></a>    pointing_error_deg: float,
+<a id="__codelineno-4-354" name="__codelineno-4-354" href="#__codelineno-4-354"></a>    reached: bool,
+<a id="__codelineno-4-355" name="__codelineno-4-355" href="#__codelineno-4-355"></a>    steps_used: int,
+<a id="__codelineno-4-356" name="__codelineno-4-356" href="#__codelineno-4-356"></a>    steps_planned: int,
+<a id="__codelineno-4-357" name="__codelineno-4-357" href="#__codelineno-4-357"></a>    truncated: bool,
+<a id="__codelineno-4-358" name="__codelineno-4-358" href="#__codelineno-4-358"></a>    reach_hint: str | None,
+<a id="__codelineno-4-359" name="__codelineno-4-359" href="#__codelineno-4-359"></a>    rotation_error_deg: float,
+<a id="__codelineno-4-360" name="__codelineno-4-360" href="#__codelineno-4-360"></a>    stop_reason: str | None,
+<a id="__codelineno-4-361" name="__codelineno-4-361" href="#__codelineno-4-361"></a>    blocked: bool,
+<a id="__codelineno-4-362" name="__codelineno-4-362" href="#__codelineno-4-362"></a>    alternatives: tuple[dict[str, Any], ...],
+<a id="__codelineno-4-363" name="__codelineno-4-363" href="#__codelineno-4-363"></a>    angles: dict[str, float] | None,
+<a id="__codelineno-4-364" name="__codelineno-4-364" href="#__codelineno-4-364"></a>    path: str | None,
+<a id="__codelineno-4-365" name="__codelineno-4-365" href="#__codelineno-4-365"></a>    note: str | None,
+<a id="__codelineno-4-366" name="__codelineno-4-366" href="#__codelineno-4-366"></a>)
+<a id="__codelineno-4-367" name="__codelineno-4-367" href="#__codelineno-4-367"></a>    Outcome of ``move_to``.
+<a id="__codelineno-4-368" name="__codelineno-4-368" href="#__codelineno-4-368"></a>
+<a id="__codelineno-4-369" name="__codelineno-4-369" href="#__codelineno-4-369"></a>    target_tool_centre / final_tool_centre: where the tool centre was sent, and where it
+<a id="__codelineno-4-370" name="__codelineno-4-370" href="#__codelineno-4-370"></a>        ended.
+<a id="__codelineno-4-371" name="__codelineno-4-371" href="#__codelineno-4-371"></a>    dist_to_target_m: distance between the two.
+<a id="__codelineno-4-372" name="__codelineno-4-372" href="#__codelineno-4-372"></a>    pointing_error_deg: how far the final pointing direction is from the one asked (0
+<a id="__codelineno-4-373" name="__codelineno-4-373" href="#__codelineno-4-373"></a>        when none was asked).
+<a id="__codelineno-4-374" name="__codelineno-4-374" href="#__codelineno-4-374"></a>    rotation_error_deg: how far the whole final orientation is from the one asked — the
+<a id="__codelineno-4-375" name="__codelineno-4-375" href="#__codelineno-4-375"></a>        pointing direction AND the fingers' turn about it.
+<a id="__codelineno-4-376" name="__codelineno-4-376" href="#__codelineno-4-376"></a>    reached: within 0.015 m and 5 degrees of the whole orientation.
+<a id="__codelineno-4-377" name="__codelineno-4-377" href="#__codelineno-4-377"></a>    steps_used: native actions consumed; ``steps_planned`` what the subdividing asked for
+<a id="__codelineno-4-378" name="__codelineno-4-378" href="#__codelineno-4-378"></a>        (a motion stopped early because it arrived).
+<a id="__codelineno-4-379" name="__codelineno-4-379" href="#__codelineno-4-379"></a>    truncated: it used every action ``max_actions`` allowed and had not arrived.
+<a id="__codelineno-4-380" name="__codelineno-4-380" href="#__codelineno-4-380"></a>    stop_reason: why a motion that did not arrive stopped: ``"out_of_reach"`` (the arm
+<a id="__codelineno-4-381" name="__codelineno-4-381" href="#__codelineno-4-381"></a>        kept moving but no longer got closer — the edge of its reach from this waist
+<a id="__codelineno-4-382" name="__codelineno-4-382" href="#__codelineno-4-382"></a>        pose), ``"blocked"`` (the arm stopped moving: something is in the way, it pushes
+<a id="__codelineno-4-383" name="__codelineno-4-383" href="#__codelineno-4-383"></a>        against what it holds — at the end of a push, the end of the travel — or a joint
+<a id="__codelineno-4-384" name="__codelineno-4-384" href="#__codelineno-4-384"></a>        is at its end), ``"budget"`` (still closing in when the actions ran out: call
+<a id="__codelineno-4-385" name="__codelineno-4-385" href="#__codelineno-4-385"></a>        again), or None when it arrived.
+<a id="__codelineno-4-386" name="__codelineno-4-386" href="#__codelineno-4-386"></a>    blocked: ``stop_reason == "blocked"``.
+<a id="__codelineno-4-387" name="__codelineno-4-387" href="#__codelineno-4-387"></a>    reach_hint: set with ``"out_of_reach"``.  Only then consider ``move_waist``.
+<a id="__codelineno-4-388" name="__codelineno-4-388" href="#__codelineno-4-388"></a>    alternatives: when the target was refused before moving (``steps_used == 0`` and
+<a id="__codelineno-4-389" name="__codelineno-4-389" href="#__codelineno-4-389"></a>        ``"out_of_reach"``: the benchmark's own IK, asked first, found no pose of this arm
+<a id="__codelineno-4-390" name="__codelineno-4-390" href="#__codelineno-4-390"></a>        within 3 cm and 10 degrees of it), nearby requests that the same IK says ARE
+<a id="__codelineno-4-391" name="__codelineno-4-391" href="#__codelineno-4-391"></a>        reachable — each a dict naming the change and the call(s) that make it, e.g.
+<a id="__codelineno-4-392" name="__codelineno-4-392" href="#__codelineno-4-392"></a>        ``{"change": "pointing tilted 15 deg toward vertical", "move_to": {"xyz": [...],
+<a id="__codelineno-4-393" name="__codelineno-4-393" href="#__codelineno-4-393"></a>        "point": [...]}}`` or one with ``"move_waist": {...}`` to run first.
+<a id="__codelineno-4-394" name="__codelineno-4-394" href="#__codelineno-4-394"></a>
+<a id="__codelineno-4-395" name="__codelineno-4-395" href="#__codelineno-4-395"></a>class Gripper(arm: str, commanded: str, opening: float, holding: bool, steps_used: int)
+<a id="__codelineno-4-396" name="__codelineno-4-396" href="#__codelineno-4-396"></a>    Outcome of ``set_gripper``.
+<a id="__codelineno-4-397" name="__codelineno-4-397" href="#__codelineno-4-397"></a>
+<a id="__codelineno-4-398" name="__codelineno-4-398" href="#__codelineno-4-398"></a>    commanded: ``"closed"`` or ``"open"``.
+<a id="__codelineno-4-399" name="__codelineno-4-399" href="#__codelineno-4-399"></a>    opening: the measured opening once the fingers stopped, normalised: 1.0 = open,
+<a id="__codelineno-4-400" name="__codelineno-4-400" href="#__codelineno-4-400"></a>        0.0 = closed on nothing.
+<a id="__codelineno-4-401" name="__codelineno-4-401" href="#__codelineno-4-401"></a>    holding: after a close, the fingers stopped apart: something is between them.  It
+<a id="__codelineno-4-402" name="__codelineno-4-402" href="#__codelineno-4-402"></a>        does not say what: check that the intended object moves with the arm.
+<a id="__codelineno-4-403" name="__codelineno-4-403" href="#__codelineno-4-403"></a>    steps_used: native actions consumed.
+<a id="__codelineno-4-404" name="__codelineno-4-404" href="#__codelineno-4-404"></a>
+<a id="__codelineno-4-405" name="__codelineno-4-405" href="#__codelineno-4-405"></a>class Waist(
+<a id="__codelineno-4-406" name="__codelineno-4-406" href="#__codelineno-4-406"></a>    moved: bool,
+<a id="__codelineno-4-407" name="__codelineno-4-407" href="#__codelineno-4-407"></a>    reached: bool,
+<a id="__codelineno-4-408" name="__codelineno-4-408" href="#__codelineno-4-408"></a>    chest_moved_m: tuple[float, float],
+<a id="__codelineno-4-409" name="__codelineno-4-409" href="#__codelineno-4-409"></a>    torso_pitch_deg: float | None,
+<a id="__codelineno-4-410" name="__codelineno-4-410" href="#__codelineno-4-410"></a>    turn_deg: float | None,
+<a id="__codelineno-4-411" name="__codelineno-4-411" href="#__codelineno-4-411"></a>    error_reason: str | None,
+<a id="__codelineno-4-412" name="__codelineno-4-412" href="#__codelineno-4-412"></a>    steps_used: int,
+<a id="__codelineno-4-413" name="__codelineno-4-413" href="#__codelineno-4-413"></a>)
+<a id="__codelineno-4-414" name="__codelineno-4-414" href="#__codelineno-4-414"></a>    Outcome of ``move_waist``.
+<a id="__codelineno-4-415" name="__codelineno-4-415" href="#__codelineno-4-415"></a>
+<a id="__codelineno-4-416" name="__codelineno-4-416" href="#__codelineno-4-416"></a>    moved: the waist was commanded; False when the asked pose is outside the joints' range
+<a id="__codelineno-4-417" name="__codelineno-4-417" href="#__codelineno-4-417"></a>        (``error_reason`` says which joint), and nothing moved.
+<a id="__codelineno-4-418" name="__codelineno-4-418" href="#__codelineno-4-418"></a>    reached: the waist joints ended where they were sent.
+<a id="__codelineno-4-419" name="__codelineno-4-419" href="#__codelineno-4-419"></a>    chest_moved_m: how far the chest went [forward, up], metres, in ``robo.FRAME``.  The
+<a id="__codelineno-4-420" name="__codelineno-4-420" href="#__codelineno-4-420"></a>        hands moved by about the same amount: the arms keep their joint angles.
+<a id="__codelineno-4-421" name="__codelineno-4-421" href="#__codelineno-4-421"></a>    torso_pitch_deg: how far the torso leans forward from upright (it starts near 28).
+<a id="__codelineno-4-422" name="__codelineno-4-422" href="#__codelineno-4-422"></a>    turn_deg: how far the upper body is turned (+ to the robot's left).
+<a id="__codelineno-4-423" name="__codelineno-4-423" href="#__codelineno-4-423"></a>    steps_used: native actions consumed.
+<a id="__codelineno-4-424" name="__codelineno-4-424" href="#__codelineno-4-424"></a>
+<a id="__codelineno-4-425" name="__codelineno-4-425" href="#__codelineno-4-425"></a>class Home(arm: str, reached: bool, max_joint_error_rad: float, steps_used: int)
+<a id="__codelineno-4-426" name="__codelineno-4-426" href="#__codelineno-4-426"></a>    Outcome of ``home``.
+<a id="__codelineno-4-427" name="__codelineno-4-427" href="#__codelineno-4-427"></a>
+<a id="__codelineno-4-428" name="__codelineno-4-428" href="#__codelineno-4-428"></a>    reached: every joint of the returned arm(s) ended within 0.02 rad of the angle it had
+<a id="__codelineno-4-429" name="__codelineno-4-429" href="#__codelineno-4-429"></a>        when the episode started.
+<a id="__codelineno-4-430" name="__codelineno-4-430" href="#__codelineno-4-430"></a>    max_joint_error_rad: the largest difference that remains.
+<a id="__codelineno-4-431" name="__codelineno-4-431" href="#__codelineno-4-431"></a>    steps_used: native actions consumed.
+<a id="__codelineno-4-432" name="__codelineno-4-432" href="#__codelineno-4-432"></a>
+<a id="__codelineno-4-433" name="__codelineno-4-433" href="#__codelineno-4-433"></a>class ObjectPose(
+<a id="__codelineno-4-434" name="__codelineno-4-434" href="#__codelineno-4-434"></a>    found: bool,
+<a id="__codelineno-4-435" name="__codelineno-4-435" href="#__codelineno-4-435"></a>    centre_xyz: tuple[float, float, float] | None,
+<a id="__codelineno-4-436" name="__codelineno-4-436" href="#__codelineno-4-436"></a>    top_z: float | None,
+<a id="__codelineno-4-437" name="__codelineno-4-437" href="#__codelineno-4-437"></a>    height_m: float | None,
+<a id="__codelineno-4-438" name="__codelineno-4-438" href="#__codelineno-4-438"></a>    size_xyz: tuple[float, float, float] | None,
+<a id="__codelineno-4-439" name="__codelineno-4-439" href="#__codelineno-4-439"></a>    pixel_uv: tuple[int, int] | None,
+<a id="__codelineno-4-440" name="__codelineno-4-440" href="#__codelineno-4-440"></a>    area_px: int,
+<a id="__codelineno-4-441" name="__codelineno-4-441" href="#__codelineno-4-441"></a>    colour: str | None,
+<a id="__codelineno-4-442" name="__codelineno-4-442" href="#__codelineno-4-442"></a>    camera: str,
+<a id="__codelineno-4-443" name="__codelineno-4-443" href="#__codelineno-4-443"></a>    note: str | None,
+<a id="__codelineno-4-444" name="__codelineno-4-444" href="#__codelineno-4-444"></a>    tilt_deg: float | None,
+<a id="__codelineno-4-445" name="__codelineno-4-445" href="#__codelineno-4-445"></a>    long_axis_deg: float | None,
+<a id="__codelineno-4-446" name="__codelineno-4-446" href="#__codelineno-4-446"></a>    support_z: float | None,
+<a id="__codelineno-4-447" name="__codelineno-4-447" href="#__codelineno-4-447"></a>    method: str | None,
+<a id="__codelineno-4-448" name="__codelineno-4-448" href="#__codelineno-4-448"></a>    score: float | None,
+<a id="__codelineno-4-449" name="__codelineno-4-449" href="#__codelineno-4-449"></a>    candidates: tuple[dict[str, Any], ...],
+<a id="__codelineno-4-450" name="__codelineno-4-450" href="#__codelineno-4-450"></a>    grasp_fingers: tuple[float, float, float] | None,
+<a id="__codelineno-4-451" name="__codelineno-4-451" href="#__codelineno-4-451"></a>    grasp_yaw: float | None,
+<a id="__codelineno-4-452" name="__codelineno-4-452" href="#__codelineno-4-452"></a>    width_m: float | None,
+<a id="__codelineno-4-453" name="__codelineno-4-453" href="#__codelineno-4-453"></a>    length_m: float | None,
+<a id="__codelineno-4-454" name="__codelineno-4-454" href="#__codelineno-4-454"></a>)
+<a id="__codelineno-4-455" name="__codelineno-4-455" href="#__codelineno-4-455"></a>    Outcome of ``locate``: one colour region of the scene, measured in 3D.
+<a id="__codelineno-4-456" name="__codelineno-4-456" href="#__codelineno-4-456"></a>
+<a id="__codelineno-4-457" name="__codelineno-4-457" href="#__codelineno-4-457"></a>    found: a region of contiguous colour was found in the head camera.
+<a id="__codelineno-4-458" name="__codelineno-4-458" href="#__codelineno-4-458"></a>    centre_xyz: [x, y, z] of the middle of its footprint, at half its height above the
+<a id="__codelineno-4-459" name="__codelineno-4-459" href="#__codelineno-4-459"></a>        surface it stands on, metres.
+<a id="__codelineno-4-460" name="__codelineno-4-460" href="#__codelineno-4-460"></a>    top_z: the highest coordinate seen along ``robo.FRAME`` z.
+<a id="__codelineno-4-461" name="__codelineno-4-461" href="#__codelineno-4-461"></a>    height_m: ``top_z`` above that surface.
+<a id="__codelineno-4-462" name="__codelineno-4-462" href="#__codelineno-4-462"></a>    size_xyz: the region's extent along each axis of ``robo.FRAME``.
+<a id="__codelineno-4-463" name="__codelineno-4-463" href="#__codelineno-4-463"></a>    pixel_uv: (row, col) of the region in the image it was measured in.
+<a id="__codelineno-4-464" name="__codelineno-4-464" href="#__codelineno-4-464"></a>    area_px: pixels of the region.
+<a id="__codelineno-4-465" name="__codelineno-4-465" href="#__codelineno-4-465"></a>    colour: mean colour of the region as a hex string, so a program can say which.
+<a id="__codelineno-4-466" name="__codelineno-4-466" href="#__codelineno-4-466"></a>    camera: the camera measured from.
+<a id="__codelineno-4-467" name="__codelineno-4-467" href="#__codelineno-4-467"></a>    note: why there is no 3D measurement, else None.
+<a id="__codelineno-4-468" name="__codelineno-4-468" href="#__codelineno-4-468"></a>    tilt_deg: how far the object's upward face is tilted from horizontal, degrees (0 = lying
+<a id="__codelineno-4-469" name="__codelineno-4-469" href="#__codelineno-4-469"></a>        flat / standing upright).  Tasks that check "upright" usually allow 5-15 degrees:
+<a id="__codelineno-4-470" name="__codelineno-4-470" href="#__codelineno-4-470"></a>        re-``locate`` after placing and fix it if this is larger.
+<a id="__codelineno-4-471" name="__codelineno-4-471" href="#__codelineno-4-471"></a>    long_axis_deg: direction of the long side of that face on the table, degrees from
+<a id="__codelineno-4-472" name="__codelineno-4-472" href="#__codelineno-4-472"></a>        ``robo.FRAME`` +x (-90..90).  To close across the SHORT side, pointing down, turn the
+<a id="__codelineno-4-473" name="__codelineno-4-473" href="#__codelineno-4-473"></a>        fingers along this line.
+<a id="__codelineno-4-474" name="__codelineno-4-474" href="#__codelineno-4-474"></a>    support_z: height of the surface it stands on (the table top), metres.
+<a id="__codelineno-4-475" name="__codelineno-4-475" href="#__codelineno-4-475"></a>    method: how the object was cut out of the image: ``"sam3_text"`` (SAM3 found the text
+<a id="__codelineno-4-476" name="__codelineno-4-476" href="#__codelineno-4-476"></a>        you named), ``"geometry"`` (what rises above its surface at the pixel),
+<a id="__codelineno-4-477" name="__codelineno-4-477" href="#__codelineno-4-477"></a>        ``"sam3_point"`` (SAM3's mask at the pixel), ``"colour"`` (the pixel's colour region).
+<a id="__codelineno-4-478" name="__codelineno-4-478" href="#__codelineno-4-478"></a>    score: SAM3's confidence in its mask (0..1), when SAM3 made it.
+<a id="__codelineno-4-479" name="__codelineno-4-479" href="#__codelineno-4-479"></a>    grasp_fingers: for an elongated object (a bottle, a pen, a box lying down), the
+<a id="__codelineno-4-480" name="__codelineno-4-480" href="#__codelineno-4-480"></a>        horizontal direction ACROSS it in ``robo.FRAME``: the fingers close across the short
+<a id="__codelineno-4-481" name="__codelineno-4-481" href="#__codelineno-4-481"></a>        side when they close along it (``grasp_yaw`` is the yaw that does so).  None for a
+<a id="__codelineno-4-482" name="__codelineno-4-482" href="#__codelineno-4-482"></a>        round or square one (any direction closes on it).
+<a id="__codelineno-4-483" name="__codelineno-4-483" href="#__codelineno-4-483"></a>    grasp_yaw: the ``yaw`` that, pointing straight down (``pitch=90``), closes the fingers
+<a id="__codelineno-4-484" name="__codelineno-4-484" href="#__codelineno-4-484"></a>        across the object's narrow side: ``move_to([x, y, z], arm, pitch=90,
+<a id="__codelineno-4-485" name="__codelineno-4-485" href="#__codelineno-4-485"></a>        yaw=pose.grasp_yaw)``.  None for a round or square object.
+<a id="__codelineno-4-486" name="__codelineno-4-486" href="#__codelineno-4-486"></a>    width_m / length_m: the object's horizontal extent across and along its long axis —
+<a id="__codelineno-4-487" name="__codelineno-4-487" href="#__codelineno-4-487"></a>        ``width_m`` is what the fingers must span.
+<a id="__codelineno-4-488" name="__codelineno-4-488" href="#__codelineno-4-488"></a>    candidates: for a named object, every instance SAM3 matched to the name, best first:
+<a id="__codelineno-4-489" name="__codelineno-4-489" href="#__codelineno-4-489"></a>        ``{"pixel_uv": (row, col), "score", "area_px"}``.  The measured one is the best
+<a id="__codelineno-4-490" name="__codelineno-4-490" href="#__codelineno-4-490"></a>        scoring unless ``near`` chose another; when several match, check which is meant.
+<a id="__codelineno-4-491" name="__codelineno-4-491" href="#__codelineno-4-491"></a>
+<a id="__codelineno-4-492" name="__codelineno-4-492" href="#__codelineno-4-492"></a>class Segment(
+<a id="__codelineno-4-493" name="__codelineno-4-493" href="#__codelineno-4-493"></a>    found: bool,
+<a id="__codelineno-4-494" name="__codelineno-4-494" href="#__codelineno-4-494"></a>    centroid: tuple[int, int] | None,
+<a id="__codelineno-4-495" name="__codelineno-4-495" href="#__codelineno-4-495"></a>    area_px: int,
+<a id="__codelineno-4-496" name="__codelineno-4-496" href="#__codelineno-4-496"></a>    colour: str | None,
+<a id="__codelineno-4-497" name="__codelineno-4-497" href="#__codelineno-4-497"></a>    box: tuple[int, int, int, int] | None,
+<a id="__codelineno-4-498" name="__codelineno-4-498" href="#__codelineno-4-498"></a>    camera: str,
+<a id="__codelineno-4-499" name="__codelineno-4-499" href="#__codelineno-4-499"></a>    method: str | None,
+<a id="__codelineno-4-500" name="__codelineno-4-500" href="#__codelineno-4-500"></a>    score: float | None,
+<a id="__codelineno-4-501" name="__codelineno-4-501" href="#__codelineno-4-501"></a>)
+<a id="__codelineno-4-502" name="__codelineno-4-502" href="#__codelineno-4-502"></a>    Outcome of ``segment``: a colour region of one camera.
+<a id="__codelineno-4-503" name="__codelineno-4-503" href="#__codelineno-4-503"></a>
+<a id="__codelineno-4-504" name="__codelineno-4-504" href="#__codelineno-4-504"></a>    found: a region of contiguous colour was found.
+<a id="__codelineno-4-505" name="__codelineno-4-505" href="#__codelineno-4-505"></a>    centroid: (row, col) of the region's centroid; pass it to ``back_project``.
+<a id="__codelineno-4-506" name="__codelineno-4-506" href="#__codelineno-4-506"></a>    area_px: pixels of the region.
+<a id="__codelineno-4-507" name="__codelineno-4-507" href="#__codelineno-4-507"></a>    colour: mean colour of the region as a hex string.
+<a id="__codelineno-4-508" name="__codelineno-4-508" href="#__codelineno-4-508"></a>    box: (row0, col0, row1, col1) around the region.
+<a id="__codelineno-4-509" name="__codelineno-4-509" href="#__codelineno-4-509"></a>
+<a id="__codelineno-4-510" name="__codelineno-4-510" href="#__codelineno-4-510"></a>class WorldPoint(
+<a id="__codelineno-4-511" name="__codelineno-4-511" href="#__codelineno-4-511"></a>    pixel: tuple[int, int],
+<a id="__codelineno-4-512" name="__codelineno-4-512" href="#__codelineno-4-512"></a>    xyz: tuple[float, float, float],
+<a id="__codelineno-4-513" name="__codelineno-4-513" href="#__codelineno-4-513"></a>    depth_m: float,
+<a id="__codelineno-4-514" name="__codelineno-4-514" href="#__codelineno-4-514"></a>    camera: str,
+<a id="__codelineno-4-515" name="__codelineno-4-515" href="#__codelineno-4-515"></a>)
+<a id="__codelineno-4-516" name="__codelineno-4-516" href="#__codelineno-4-516"></a>    Outcome of ``back_project``: the surface point seen at one pixel.
+<a id="__codelineno-4-517" name="__codelineno-4-517" href="#__codelineno-4-517"></a>
+<a id="__codelineno-4-518" name="__codelineno-4-518" href="#__codelineno-4-518"></a>    xyz: [x, y, z] in ``robo.FRAME``, metres.  It is a visible SURFACE point, not a
+<a id="__codelineno-4-519" name="__codelineno-4-519" href="#__codelineno-4-519"></a>        centre.
+<a id="__codelineno-4-520" name="__codelineno-4-520" href="#__codelineno-4-520"></a>    depth_m: distance of that point along the camera's optical axis.
+<a id="__codelineno-4-521" name="__codelineno-4-521" href="#__codelineno-4-521"></a>
+<a id="__codelineno-4-522" name="__codelineno-4-522" href="#__codelineno-4-522"></a>class BothMove(
+<a id="__codelineno-4-523" name="__codelineno-4-523" href="#__codelineno-4-523"></a>    reached: bool,
+<a id="__codelineno-4-524" name="__codelineno-4-524" href="#__codelineno-4-524"></a>    left: dict[str, Any] | None,
+<a id="__codelineno-4-525" name="__codelineno-4-525" href="#__codelineno-4-525"></a>    right: dict[str, Any] | None,
+<a id="__codelineno-4-526" name="__codelineno-4-526" href="#__codelineno-4-526"></a>    steps_used: int,
+<a id="__codelineno-4-527" name="__codelineno-4-527" href="#__codelineno-4-527"></a>)
+<a id="__codelineno-4-528" name="__codelineno-4-528" href="#__codelineno-4-528"></a>    Outcome of ``move_both``: ``left`` / ``right`` are each arm's ``final_tool_centre``,
+<a id="__codelineno-4-529" name="__codelineno-4-529" href="#__codelineno-4-529"></a>    ``dist_to_target_m``, ``reached`` and ``stop_reason`` (None for an arm that held).
+<a id="__codelineno-4-530" name="__codelineno-4-530" href="#__codelineno-4-530"></a>
+<a id="__codelineno-4-531" name="__codelineno-4-531" href="#__codelineno-4-531"></a>class BaseMove(commanded: dict[str, float], steps_used: int)
+<a id="__codelineno-4-532" name="__codelineno-4-532" href="#__codelineno-4-532"></a>    Outcome of ``move_base``.  OPEN LOOP: ``commanded`` is what was sent, not a measured
+<a id="__codelineno-4-533" name="__codelineno-4-533" href="#__codelineno-4-533"></a>    displacement; look with the head camera to see where the base went.
+<a id="__codelineno-4-534" name="__codelineno-4-534" href="#__codelineno-4-534"></a>
+<a id="__codelineno-4-535" name="__codelineno-4-535" href="#__codelineno-4-535"></a>Exceptions:
+<a id="__codelineno-4-536" name="__codelineno-4-536" href="#__codelineno-4-536"></a>    ToolError(RuntimeError): a call was rejected or a service failed; catch it if you have a fallback.
+<a id="__codelineno-4-537" name="__codelineno-4-537" href="#__codelineno-4-537"></a>    ValueError: an argument was invalid (e.g. a planar move over 0.30 m) - nothing was executed.
+<a id="__codelineno-4-538" name="__codelineno-4-538" href="#__codelineno-4-538"></a>    EpisodeFinished(BaseException): the episode is over (reason: truncated | timeout | cancelled); return.
+</code></pre></div>
+</details>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+    
+      
+      <nav class="md-footer__inner md-grid" aria-label="Footer" >
+        
+          
+          <a href="../robocasa/" class="md-footer__link md-footer__link--prev" aria-label="Previous: RoboCasa365">
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+            </div>
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Previous
+              </span>
+              <div class="md-ellipsis">
+                RoboCasa365
+              </div>
+            </div>
+          </a>
+        
+        
+          
+          <a href="../adding-a-robot/" class="md-footer__link md-footer__link--next" aria-label="Next: Adding a Robot">
+            <div class="md-footer__title">
+              <span class="md-footer__direction">
+                Next
+              </span>
+              <div class="md-ellipsis">
+                Adding a Robot
+              </div>
+            </div>
+            <div class="md-footer__button md-icon">
+              
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M4 11v2h12l-5.5 5.5 1.42 1.42L19.84 12l-7.92-7.92L10.5 5.5 16 11z"/></svg>
+            </div>
+          </a>
+        
+      </nav>
+    
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2026 PyRUA-Lean Contributors
+    </div>
+  
+  
+</div>
+      
+        
+<div class="md-social">
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/DAGroup-PKU/PyRUA-Lean" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M173.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M252.8 8C114.1 8 8 113.3 8 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C436.2 457.8 504 362.9 504 252 504 113.3 391.5 8 252.8 8M105.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://arxiv.org/abs/2610.01939" target="_blank" rel="noopener" title="arxiv.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.842 0a1 1 0 0 0-.922.608c-.153.369-.044.627.294 1.111l6.919 8.36-1.023 1.106a1.04 1.04 0 0 0 .003 1.423l1.23 1.313-5.44 6.444c-.28.3-.453.823-.297 1.199a1.025 1.025 0 0 0 .959.635.91.91 0 0 0 .689-.34l5.783-6.126 7.49 8.005a.85.85 0 0 0 .684.26.96.96 0 0 0 .877-.615c.158-.377-.017-.75-.306-1.14L13.73 13.9l1.064-1.13a.963.963 0 0 0 .009-1.316L4.633.464S4.26.01 3.867 0zm0 .272h.017c.218.005.487.272.564.364l.005.006.005.005 10.17 10.99a.69.69 0 0 1-.008.946l-1.066 1.133-1.498-1.772-8.6-10.39c-.328-.472-.352-.619-.26-.841a.73.73 0 0 1 .671-.44Zm14.341 1.57a.88.88 0 0 0-.655.242l-5.696 6.158 1.694 1.832 5.309-6.514c.325-.433.479-.66.325-1.029a1.12 1.12 0 0 0-.977-.689zm-7.655 12.282 1.318 1.414-5.786 6.13a.65.65 0 0 1-.496.26.75.75 0 0 1-.706-.467c-.112-.269.036-.687.244-.909l.005-.005.005-.006z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.instant", "navigation.tracking", "navigation.sections", "navigation.expand", "navigation.top", "navigation.indexes", "navigation.footer", "search.suggest", "search.highlight", "content.tabs.link", "content.code.copy", "content.code.annotate"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+    
+  </body>
+</html>

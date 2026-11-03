@@ -611,6 +611,8 @@
       
         
       
+        
+      
     
     
     
@@ -913,6 +915,97 @@
   
   
   
+    
+    
+      
+        
+      
+    
+    
+    
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_4_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4_4" id="__nav_4_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    GenieSim
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_4_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    GenieSim
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="robocoliseum/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RoboColiseum
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
     <li class="md-nav__item">
       <a href="adding-a-robot/" class="md-nav__link">
         
@@ -1113,12 +1206,20 @@
 <td>RLDX-1</td>
 <td><code>agentview</code>, <code>navview</code>, <code>wrist</code></td>
 </tr>
+<tr>
+<td><code>robocoliseum</code></td>
+<td><a href="robocoliseum/">RoboColiseum</a></td>
+<td>GenieSim, under its own benchmark (locally, or online through the platform's tunnel)</td>
+<td>none (SAM3 for segmentation)</td>
+<td><code>head</code>, two wrists, with depth</td>
+</tr>
 </tbody>
 </table>
 <p>New robots are added through <a href="https://github.com/XPolicyLab/XPolicyLab">XPolicyLab</a>
 (<a href="adding-a-robot/">Adding a Robot</a>): the benchmark's own client runs the simulator and judges the episode, and one
 adapter directory can serve the benchmarks XPolicyLab integrates (today: RoboDojo). LIBERO-PRO, RoboTwin 2.0 and
-RoboCasa365 run on <a href="https://github.com/RLinf/RPent">RPent</a>'s stacks.</p>
+RoboCasa365 run on <a href="https://github.com/RLinf/RPent">RPent</a>'s stacks. RoboColiseum answers GenieSim's own inference
+protocol, as the benchmark and the online platform call a policy.</p>
 <p>Every robot page gives the API reference the agent reads, generated from the robot class when these docs are built.</p>
 
 
