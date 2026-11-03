@@ -21,3 +21,10 @@ Parts of this repository are derived from RPent and were modified:
 RPent is described in: Harness VLA: Steering Frozen VLAs into Reliable
 Manipulation Primitives via Memory-Guided Agents, arXiv:2607.08448
 (https://arxiv.org/abs/2607.08448).
+
+The RoboColiseum robot ships GenieSim's IK description of the AgiBot G2
+(https://github.com/AgibotTech/genie_sim, commit a2bbec0): the files in
+src/pyrualean/hosts/robocoliseum_ik/ are licensed under the Mozilla Public
+License 2.0 (see the LICENSE and README.md in that directory); g2_goal.yaml is a
+modified copy of g2_solver.yaml.  GenieSim's ik_solver wheel is installed by the
+`robocoliseum` extra and is not redistributed.

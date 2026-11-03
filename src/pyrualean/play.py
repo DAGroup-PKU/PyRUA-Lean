@@ -898,7 +898,7 @@ def build_parser(
 
     host = get_adapter(robot).host_module()
     parser = argparse.ArgumentParser(prog=prog, description=__doc__)
-    parser.add_argument("--robot", default="libero", help="libero | robocasa | robotwin | robodojo")
+    parser.add_argument("--robot", default="libero", help="libero | robocasa | robotwin | robodojo | robocoliseum")
     parser.add_argument("--arm", choices=ARMS, required=True)
     host.add_cell_args(parser)
     host.add_boot_args(parser)
