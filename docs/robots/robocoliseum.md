@@ -1,6 +1,7 @@
 # RoboColiseum
 
-[RoboColiseum](https://robocoliseum.ai/leaderboard) is AgiBot's simulation challenge on
+[RoboColiseum](https://robocoliseum.ai/leaderboard) is an embodied-AI benchmark jointly initiated by nearly 20
+universities, companies and research institutes worldwide, including Hugging Face, NVIDIA and Tsinghua University. It runs on
 [GenieSim](https://github.com/AgibotTech/genie_sim): the G2 robot in Isaac Sim, on four boards (instruction following,
 spatial reasoning, general manipulation and robustness). GenieSim's own benchmark runs the simulator and judges every
 episode, and asks a policy for actions over its inference protocol; PyRUA-Lean answers it as that policy. A language
