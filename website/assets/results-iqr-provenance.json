@@ -1,0 +1,72 @@
+{
+  "source": "Figure 5, PDF page 8",
+  "method": "Inverse log10 mapping from original vector error-bar endpoints, calibrated with 100 and 1000 second tick x positions. All digitized marker centers reproduce printed medians within 0.01 s. IQR endpoints should remain labelled approximately digitized, not raw tabulated results.",
+  "x100": 438.96593191713,
+  "x1000": 477.96452378774,
+  "results": [
+    {
+      "task": "Tic-tac-toe",
+      "q25_approx_s": 533.78,
+      "reported_median_s": 539.47,
+      "median_from_vector_s": 539.47,
+      "q75_approx_s": 571.3,
+      "source_pdf_line_index": 22
+    },
+    {
+      "task": "Five-block stacking",
+      "q25_approx_s": 170.17,
+      "reported_median_s": 179.31,
+      "median_from_vector_s": 179.31,
+      "q75_approx_s": 206.49,
+      "source_pdf_line_index": 27
+    },
+    {
+      "task": "Tower of Hanoi",
+      "q25_approx_s": 918.9,
+      "reported_median_s": 1003.2,
+      "median_from_vector_s": 1003.2,
+      "q75_approx_s": 1431.73,
+      "source_pdf_line_index": 32
+    },
+    {
+      "task": "Towel folding",
+      "q25_approx_s": 24.8,
+      "reported_median_s": 30.3,
+      "median_from_vector_s": 30.3,
+      "q75_approx_s": 33.45,
+      "source_pdf_line_index": 37
+    },
+    {
+      "task": "Push T",
+      "q25_approx_s": 104.32,
+      "reported_median_s": 128.85,
+      "median_from_vector_s": 128.85,
+      "q75_approx_s": 149.89,
+      "source_pdf_line_index": 42
+    },
+    {
+      "task": "Block sorting",
+      "q25_approx_s": 155.1,
+      "reported_median_s": 178.8,
+      "median_from_vector_s": 178.8,
+      "q75_approx_s": 214.6,
+      "source_pdf_line_index": 47
+    },
+    {
+      "task": "Block storage",
+      "q25_approx_s": 90.0,
+      "reported_median_s": 109.0,
+      "median_from_vector_s": 109.0,
+      "q75_approx_s": 134.0,
+      "source_pdf_line_index": 52
+    },
+    {
+      "task": "Ethernet insertion (online-assisted)",
+      "q25_approx_s": 510.98,
+      "reported_median_s": 519.29,
+      "median_from_vector_s": 519.29,
+      "q75_approx_s": 815.3,
+      "source_pdf_line_index": 57
+    }
+  ]
+}

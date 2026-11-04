@@ -1,0 +1,1182 @@
+{
+  "tic-tac-toe": {
+    "file": "duo_selfplay.py",
+    "label": "Stage-linked code",
+    "lines": [
+      "self.board,pieces=self.stable_scene([0]*9)",
+      "while outcome(tuple(self.board)) is None:",
+      "    _,cell=solve(tuple(self.board),turn)",
+      "    destination=self.config['cells'][cell]['xy_board']",
+      "    stock=[p for p in pieces if p['symbol']==turn and cell_of(p['xy']) is None]",
+      "    if not stock:raise RuntimeError('No stock piece for current player')",
+      "    source=min(stock,key=lambda p:np.linalg.norm(np.array(p['xy'])-destination))",
+      "    self.log('decision',symbol=turn,cell=cell+1,board=self.board)",
+      "    pieces=self.transfer(source,destination);turn=3-turn",
+      "# …",
+      "session=PieceTransferSession(self.output/'workcell.json',TASK/f'config/tool_{side}.json',side,",
+      "    Path(action['path']),controller=self.ctrl,sensors=self.hub,smooth=True,symbol=symbol)",
+      "try:",
+      "    held=session.pick(np.array(source))",
+      "    self.checkpoint(pending=action,held=held)",
+      "    result=session.place(held,np.array(destination))",
+      "    self.log('transfer_released',**action,result=result)",
+      "# …",
+      "    self.board,pieces=self.stable_scene(expected,destination,symbol)",
+      "    self.checkpoint();self.log('transfer_verified',**action)",
+      "    return pieces",
+      "",
+      "def reset(self):",
+      "    self.phase='RESET';self.board,pieces=self.stable_scene()",
+      "    while True:",
+      "        action=reset_action(pieces)",
+      "        if action is None:break",
+      "        pieces=self.transfer(*action)",
+      "    self.board,pieces=self.stable_scene([0]*9)",
+      "    self.log('reset_completed',board=self.board)"
+    ],
+    "cues": [
+      {
+        "time": 0.067,
+        "line": 0,
+        "label": "Play · game started"
+      },
+      {
+        "time": 1.067,
+        "line": 2,
+        "label": "Play · decision"
+      },
+      {
+        "time": 1.067,
+        "line": 13,
+        "label": "Play · transfer start"
+      },
+      {
+        "time": 31.933,
+        "line": 16,
+        "label": "Play · transfer released"
+      },
+      {
+        "time": 33.0,
+        "line": 19,
+        "label": "Play · transfer verified"
+      },
+      {
+        "time": 33.0,
+        "line": 2,
+        "label": "Play · decision"
+      },
+      {
+        "time": 33.0,
+        "line": 13,
+        "label": "Play · transfer start"
+      },
+      {
+        "time": 56.4,
+        "line": 16,
+        "label": "Play · transfer released"
+      },
+      {
+        "time": 58.133,
+        "line": 19,
+        "label": "Play · transfer verified"
+      },
+      {
+        "time": 58.133,
+        "line": 2,
+        "label": "Play · decision"
+      },
+      {
+        "time": 58.133,
+        "line": 13,
+        "label": "Play · transfer start"
+      },
+      {
+        "time": 88.067,
+        "line": 16,
+        "label": "Play · transfer released"
+      },
+      {
+        "time": 89.133,
+        "line": 19,
+        "label": "Play · transfer verified"
+      },
+      {
+        "time": 89.133,
+        "line": 2,
+        "label": "Play · decision"
+      },
+      {
+        "time": 89.133,
+        "line": 13,
+        "label": "Play · transfer start"
+      },
+      {
+        "time": 114.467,
+        "line": 16,
+        "label": "Play · transfer released"
+      },
+      {
+        "time": 115.533,
+        "line": 19,
+        "label": "Play · transfer verified"
+      },
+      {
+        "time": 115.533,
+        "line": 2,
+        "label": "Play · decision"
+      },
+      {
+        "time": 115.533,
+        "line": 13,
+        "label": "Play · transfer start"
+      },
+      {
+        "time": 146.6,
+        "line": 16,
+        "label": "Play · transfer released"
+      },
+      {
+        "time": 148.533,
+        "line": 19,
+        "label": "Play · transfer verified"
+      },
+      {
+        "time": 148.533,
+        "line": 2,
+        "label": "Play · decision"
+      },
+      {
+        "time": 148.533,
+        "line": 13,
+        "label": "Play · transfer start"
+      },
+      {
+        "time": 177.2,
+        "line": 16,
+        "label": "Play · transfer released"
+      },
+      {
+        "time": 178.267,
+        "line": 19,
+        "label": "Play · transfer verified"
+      },
+      {
+        "time": 178.267,
+        "line": 2,
+        "label": "Play · decision"
+      },
+      {
+        "time": 178.267,
+        "line": 13,
+        "label": "Play · transfer start"
+      },
+      {
+        "time": 206.933,
+        "line": 16,
+        "label": "Play · transfer released"
+      },
+      {
+        "time": 209.067,
+        "line": 19,
+        "label": "Play · transfer verified"
+      },
+      {
+        "time": 209.067,
+        "line": 2,
+        "label": "Play · decision"
+      },
+      {
+        "time": 209.067,
+        "line": 13,
+        "label": "Play · transfer start"
+      },
+      {
+        "time": 236.467,
+        "line": 16,
+        "label": "Play · transfer released"
+      },
+      {
+        "time": 237.533,
+        "line": 19,
+        "label": "Play · transfer verified"
+      },
+      {
+        "time": 237.533,
+        "line": 2,
+        "label": "Play · decision"
+      },
+      {
+        "time": 237.533,
+        "line": 13,
+        "label": "Play · transfer start"
+      },
+      {
+        "time": 271.133,
+        "line": 16,
+        "label": "Play · transfer released"
+      },
+      {
+        "time": 272.2,
+        "line": 19,
+        "label": "Play · transfer verified"
+      },
+      {
+        "time": 272.2,
+        "line": 24,
+        "label": "Play · game finished"
+      },
+      {
+        "time": 273.133,
+        "line": 13,
+        "label": "Reset · transfer start"
+      },
+      {
+        "time": 298.067,
+        "line": 16,
+        "label": "Reset · transfer released"
+      },
+      {
+        "time": 299.133,
+        "line": 19,
+        "label": "Reset · transfer verified"
+      },
+      {
+        "time": 299.133,
+        "line": 13,
+        "label": "Reset · transfer start"
+      },
+      {
+        "time": 328.4,
+        "line": 16,
+        "label": "Reset · transfer released"
+      },
+      {
+        "time": 329.467,
+        "line": 19,
+        "label": "Reset · transfer verified"
+      },
+      {
+        "time": 329.467,
+        "line": 13,
+        "label": "Reset · transfer start"
+      },
+      {
+        "time": 356.267,
+        "line": 16,
+        "label": "Reset · transfer released"
+      },
+      {
+        "time": 357.333,
+        "line": 19,
+        "label": "Reset · transfer verified"
+      },
+      {
+        "time": 357.333,
+        "line": 13,
+        "label": "Reset · transfer start"
+      },
+      {
+        "time": 381.467,
+        "line": 16,
+        "label": "Reset · transfer released"
+      },
+      {
+        "time": 382.6,
+        "line": 19,
+        "label": "Reset · transfer verified"
+      },
+      {
+        "time": 382.6,
+        "line": 13,
+        "label": "Reset · transfer start"
+      },
+      {
+        "time": 413.333,
+        "line": 16,
+        "label": "Reset · transfer released"
+      },
+      {
+        "time": 414.467,
+        "line": 19,
+        "label": "Reset · transfer verified"
+      },
+      {
+        "time": 414.467,
+        "line": 13,
+        "label": "Reset · transfer start"
+      },
+      {
+        "time": 448.133,
+        "line": 16,
+        "label": "Reset · transfer released"
+      },
+      {
+        "time": 449.133,
+        "line": 19,
+        "label": "Reset · transfer verified"
+      },
+      {
+        "time": 449.133,
+        "line": 13,
+        "label": "Reset · transfer start"
+      },
+      {
+        "time": 479.733,
+        "line": 16,
+        "label": "Reset · transfer released"
+      },
+      {
+        "time": 480.867,
+        "line": 19,
+        "label": "Reset · transfer verified"
+      },
+      {
+        "time": 480.867,
+        "line": 13,
+        "label": "Reset · transfer start"
+      },
+      {
+        "time": 511.133,
+        "line": 16,
+        "label": "Reset · transfer released"
+      },
+      {
+        "time": 512.133,
+        "line": 19,
+        "label": "Reset · transfer verified"
+      },
+      {
+        "time": 512.133,
+        "line": 13,
+        "label": "Reset · transfer start"
+      },
+      {
+        "time": 542.4,
+        "line": 16,
+        "label": "Reset · transfer released"
+      },
+      {
+        "time": 543.467,
+        "line": 19,
+        "label": "Reset · transfer verified"
+      },
+      {
+        "time": 544.867,
+        "line": 29,
+        "label": "Reset · reset completed"
+      }
+    ]
+  },
+  "five-block-stacking": {
+    "file": "stack_cycles.py",
+    "label": "Stage-linked code",
+    "lines": [
+      "def perform_cycle(cell, objects, slots, cycle):",
+      "    layers = {'yellow': objects['yellow']}",
+      "    top = layers['yellow']",
+      "    for colour in ORDER[1:]:",
+      "        top = cell.relocate(SIDES[colour], objects[colour], top, THICKNESS[colour], f'c{cycle}_up_{colour}')",
+      "        layers[colour] = top",
+      "        save(cell.out / 'checkpoint.json', dict(cycle=cycle, phase='stack', layers=layers, scene=cell.scene))",
+      "    staged = {'yellow': layers['yellow']}",
+      "    for i in range(4, 0, -1):",
+      "        colour = ORDER[i]",
+      "        below = layers[ORDER[i - 1]]",
+      "        staged[colour] = cell.relocate(SIDES[colour], layers[colour], slots[colour], THICKNESS[colour],",
+      "                                      f'c{cycle}_down_{colour}', underneath=below, table=True)",
+      "        save(cell.out / 'checkpoint.json', dict(cycle=cycle, phase='unstack', staged=staged, scene=cell.scene))",
+      "    return staged"
+    ],
+    "cues": [
+      {
+        "time": 0.0,
+        "line": 1,
+        "label": "Cycle Start"
+      },
+      {
+        "time": 0.067,
+        "line": 4,
+        "label": "Up Red"
+      },
+      {
+        "time": 14.533,
+        "line": 4,
+        "label": "Up Pink"
+      },
+      {
+        "time": 27.2,
+        "line": 4,
+        "label": "Up Green"
+      },
+      {
+        "time": 43.8,
+        "line": 4,
+        "label": "Up Blue"
+      },
+      {
+        "time": 59.067,
+        "line": 11,
+        "label": "Down Blue"
+      },
+      {
+        "time": 73.533,
+        "line": 11,
+        "label": "Down Green"
+      },
+      {
+        "time": 87.733,
+        "line": 11,
+        "label": "Down Pink"
+      },
+      {
+        "time": 106.133,
+        "line": 11,
+        "label": "Down Red"
+      }
+    ]
+  },
+  "tower-of-hanoi": {
+    "file": "grasp_any_disk.py",
+    "label": "Stage-linked code",
+    "lines": [
+      "log(\"stack_round\", round=round_, on_table=[(d[\"id\"], d[\"colour\"], round(d[\"D_snap_m\"] * 1000, 1)) for d in todo], stacked=stack_count)",
+      "# …",
+      "try:",
+      "    g = ep.run()",
+      "# …",
+      "ins = Inserter(ep, pegs[side], log, stack_count).run()",
+      "ins[\"grasp\"] = {k: g.get(k) for k in (\"chord_mm\", \"close_preload_N\", \"centring_residual_mm\")}",
+      "log(\"INSERT_RESULT\", **{k: v for k, v in ins.items() if k != \"attempts\"}, n_attempts=len(ins.get(\"attempts\", [])))",
+      "results.append(ins)",
+      "held_stop = False",
+      "if ins[\"verdict\"] == \"SEATED\":",
+      "    stack_count += 1",
+      "    stacked_ds.append((target[\"D_snap_m\"], target[\"colour\"]))",
+      "# …",
+      "log(\"unstack_target\", k=k, colour=colour, D_mm=round(D * 1000, 1), seat_h=round(seat_h, 3), arm=None if not chosen else chosen[0])",
+      "# …",
+      "ok, grec = picker.grasp_from_peg(D, opening, seat_h, colour=colour, below=below)",
+      "# …",
+      "okp, placed = picker.place_on_table(centre, plan, opening, level_normal=grec.get(\"disk_normal_flange\"))",
+      "if okp:",
+      "    cL = to_left_base(placed) if side == \"right\" else np.asarray(placed)",
+      "# …",
+      "results[-1][\"verify\"] = verify_placed_on_table(log, side, colour, D, placed, tag=f\"verify_{len(results)}_{colour}\", arms=arms, wrists=wrists)"
+    ],
+    "cues": [
+      {
+        "time": 34.833,
+        "line": 0,
+        "label": "Stack Round"
+      },
+      {
+        "time": 35.867,
+        "line": 3,
+        "label": "Gripper Open For Disk"
+      },
+      {
+        "time": 62.367,
+        "line": 5,
+        "label": "Insert Attempt"
+      },
+      {
+        "time": 66.933,
+        "line": 5,
+        "label": "Insert Attempt"
+      },
+      {
+        "time": 75.4,
+        "line": 5,
+        "label": "Insert Attempt"
+      },
+      {
+        "time": 78.233,
+        "line": 10,
+        "label": "Insert Result"
+      },
+      {
+        "time": 86.5,
+        "line": 0,
+        "label": "Stack Round"
+      },
+      {
+        "time": 87.133,
+        "line": 3,
+        "label": "Gripper Open For Disk"
+      },
+      {
+        "time": 111.567,
+        "line": 5,
+        "label": "Insert Attempt"
+      },
+      {
+        "time": 116.133,
+        "line": 5,
+        "label": "Insert Attempt"
+      },
+      {
+        "time": 124.8,
+        "line": 5,
+        "label": "Insert Attempt"
+      },
+      {
+        "time": 127.867,
+        "line": 10,
+        "label": "Insert Result"
+      },
+      {
+        "time": 135.933,
+        "line": 0,
+        "label": "Stack Round"
+      },
+      {
+        "time": 136.633,
+        "line": 3,
+        "label": "Gripper Open For Disk"
+      },
+      {
+        "time": 159.8,
+        "line": 5,
+        "label": "Insert Attempt"
+      },
+      {
+        "time": 167.233,
+        "line": 5,
+        "label": "Insert Attempt"
+      },
+      {
+        "time": 170.367,
+        "line": 10,
+        "label": "Insert Result"
+      },
+      {
+        "time": 178.333,
+        "line": 0,
+        "label": "Stack Round"
+      },
+      {
+        "time": 179.2,
+        "line": 3,
+        "label": "Gripper Open For Disk"
+      },
+      {
+        "time": 206.033,
+        "line": 5,
+        "label": "Insert Attempt"
+      },
+      {
+        "time": 209.067,
+        "line": 10,
+        "label": "Insert Result"
+      },
+      {
+        "time": 217.1,
+        "line": 0,
+        "label": "Stack Round"
+      },
+      {
+        "time": 218.0,
+        "line": 3,
+        "label": "Gripper Open For Disk"
+      },
+      {
+        "time": 246.767,
+        "line": 5,
+        "label": "Insert Attempt"
+      },
+      {
+        "time": 250.0,
+        "line": 10,
+        "label": "Insert Result"
+      },
+      {
+        "time": 257.933,
+        "line": 0,
+        "label": "Stack Round"
+      },
+      {
+        "time": 258.733,
+        "line": 3,
+        "label": "Gripper Open For Disk"
+      },
+      {
+        "time": 281.333,
+        "line": 5,
+        "label": "Insert Attempt"
+      },
+      {
+        "time": 286.7,
+        "line": 5,
+        "label": "Insert Attempt"
+      },
+      {
+        "time": 291.367,
+        "line": 5,
+        "label": "Insert Attempt"
+      },
+      {
+        "time": 297.067,
+        "line": 5,
+        "label": "Insert Attempt"
+      },
+      {
+        "time": 300.167,
+        "line": 10,
+        "label": "Insert Result"
+      },
+      {
+        "time": 307.767,
+        "line": 0,
+        "label": "Stack Round"
+      },
+      {
+        "time": 308.6,
+        "line": 3,
+        "label": "Gripper Open For Disk"
+      },
+      {
+        "time": 339.6,
+        "line": 5,
+        "label": "Insert Attempt"
+      },
+      {
+        "time": 342.767,
+        "line": 10,
+        "label": "Insert Result"
+      },
+      {
+        "time": 350.233,
+        "line": 0,
+        "label": "Stack Round"
+      },
+      {
+        "time": 350.967,
+        "line": 3,
+        "label": "Gripper Open For Disk"
+      },
+      {
+        "time": 377.533,
+        "line": 5,
+        "label": "Insert Attempt"
+      },
+      {
+        "time": 384.4,
+        "line": 5,
+        "label": "Insert Attempt"
+      },
+      {
+        "time": 387.467,
+        "line": 10,
+        "label": "Insert Result"
+      },
+      {
+        "time": 395.133,
+        "line": 0,
+        "label": "Stack Round"
+      },
+      {
+        "time": 398.367,
+        "line": 14,
+        "label": "Unstack Target"
+      },
+      {
+        "time": 411.133,
+        "line": 16,
+        "label": "Rim Pick Start"
+      },
+      {
+        "time": 443.033,
+        "line": 22,
+        "label": "Place Verify"
+      },
+      {
+        "time": 443.1,
+        "line": 14,
+        "label": "Unstack Target"
+      },
+      {
+        "time": 453.6,
+        "line": 16,
+        "label": "Rim Pick Start"
+      },
+      {
+        "time": 484.4,
+        "line": 22,
+        "label": "Place Verify"
+      },
+      {
+        "time": 484.467,
+        "line": 14,
+        "label": "Unstack Target"
+      },
+      {
+        "time": 494.833,
+        "line": 16,
+        "label": "Rim Pick Start"
+      },
+      {
+        "time": 527.033,
+        "line": 22,
+        "label": "Place Verify"
+      },
+      {
+        "time": 527.1,
+        "line": 14,
+        "label": "Unstack Target"
+      },
+      {
+        "time": 537.767,
+        "line": 16,
+        "label": "Rim Pick Start"
+      },
+      {
+        "time": 569.067,
+        "line": 22,
+        "label": "Place Verify"
+      },
+      {
+        "time": 569.133,
+        "line": 14,
+        "label": "Unstack Target"
+      },
+      {
+        "time": 579.667,
+        "line": 16,
+        "label": "Rim Pick Start"
+      },
+      {
+        "time": 611.633,
+        "line": 22,
+        "label": "Place Verify"
+      },
+      {
+        "time": 612.7,
+        "line": 14,
+        "label": "Unstack Target"
+      },
+      {
+        "time": 623.6,
+        "line": 16,
+        "label": "Rim Pick Start"
+      },
+      {
+        "time": 655.867,
+        "line": 22,
+        "label": "Place Verify"
+      },
+      {
+        "time": 656.9,
+        "line": 14,
+        "label": "Unstack Target"
+      },
+      {
+        "time": 730.067,
+        "line": 22,
+        "label": "Place Verify"
+      },
+      {
+        "time": 731.033,
+        "line": 14,
+        "label": "Unstack Target"
+      },
+      {
+        "time": 808.4,
+        "line": 22,
+        "label": "Place Verify"
+      }
+    ]
+  },
+  "block-sorting": {
+    "file": "sorter.py",
+    "label": "Stage-linked code",
+    "lines": [
+      "self.set_held(None)                                   # jaws empty: forget any stale held-state",
+      "t_a = time.monotonic(); wb, img = self.wrist_blocks(); t_b = time.monotonic(); S.cv2.imwrite(str(self.res_dir/f'scan-{k}.png'), img)",
+      "cands = self.choose_target(wb, box['footprint_centre'])",
+      "cands = [t for t in cands if not self.target_failed(t[2]['centre'])]",
+      "checked = []; t_c = time.monotonic()",
+      "for c_, d, b, i in cands:",
+      "    checked.append((c_, d, b, i, self.reachable(b, box=box)))",
+      "    if checked[-1][4][0]:",
+      "        break",
+      "# …",
+      "rec.update(self.pick(target, box))",
+      "if rec['outcome'] == 'grasped':",
+      "    rec['placed'] = self.place(box, self.yaw_now(), target.get('_drop_centre'), from_grasp=rec['grasp_pose'], drop_yaw=target.get('_drop_yaw'))",
+      "    rec['outcome'] = 'placed' if rec['placed'] else 'lost_in_transport'"
+    ],
+    "cues": [
+      {
+        "time": 16.889,
+        "line": 1,
+        "label": "Left · Wrist scan"
+      },
+      {
+        "time": 18.332,
+        "line": 10,
+        "label": "Left · Grasp"
+      },
+      {
+        "time": 28.102,
+        "line": 12,
+        "label": "Left · Place"
+      },
+      {
+        "time": 31.752,
+        "line": 1,
+        "label": "Left · Wrist scan"
+      },
+      {
+        "time": 33.478,
+        "line": 10,
+        "label": "Left · Grasp"
+      },
+      {
+        "time": 43.631,
+        "line": 12,
+        "label": "Left · Place"
+      },
+      {
+        "time": 48.295,
+        "line": 1,
+        "label": "Right · Wrist scan"
+      },
+      {
+        "time": 50.948,
+        "line": 10,
+        "label": "Right · Grasp"
+      },
+      {
+        "time": 60.35,
+        "line": 12,
+        "label": "Right · Place"
+      },
+      {
+        "time": 63.699,
+        "line": 1,
+        "label": "Left · Wrist scan"
+      },
+      {
+        "time": 65.686,
+        "line": 10,
+        "label": "Left · Grasp"
+      },
+      {
+        "time": 74.638,
+        "line": 12,
+        "label": "Left · Place"
+      },
+      {
+        "time": 78.049,
+        "line": 1,
+        "label": "Right · Wrist scan"
+      },
+      {
+        "time": 80.341,
+        "line": 10,
+        "label": "Right · Grasp"
+      },
+      {
+        "time": 93.24,
+        "line": 12,
+        "label": "Right · Place"
+      },
+      {
+        "time": 96.593,
+        "line": 1,
+        "label": "Left · Wrist scan"
+      },
+      {
+        "time": 98.244,
+        "line": 10,
+        "label": "Left · Grasp"
+      },
+      {
+        "time": 107.724,
+        "line": 12,
+        "label": "Left · Place"
+      },
+      {
+        "time": 111.145,
+        "line": 1,
+        "label": "Right · Wrist scan"
+      },
+      {
+        "time": 113.678,
+        "line": 10,
+        "label": "Right · Grasp"
+      },
+      {
+        "time": 125.264,
+        "line": 12,
+        "label": "Right · Place"
+      },
+      {
+        "time": 129.029,
+        "line": 1,
+        "label": "Left · Wrist scan"
+      },
+      {
+        "time": 131.019,
+        "line": 10,
+        "label": "Left · Grasp"
+      },
+      {
+        "time": 141.513,
+        "line": 12,
+        "label": "Left · Place"
+      },
+      {
+        "time": 145.447,
+        "line": 1,
+        "label": "Right · Wrist scan"
+      },
+      {
+        "time": 148.89,
+        "line": 10,
+        "label": "Right · Grasp"
+      },
+      {
+        "time": 159.073,
+        "line": 12,
+        "label": "Right · Place"
+      },
+      {
+        "time": 162.389,
+        "line": 1,
+        "label": "Left · Wrist scan"
+      },
+      {
+        "time": 165.032,
+        "line": 1,
+        "label": "Left · Wrist scan"
+      },
+      {
+        "time": 172.686,
+        "line": 1,
+        "label": "Left · Wrist scan"
+      }
+    ]
+  },
+  "block-storage": {
+    "file": "task.py",
+    "label": "Stage-linked code",
+    "lines": [
+      "self.log(f\"   [{side}] refined by wrist: {mobj}\")",
+      "# …",
+      "held, _ = u.grip.grasp()",
+      "R_e, t_e = u.arm.pose()",
+      "lift = u.on_table(u.tcp()) + n * g.lift_height",
+      "u.arm.move_linear(R_e, u.ee_from_tcp(R_e, lift), m.dyn_fine)",
+      "if held:",
+      "    time.sleep(0.2); held = u.grip.holding()",
+      "if not held:",
+      "    self.log(f\"   [{side}] nothing in the gripper\"); u.grip.open(); return False",
+      "u.pending_bowl_c, u.pending_rim_h, u.pending_bowl_r = bowl_c, rim_h, bowl.radius",
+      "if do_place:",
+      "    with self.container_lock:",
+      "        self.place(u, bowl_c, rim_h, bowl.radius)",
+      "return True",
+      "# …",
+      "if obj.shared:                       # near the container: hold the lock for pick and place",
+      "    with self.container_lock:",
+      "        ok = self.pick_and_place(u, obj, bowl, others, do_place=False, attempt=n_try)",
+      "        if ok is True:",
+      "            self.place(u, u.pending_bowl_c, u.pending_rim_h, u.pending_bowl_r)",
+      "else:",
+      "    ok = self.pick_and_place(u, obj, bowl, others, attempt=n_try)",
+      "# …",
+      "results.append((side, obj, ok))",
+      "if ok:",
+      "    self.log(f\"   [{side}] placed {obj.colour}\")"
+    ],
+    "cues": [
+      {
+        "time": 14,
+        "line": 0,
+        "label": "Wrist refinement"
+      },
+      {
+        "time": 18,
+        "line": 2,
+        "label": "Grasp"
+      },
+      {
+        "time": 22,
+        "line": 13,
+        "label": "Place in container"
+      },
+      {
+        "time": 25,
+        "line": 26,
+        "label": "Placement complete"
+      },
+      {
+        "time": 29,
+        "line": 0,
+        "label": "Wrist refinement"
+      },
+      {
+        "time": 31,
+        "line": 2,
+        "label": "Grasp"
+      },
+      {
+        "time": 35,
+        "line": 13,
+        "label": "Place in container"
+      },
+      {
+        "time": 38,
+        "line": 26,
+        "label": "Placement complete"
+      },
+      {
+        "time": 43,
+        "line": 0,
+        "label": "Wrist refinement"
+      },
+      {
+        "time": 47,
+        "line": 0,
+        "label": "Wrist refinement"
+      },
+      {
+        "time": 51,
+        "line": 2,
+        "label": "Grasp"
+      },
+      {
+        "time": 56,
+        "line": 13,
+        "label": "Place in container"
+      },
+      {
+        "time": 59,
+        "line": 26,
+        "label": "Placement complete"
+      },
+      {
+        "time": 68,
+        "line": 0,
+        "label": "Wrist refinement"
+      },
+      {
+        "time": 71,
+        "line": 2,
+        "label": "Grasp"
+      },
+      {
+        "time": 75,
+        "line": 13,
+        "label": "Place in container"
+      },
+      {
+        "time": 77,
+        "line": 26,
+        "label": "Placement complete"
+      },
+      {
+        "time": 86,
+        "line": 0,
+        "label": "Wrist refinement"
+      },
+      {
+        "time": 101,
+        "line": 2,
+        "label": "Grasp"
+      },
+      {
+        "time": 108,
+        "line": 13,
+        "label": "Place in container"
+      },
+      {
+        "time": 110,
+        "line": 26,
+        "label": "Placement complete"
+      },
+      {
+        "time": 121,
+        "line": 0,
+        "label": "Wrist refinement"
+      },
+      {
+        "time": 128,
+        "line": 2,
+        "label": "Grasp"
+      },
+      {
+        "time": 132,
+        "line": 13,
+        "label": "Place in container"
+      },
+      {
+        "time": 134,
+        "line": 26,
+        "label": "Placement complete"
+      }
+    ]
+  },
+  "towel-folding": {
+    "file": "far_fold.py",
+    "label": "Source excerpt",
+    "lines": [
+      "obs = observe_towel(session, t0)",
+      "# …",
+      "ft = fold_targets(session, obs)",
+      "# …",
+      "for s in sides:",
+      "    session.set_dynamics(s, FAST); session.arms[s].move_joints(paths[s][0], asynchronous=True)   # both fly now",
+      "plan = fold_plan(session, pinch_pred, 'in', poses={s: {'q': pinch_pred[s]['actual_q'], 'T': pinch_pred[s]['actual_T']} for s in sides})",
+      "# …",
+      "print(f'measured [{time.monotonic()-t0:.1f}s]', flush=True)",
+      "if fix:",
+      "    move_both(session, fix, FAST, 'wrist_fix', smooth=True, quick=True)",
+      "move_both(session, down, .04, 'descend_both', probe=True, rise_n=4., hard_n=12., smooth=True, quick=True)   # gentle: stop before the reflex",
+      "# …",
+      "states = close_both(session, list(sides)); print('closed', {s: (st.position, st.obj_status) for s, st in states.items()}, f'[{time.monotonic()-t0:.1f}s]', flush=True)",
+      "write_grasp_reports(session, list(sides), states, insets, planes)",
+      "for s in sides:",
+      "    plan['arms'][s]['held_position'] = states[s].position",
+      "# …",
+      "for i, f in enumerate((.25, .5, .75, 1.0)):",
+      "    move_both(session, {s: [{'q': targets[s][i], 'min_time_s': 2.0}] for s in sides}, .3, f'arc_{int(f*100)}', quick=True)",
+      "print(f'arc done [{time.monotonic()-t0:.1f}s]', flush=True)"
+    ],
+    "cues": []
+  },
+  "push-t": {
+    "file": "control.py",
+    "label": "Source excerpt",
+    "lines": [
+      "stage='coupled_pose' # Record compatibility label, no phase-based stopping/replanning.",
+      "error=np.r_[self.a.goal[:2]-pose[:2],wrap(self.a.goal[2]-pose[2])]",
+      "self.r.append('events',dict(event='task_feedback',pose=pose,goal=self.a.goal,position_error_mm=np.linalg.norm(error[:2])*1000,yaw_error_deg=abs(error[2])*180/np.pi,mode=self.l.phase))",
+      "measured_error=None if not usable(r) else np.r_[self.a.goal[:2]-np.asarray(r['pose'])[:2],wrap(self.a.goal[2]-r['pose'][2])]",
+      "within=measured_error is not None and np.linalg.norm(measured_error[:2])<=POSITION_SCALE_M and abs(measured_error[2])<=YAW_SCALE_RAD",
+      "if within:",
+      " if settled==0:self.r.append('events',dict(event='goal_confirmation_started',current_measurement=r['pose'],pusher_motion_held=True))",
+      " if self.execute:self.n.stop(self.pusher)",
+      " if r.get('source_mono_ns')!=settled_source:settled+=1;settled_source=r.get('source_mono_ns')",
+      " if settled>=4:self.status='goal_reached';break",
+      " self.wait_tick(.05);continue",
+      "# …",
+      "self.contact=None;self.ident_previous=None;self.zero_sources.clear();self.low_request_window=None",
+      "arm,c,route=self.choose(pose,qs,avoid_face=avoid_face)",
+      "self.check_push_priority()",
+      "if route is None:self.status='no_feasible_contact_route';break",
+      "if arm!=self.pusher:",
+      " self.begin_role_handoff(arm,route);self.contact_replan('role_handoff_completed');replan=True;continue",
+      "self.approach_context=c",
+      "# Snapshot before contact, not after the finger may already carry load.",
+      "# …",
+      "velocity_generation=self.observation_priority.token()",
+      "with planning_measure(self.r,'current_contact_mpc',arm=self.pusher,face=int(c['face'])):",
+      " _,v,m=self.mpc.solve(pose,self.a.goal,c,update_stage=False)",
+      "with planning_measure(self.r,'push_command_filter',arm=self.pusher):",
+      " v,command_detail=self.push_command.update(pose,self.a.goal,stage,c,v,self.id.p,self.last_source,time.monotonic_ns())"
+    ],
+    "cues": []
+  }
+}

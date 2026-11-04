@@ -1,0 +1,58 @@
+[
+  {
+    "task": "tic",
+    "frames": 8174,
+    "allDecodedFramesIdentical": true,
+    "method": "stream-copy, timestamps /8; no resize, frame removal or re-encoding",
+    "bytes": 55119297
+  },
+  {
+    "task": "stack",
+    "frames": 1835,
+    "allDecodedFramesIdentical": true,
+    "method": "stream-copy, timestamps /8; no resize, frame removal or re-encoding",
+    "bytes": 22864195
+  },
+  {
+    "task": "hanoi",
+    "frames": 24319,
+    "allDecodedFramesIdentical": true,
+    "method": "stream-copy, timestamps /8; no resize, frame removal or re-encoding",
+    "bytes": 230577195
+  },
+  {
+    "task": "towel",
+    "frames": 586,
+    "allDecodedFramesIdentical": true,
+    "method": "stream-copy, timestamps /8; no resize, frame removal or re-encoding",
+    "bytes": 14839146
+  },
+  {
+    "task": "push",
+    "frames": 1792,
+    "allDecodedFramesIdentical": true,
+    "method": "stream-copy, timestamps /8; no resize, frame removal or re-encoding",
+    "bytes": 12168888
+  },
+  {
+    "task": "sorting",
+    "frames": 5695,
+    "allDecodedFramesIdentical": true,
+    "method": "stream-copy, timestamps /8; no resize, frame removal or re-encoding",
+    "bytes": 23314171
+  },
+  {
+    "task": "storage",
+    "frames": 2103,
+    "allDecodedFramesIdentical": true,
+    "method": "stream-copy, timestamps /8; no resize, frame removal or re-encoding",
+    "bytes": 38369656
+  },
+  {
+    "task": "ethernet",
+    "frames": 11616,
+    "allDecodedFramesIdentical": true,
+    "method": "stream-copy, timestamps /8; no resize, frame removal or re-encoding",
+    "bytes": 16760298
+  }
+]

@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#8c0000">
+  <title>PyRUA-REAL: Robot Exploration and Adaptive Learning</title>
+  <meta name="description" content="Robot Exploration and Adaptive Learning through RSI in the Real World. Research from Peking University and National University of Singapore.">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="cinematic.css?v=19">
+  <link rel="stylesheet" href="structure.css?v=20">
+  <link rel="stylesheet" href="results.css?v=19">
+  <link rel="stylesheet" href="leaderboard.css?v=18">
+  <link rel="stylesheet" href="editorial.css?v=20">
+  <link rel="stylesheet" href="gallery.css?v=21">
+  <style>
+    /* Reserve the opening before modules load; deep links never paint the title first. */
+    #cinematic { height:100svh; background:#d6d6d2; }
+    #task-video-grid:empty { min-height:70svh; }
+    html.initial-anchor { scroll-behavior:auto !important; }
+    html.initial-anchor body { visibility:hidden; }
+    html.initial-anchor .reveal-section { transform:none !important; transition:none !important; }
+  </style>
+  <script>
+    (() => {
+      const hash = location.hash;
+      const known = ['#paper','#abstract','#structure','#performance','#real-world-charts','#result-improvement','#result-benchmark','#other-findings'];
+      if (!known.includes(hash)) return;
+      const html = document.documentElement;
+      html.classList.add('initial-anchor');
+      // Fail open if a module fails or the network is unavailable.
+      const fallback = setTimeout(() => html.classList.remove('initial-anchor'), 5000);
+      addEventListener('pyrua:ready', () => {
+        clearTimeout(fallback);
+        requestAnimationFrame(() => {
+          if (location.hash === hash) {
+            const target = document.getElementById(hash.slice(1));
+            if (target) {
+              for (let node = target; node; node = node.parentElement) {
+                node.classList.add('is-revealed');
+              }
+              target.scrollIntoView({behavior:'instant', block:'start'});
+            }
+          }
+          html.classList.remove('initial-anchor');
+        });
+      }, {once:true});
+    })();
+  </script>
+  <script type="module" src="app.js?v=33"></script>
+</head>
+<body>
+  <a class="skip-link" href="#paper">Skip introduction</a>
+  <main id="top">
+    <section id="cinematic" class="cin-stage" aria-label="Real world robot tasks"><div class="cin-sticky"><video data-opening-video class="cin-video" muted playsinline preload="none" poster="media/tic-1.jpg?v=15" src="media/tic-1.mp4?v=15" aria-hidden="true" tabindex="-1"></video></div></section>
+    <script>
+      // Start the first clip without waiting for the gallery/chart module graph.
+      if ((!location.hash || location.hash === '#top') && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const opening = document.querySelector('[data-opening-video]');
+        opening.muted = opening.defaultMuted = true;
+        opening.preload = 'auto';
+        opening.autoplay = true;
+        opening.play().catch(() => {});
+      }
+    </script>
+    <button class="contents-toggle" type="button" aria-label="Open contents" aria-controls="section-nav" aria-expanded="false">☰</button>
+    <nav class="section-nav" id="section-nav" aria-label="Sections"><a class="nav-brand" href="#top">PyRUA<span>-REAL</span></a><span class="nav-caption">CONTENTS</span><div><a href="#abstract">Abstract</a><a href="#structure">Structure</a><a href="#performance">Task videos</a><a href="#real-world-charts">Real world performance</a><a href="#result-improvement">Continued improvement</a><a href="#result-benchmark">RoboDojo</a><a href="#other-findings">Further findings</a></div><a class="nav-paper" href="assets/paper.pdf" target="_blank" rel="noopener">Paper ↗</a></nav>
+    <div class="article-body">
+    <header class="paper-header wrap" id="paper">
+      <div class="paper-brand"><span>PyRUA</span>-REAL</div>
+      <h1><span class="real-initial">R</span>obot <span class="real-initial">E</span>xploration and <span class="real-initial">A</span>daptive <span class="real-initial">L</span>earning<br class="desktop-break"> through RSI in the Real World</h1>
+      <div class="authors">
+        <span><a href="https://qistee.github.io/" target="_blank" rel="noopener">Qiang Wang</a><sup>*1</sup></span><span><a href="https://jxbi1010.github.io/" target="_blank" rel="noopener">Jianxin Bi</a><sup>*1,2</sup></span><span><a href="https://github.com/shu1ong" target="_blank" rel="noopener">Shulong Jiang</a><sup>*1</sup></span><span aria-label="Additional authors to be confirmed">…</span><span><a href="https://zhoudaquan.github.io/homepage.io/index.html" target="_blank" rel="noopener">Daquan Zhou</a><sup>1†</sup></span>
+      </div>
+      <div class="affiliations"><span><sup>1</sup>Peking University</span><span><sup>2</sup>National University of Singapore</span></div>
+      <p class="author-notes">* Equal contribution &nbsp; † Corresponding author</p>
+      <div class="paper-links">
+        <a href="assets/paper.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6M9 16h6"/></svg>Paper</a>
+        <a href="#performance"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/></svg>Videos</a>
+        <a href="https://dagroup-pku.github.io/PyRUA-Lean/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M11 4H4v16h16v-7"/></svg>PyRUA-Lean</a>
+      </div>
+      <div class="university-logos" aria-label="Participating universities"><img class="university-pku" src="assets/universities/pku.png" alt="Peking University"><img class="university-nus" src="assets/universities/nus.png" alt="National University of Singapore"></div>
+    </header>
+
+
+
+    <section class="abstract-section section wrap" id="abstract">
+      <h2>Abstract</h2>
+      <p>Coding agents such as GPT-6-Astra empowers spatial reasoning with executable robot behavior, raising the question of how coding agent can produce lasting improvements in robot capabilities from physical interaction. In this work, we study <strong>embodied recursive self-improvement (RSI)</strong> through real world exploration, code improvement, and deployment using PyRUA-REAL. Within this framework, coding agents retain interaction experience as <strong>persistent memory and reusable executable skills</strong> to inform subsequent exploration and improvements. Our empirical study places physical manipulation at the center of the improvement process, examining how agents collaborate, what kind of execution feedback supports effective code improvement, and how task specifications and previously acquired skills influence robustness and task transfer. We further investigate the efficiency and capability of deploying the resulting programs without online agent decisions. Across eight real world tasks, recorded development success averages <strong>91.1%</strong> across tasks. Complementary RoboDojo evaluation with PyRUA-RSI frozen programs achieves <strong>84.42% capability-averaged success</strong> on the development seed and <strong>80.73% on held-out seed 2</strong>, without language-model calls at evaluation time. This study provides empirical guidance for turning physical exploration into reusable robot skills that support continued improvement and robust, efficient deployment.</p>
+    </section>
+
+
+
+    <figure class="teaser-figure wrap" aria-label="PyRUA-REAL research overview">
+      <a href="assets/pyrua-real-teaser-final.pdf" target="_blank" rel="noopener" aria-label="Open the research overview as a full-resolution PDF">
+        <img src="assets/pyrua-real-teaser-final.png" width="3200" height="1986" loading="lazy" decoding="async" alt="PyRUA-REAL overview: embodied RSI, iterative program improvement, real world task success, RoboDojo performance at 84.42%, and eight real world tasks.">
+      </a>
+    </figure>
+
+    <section class="structure-section section" id="structure"><div class="wrap"><h2>Structure</h2><div id="structure-diagram"></div></div></section>
+    <section class="result-section section wrap" id="result"><h2>Result</h2><div id="results-visualization" class="rs-root"><article class="rs-story rs-acquisition" id="result-acquisition"><header class="rs-heading"><h3 class="rs-label">Real world performance</h3></header><div data-performance-slot><section class="rs-performance" id="performance" aria-label="Complete task recordings">
+      <div class="section-heading"><div class="segmented domain-tabs" role="group" aria-label="Demonstration environment"><button type="button" class="active" data-domain="real" aria-pressed="true">Real world</button><button type="button" data-domain="sim" aria-pressed="false">Simulation</button></div></div>
+      <div class="gallery-toolbar"><div><button type="button" class="gallery-code-toggle" role="switch" aria-checked="true" aria-label="Show code"><span>Code</span><span class="gallery-switch-track" aria-hidden="true"><span class="gallery-switch-thumb"></span></span></button></div></div>
+      <div class="task-video-grid" id="task-video-grid"></div>
+    </section></div></article></div></section>
+    </div>
+
+  </main>
+  <footer class="wrap"><a href="#top" class="footer-brand">PyRUA<span>-REAL</span></a><span>Peking University · National University of Singapore</span><a href="assets/paper.pdf" target="_blank" rel="noopener">Paper ↗</a></footer>
+</body>
+</html>
