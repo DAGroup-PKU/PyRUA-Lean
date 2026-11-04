@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PyRUA-DataFarm: LLM Agent as a Cost-Efficient Teleoperator for Real-Ready Robot Data</title>
+  <meta name="description" content="PyRUA-DataFarm: a coding agent turns a data request and one calibration episode of the scene into real-ready robot data: synchronized photographic camera views labelled with the robot's own actions.">
+  <meta name="keywords" content="Agentic data generation, Robot learning, Real-to-sim-to-real, Video generation, Teleoperation, Coding agents">
+  <meta name="author" content="Kewei Zhang, Juncheng Ma, Guodong Lv, Duomin Wang, Feixiang Ruan, Ruiyang Si, Chuanrui Zhang, Yuxuan Chen, Hao Chen, Yichen Liu, Yintianrun Zhang, Yufan Deng, Enze Xie, Daquan Zhou">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Peking University, NVIDIA">
+  <meta property="og:title" content="PyRUA-DataFarm: LLM Agent as a Cost-Efficient Teleoperator for Real-Ready Robot Data">
+  <meta property="og:description" content="One calibration episode in, real-ready robot data out. Policies trained only on farm data keep 87 successes in 100 real-robot trials under unseen appearance, where teleoperation-trained policies fall to 46.">
+  <meta property="og:image" content="static/images/teaser.jpg">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#0A0E16">
+
+  <link rel="icon" type="image/svg+xml" href="static/images/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Inter+Tight:wght@600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@500&display=swap">
+  <link rel="stylesheet" href="static/css/site.css?v=20261028">
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script defer src="static/js/site.js?v=20261028"></script>
+</head>
+<body>
+
+<header class="bar">
+  <a class="bar-brand" href="#top" aria-label="PyRUA-DataFarm, back to top"><span class="wm-py">PyRUA</span><span class="wm-dash">-</span><span class="wm-farm">DataFarm</span></a>
+  <nav class="bar-nav" aria-label="Sections">
+    <a href="#contrast">Camera views</a>
+    <a href="#idea">How it works</a>
+    <a href="#photo">The data</a>
+    <a href="#results">Real robot</a>
+    <a href="#cost">Cost</a>
+    <a href="#details">Paper</a>
+  </nav>
+  <div class="bar-links">
+    <a class="pill is-soon" title="Coming soon"><i class="fas fa-file-pdf"></i><span>Paper</span></a>
+    <a class="pill is-soon" title="Coming soon"><i class="fab fa-github"></i><span>Code</span></a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ============ Hero: title, then the opening showcase of the demo ============ -->
+<section class="hero">
+  <div class="hero-title">
+    <div class="wordmark" aria-label="PyRUA-DataFarm"><span class="wm-py">PyRUA</span><span class="wm-dash">-</span><span class="wm-farm">DataFarm</span></div>
+    <h1>LLM Agent as a Cost-Efficient Teleoperator for <span class="hl">Real-Ready</span> Robot Data</h1>
+    <p class="tagline">A coding agent does the teleoperator's job. <b>One calibration episode in, real-ready robot data out.</b></p>
+    <div class="authors">
+      <span><a href="https://xiwen1.github.io/" target="_blank" rel="noopener">Kewei Zhang</a><sup>1*</sup></span>
+      <span>Juncheng Ma<sup>1*</sup></span>
+      <span>Guodong Lv<sup>1</sup></span>
+      <span><a href="https://dorniwang.github.io/" target="_blank" rel="noopener">Duomin Wang</a><sup>2&dagger;</sup></span>
+      <span><a href="https://vme0522.github.io/" target="_blank" rel="noopener">Feixiang Ruan</a><sup>1</sup></span>
+      <span>Ruiyang Si<sup>1</sup></span>
+      <span>Chuanrui Zhang<sup>2</sup></span>
+      <span>Yuxuan Chen<sup>1</sup></span>
+      <span>Hao Chen<sup>1</sup></span>
+      <span>Yichen Liu<sup>1</sup></span>
+      <span>Yintianrun Zhang<sup>1</sup></span>
+      <span>Yufan Deng<sup>1</sup></span>
+      <span>Enze Xie<sup>2&dagger;</sup></span>
+      <span><a href="https://zhoudaquan.github.io/homepage.io/index.html" target="_blank" rel="noopener">Daquan Zhou</a><sup>1&dagger;</sup></span>
+    </div>
+    <div class="affils"><span><sup>1</sup>Peking University</span><span><sup>2</sup>NVIDIA</span><span><sup>*</sup>Equal contribution &nbsp;<sup>&dagger;</sup>Project lead</span></div>
+    <div class="hero-row">
+      <div class="logos">
+        <span><img src="static/images/logos/pku.png" alt="Peking University" width="398" height="112"></span>
+        <span class="nv"><img src="static/images/logos/nvidia.png" alt="NVIDIA" width="406" height="76"></span>
+      </div>
+      <div class="hero-links">
+        <a class="pill is-soon" title="Coming soon"><i class="fas fa-file-pdf"></i><span>Paper</span></a>
+        <a class="pill is-soon" title="Coming soon"><i class="fas fa-scroll"></i><span>arXiv</span></a>
+        <a class="pill is-soon" title="Coming soon"><i class="fab fa-github"></i><span>Code</span></a>
+        <a class="pill is-soon" title="Coming soon"><i class="fas fa-database"></i><span>Data</span></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="showcase">
+    <div class="show-head">
+      <div>
+        <span class="kicker">One rollout &middot; three cameras</span>
+        <h2>Simulation in, consistent multi-view video out</h2>
+      </div>
+      <div class="show-legend">
+        <span><i class="sw" style="background:var(--coral);box-shadow:0 0 8px var(--coral)"></i>left gripper</span>
+        <span><i class="sw" style="background:var(--cyan);box-shadow:0 0 8px var(--cyan)"></i>right gripper</span>
+        <span>trajectories drawn from the action labels</span>
+      </div>
+    </div>
+    <div class="show-stage" id="show">
+      <video id="show-src" muted playsinline preload="auto" poster="static/demo/show_towel.jpg"><source src="static/demo/show_towel.mp4" type="video/mp4"></video>
+      <canvas id="show-canvas" width="1600" height="676"></canvas>
+      <svg id="show-svg" viewBox="0 0 1600 676" preserveAspectRatio="none" aria-hidden="true"></svg>
+    </div>
+    <div class="show-foot">
+      <div class="tabs" data-group="show" role="tablist" aria-label="Episode">
+        <button data-key="towel">Fold towel</button><button data-key="stack">Stack cups</button><button data-key="drawer">Pull drawer</button>
+      </div>
+      <p class="fine">Left: the simulated rollout. Right: the farm episode rendered from it. Head camera on top, wrist cameras below; the views agree with each other, and every frame keeps the exact action behind it. Fold towel plays at 2&times;.</p>
+    </div>
+  </div>
+
+  <div class="stats">
+    <a class="stat" href="#results"><span class="stat-k">Unseen tablecloth &amp; light</span><span class="stat-v"><b data-count="87">87</b><i>vs 46</i></span><span class="stat-t">real-robot successes in 100 trials, farm data vs. as many teleoperated episodes</span></a>
+    <a class="stat" href="#results"><span class="stat-k">Original scene</span><span class="stat-v"><b data-count="93">93</b><i>vs 84</i></span><span class="stat-t">successes in 100 trials over five tasks, without a single real demonstration in training</span></a>
+    <a class="stat" href="#cost"><span class="stat-k">No person in the loop</span><span class="stat-v"><b data-count="21" data-prefix="$">$21</b><i>per task</i></span><span class="stat-t">mean one-time agent cost to adapt a new task, fully automatic</span></a>
+    <a class="stat" href="#contrast"><span class="stat-k">Every camera</span><span class="stat-v"><b data-count="3">3</b><i>views, one generation</i></span><span class="stat-t">head and wrist cameras rendered together, all following the same simulated state</span></a>
+  </div>
+</section>
+
+<!-- ============ Why the framework matters: direct calls vs DataFarm ============ -->
+<section class="sec deep" id="contrast">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="kicker">Why the framework matters</span>
+      <h2>Video model alone vs. inside DataFarm</h2>
+      <p>The same simulated episode, the same video model. Called directly, it gets the look but not the episode: extra cups, a misplaced arm, views that disagree. Inside DataFarm, every view stays consistent with the others and with the simulation.</p>
+    </div>
+    <div class="trials-head rv">
+      <div class="tabs" data-group="views" role="tablist" aria-label="Task">
+        <button data-task="drawer">Pull drawer</button><button data-task="cups">Stack cups</button>
+      </div>
+      <span class="fine" style="margin:0">Synchronized, real time. Head camera on top, wrist cameras below.</span>
+    </div>
+    <div class="badges rv">
+      <div class="badge"><em>SIM</em><span>Simulation: the action labels</span></div>
+      <div class="badge base"><em>BASELINE</em><span>Direct call, all cameras on one canvas</span></div>
+      <div class="badge base"><em>BASELINE</em><span>Direct call, each camera separately</span></div>
+      <div class="badge ours"><em>OURS</em><span>Rendered inside DataFarm</span></div>
+    </div>
+    <div class="views-stage media rv">
+      <video id="views-src" muted playsinline loop preload="auto" poster="static/videos/views_drawer.jpg"><source src="static/videos/views_drawer.mp4" type="video/mp4"></video>
+      <canvas id="views-canvas" width="1920" height="404"></canvas>
+      <div class="views-frames" aria-hidden="true"><div></div><div class="no"></div><div class="no"></div><div class="ok"></div></div>
+    </div>
+    <div class="views-note rv"><i class="fas fa-info-circle"></i><span id="views-note"></span></div>
+
+    <div class="contrast-row">
+      <div class="prose rv">
+        <h3>What DataFarm adds to the video model</h3>
+        <p><b>Structure from the simulator, appearance from the real cameras.</b> Edge maps of the untextured simulator video fix arm pose, object positions, and timing; real reference frames and a picture of the robot supply only the look.</p>
+        <p><b>All cameras in one generation.</b> Head and wrist views are tiled on one canvas and generated as one video, so they share lighting and materials and agree on which objects exist and what each gripper holds.</p>
+        <p><b>References and prompts that add no content,</b> and <b>long episodes without drift</b>: references match the simulated task state, prompts describe only the current segment, and long episodes are generated as independent chunks and joined where neighbouring chunks differ least.</p>
+      </div>
+      <div class="tcard rv">
+        <table class="tbl">
+          <thead><tr><th>Renderer</th><th>Motion&nbsp;&uarr;</th><th>Structure&nbsp;&uarr;</th><th>Jumps&nbsp;&darr;</th></tr></thead>
+          <tbody>
+            <tr><td>Direct call, one canvas</td><td>0.07</td><td>0.16</td><td>11.2</td></tr>
+            <tr><td>Direct call, each camera</td><td>0.04</td><td>0.10</td><td>8.8</td></tr>
+            <tr><td>Edge control only</td><td>0.50</td><td>0.54</td><td>30.2</td></tr>
+            <tr><td>DataFarm, each camera<sup>&dagger;</sup></td><td>0.55</td><td>0.64</td><td>40.6</td></tr>
+            <tr class="us"><td>DataFarm</td><td>0.74</td><td>0.85</td><td>2.9</td></tr>
+          </tbody>
+        </table>
+        <p class="fine">Correlation of each view with the simulator video, in frame-difference energy (motion) and image gradients (structure); jumps per 1,000 frames. Means over stack cups, weigh apple, and pull drawer. <sup>&dagger;</sup>Stack cups only; DataFarm on that episode: 0.75, 0.87, 4.2.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ The problem, and the idea ============ -->
+<section class="sec" id="idea">
+  <div class="wrap">
+    <div class="problem">
+      <div class="media rv"><video muted playsinline loop autoplay preload="metadata" poster="static/demo/problem_real.jpg"><source src="static/demo/problem_real.mp4" type="video/mp4"></video></div>
+      <div class="rv">
+        <span class="kicker">The problem</span>
+        <div class="sec-head" style="margin-bottom:22px"><h2>Robot data is still collected one episode at a time</h2></div>
+        <ul>
+          <li>Each episode needs a robot, an operator, and a reset.</li>
+          <li>Every new task, layout, or scene starts the collection over.</li>
+          <li>The cost grows with every episode you record.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="idea">
+      <div class="sec-head center rv">
+        <span class="kicker">DataFarm</span>
+        <h2>A coding agent takes the teleoperator's place</h2>
+        <p>It does not drive the robot: it compiles the task into a simulation and a render contract, and the farm produces every further episode.</p>
+      </div>
+      <div class="steps">
+        <div class="step rv"><div class="step-media"><img src="static/demo/calib.jpg" alt="Calibration episode" loading="lazy"></div>
+          <div class="step-t"><span>01</span><b>Calibrate</b></div>
+          <p>One calibration episode: a short recording of the robot in the target scene, plus a request such as "100 episodes of this task". None of its actions are reused.</p></div>
+        <div class="step rv"><div class="step-media"><video muted playsinline loop autoplay preload="metadata"><source src="static/demo/idea_sim.mp4" type="video/mp4"></video></div>
+          <div class="step-t"><span>02</span><b>Simulate</b></div>
+          <p>The agent fits cameras and scene, qualifies the simulator, and writes an expert against a judge it cannot see; the simulator fixes actions, states, and contacts.</p></div>
+        <div class="step rv"><div class="step-media"><video muted playsinline loop autoplay preload="metadata"><source src="static/demo/idea_ren.mp4" type="video/mp4"></video></div>
+          <div class="step-t"><span>03</span><b>Render</b></div>
+          <p>A video model conditioned on real frames renders every rollout as photographic video, all cameras in one generation.</p></div>
+        <div class="step rv"><div class="step-media"><video muted playsinline loop autoplay preload="metadata"><source src="static/demo/idea_ren.mp4" type="video/mp4"></video><span class="chip green"><i class="fas fa-check"></i> admitted</span></div>
+          <div class="step-t"><span>04</span><b>Admit</b></div>
+          <p>Machine checks and an independent reviewer compare every render with its simulated state; only episodes that agree enter the dataset.</p></div>
+      </div>
+      <div class="duo rv"><span class="a">Actions from the simulator</span><span class="b">Appearance from the real world</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Part one ============ -->
+<div class="part sec alt" style="padding-bottom:0"><span class="part-n">Part one</span><h2>From simulation to photograph</h2></div>
+
+<section class="sec alt" id="photo" style="padding-top:48px">
+  <div class="wrap">
+    <div class="wipe-layout">
+      <div class="wipe-side rv">
+        <span class="kicker">Five tasks</span>
+        <div class="sec-head" style="margin-bottom:18px"><h2 style="font-size:30px">Same rollout, real look</h2></div>
+        <div class="tabs" data-group="wipe" role="tablist" aria-label="Task">
+          <button data-task="cups">Stack cups</button><button data-task="apple">Weigh apple</button><button data-task="drum">Beat drum</button><button data-task="drawer">Pull drawer</button><button data-task="towel">Fold towel</button>
+        </div>
+        <p class="wipe-line" id="wipe-line"></p>
+      </div>
+      <div class="rv">
+        <div class="wipe" id="wipe" tabindex="0" role="slider" aria-label="Drag to compare the simulator rollout with the DataFarm episode" aria-valuemin="0" aria-valuemax="100" aria-valuenow="50">
+          <video id="wipe-src" muted playsinline loop preload="auto" poster="static/videos/gen_cups.jpg"><source src="static/videos/gen_cups.mp4" type="video/mp4"></video>
+          <canvas id="wipe-canvas" width="960" height="540"></canvas>
+          <span class="chip grey wipe-tag l">Simulator</span>
+          <span class="chip red wipe-tag r">DataFarm</span>
+          <span class="chip wipe-speed" id="wipe-speed" hidden></span>
+          <div class="wipe-handle" aria-hidden="true"><span><i class="fas fa-arrows-alt-h"></i></span></div>
+        </div>
+        <p class="fine">Drag across the video. Left of the handle: the simulator rollout; right: the farm episode rendered from it, frame by frame.</p>
+      </div>
+    </div>
+
+    <div style="margin-top:110px">
+      <div class="sec-head rv">
+        <span class="kicker">Close-up</span>
+        <h2>Texture the simulator cannot draw</h2>
+        <p>The simulator models the geometry and contacts the physics needs; the look of a lit display or a woven towel comes from the calibration episode, set once per task by a render contract costing $4.1&ndash;6.2.</p>
+      </div>
+      <div class="closeups rv" id="closeups">
+        <span class="cu-head blank"></span><span class="cu-head">Simulator</span><span class="cu-head">Real camera</span><span class="cu-head">DataFarm</span>
+        <div class="cu-label">Scale display</div>
+        <div class="cu" style="--s:3.2;--tx:-31.25%;--ty:-52.08%"><img src="static/demo/q_scale_sim.jpg" alt="Simulator: flat scale display" loading="lazy"><span class="chip">Simulator</span></div>
+        <div class="cu" style="--s:3.2;--tx:-31.25%;--ty:-51.39%"><img src="static/demo/q_scale_real.jpg" alt="Real camera: lit scale display" loading="lazy"><span class="chip">Real camera</span></div>
+        <div class="cu ours" style="--s:3.2;--tx:-31.25%;--ty:-52.08%"><img src="static/demo/q_scale_ours.jpg" alt="DataFarm: lit scale display" loading="lazy"><span class="chip red">DataFarm</span></div>
+        <div class="cu-label">Towel</div>
+        <div class="cu" style="--s:2.2857;--tx:-31.64%;--ty:-24.31%"><img src="static/demo/q_towel_sim.jpg" alt="Simulator: smooth particle cloth" loading="lazy"><span class="chip">Simulator</span></div>
+        <div class="cu" style="--s:2;--tx:-25.78%;--ty:-33.33%"><img src="static/demo/q_towel_real.jpg" alt="Real camera: towel weave" loading="lazy"><span class="chip">Real camera</span></div>
+        <div class="cu ours" style="--s:2.2857;--tx:-31.64%;--ty:-24.31%"><img src="static/demo/q_towel_ours.jpg" alt="DataFarm: towel weave" loading="lazy"><span class="chip red">DataFarm</span></div>
+      </div>
+      <p class="fine rv">Real frames come from a recording at the same task phase, not the same frame.</p>
+    </div>
+
+    <div class="scale-row" style="margin-top:110px">
+      <div class="rv">
+        <span class="kicker">Scale without a robot</span>
+        <div class="big-num">1 &rarr; 100</div>
+        <div class="sec-head" style="margin:14px 0 0"><h2 style="font-size:30px">One calibration episode, one hundred farm episodes</h2>
+          <p>Nine stack-cups farm episodes, each a different simulated rollout with its own layout. Once the task is compiled, every further episode needs no robot and no operator.</p></div>
+      </div>
+      <div class="media rv"><video muted playsinline loop autoplay preload="metadata" poster="static/demo/grid9.jpg"><source src="static/demo/grid9.mp4" type="video/mp4"></video><span class="chip" style="position:absolute;right:12px;top:12px">2.5&times; speed</span></div>
+    </div>
+
+    <div style="margin-top:110px">
+      <div class="sec-head rv">
+        <span class="kicker">Appearance on demand</span>
+        <h2>New appearance, same motion</h2>
+        <p>A new tabletop or light only changes the render request; the simulated motion stays the same. Teleoperation would have to restage the scene for each one.</p>
+      </div>
+      <div class="req rv"><i class="fas fa-terminal"></i><span>render --appearance "<span class="typed" id="typed"></span><span class="caret"></span>"</span></div>
+      <div class="ood-grid">
+        <figure class="ood rv"><div class="media"><video muted playsinline loop autoplay preload="metadata" poster="static/videos/ood_lamp.jpg"><source src="static/videos/ood_lamp.mp4" type="video/mp4"></video></div>
+          <figcaption><b>Warm lamp light</b><span>Pull drawer &middot; 2&times;</span></figcaption></figure>
+        <figure class="ood rv"><div class="media"><video muted playsinline loop autoplay preload="metadata" poster="static/videos/ood_felt.jpg"><source src="static/videos/ood_felt.mp4" type="video/mp4"></video></div>
+          <figcaption><b>Blue felt</b><span>Stack cups &middot; 2.4&times;</span></figcaption></figure>
+        <figure class="ood rv"><div class="media"><video muted playsinline loop autoplay preload="metadata" poster="static/videos/ood_marble.jpg"><source src="static/videos/ood_marble.mp4" type="video/mp4"></video></div>
+          <figcaption><b>Marble table</b><span>Beat drum &middot; 1.5&times;</span></figcaption></figure>
+        <figure class="ood rv"><div class="media"><video muted playsinline loop autoplay preload="metadata" poster="static/videos/ood_steel.jpg"><source src="static/videos/ood_steel.mp4" type="video/mp4"></video></div>
+          <figcaption><b>Brushed steel</b><span>Weigh apple &middot; 1&times;</span></figcaption></figure>
+      </div>
+      <p class="fine rv">Inset: the simulator video of the same rollout.</p>
+    </div>
+
+    <div style="margin-top:110px">
+      <div class="sec-head rv">
+        <span class="kicker">Independent admission</span>
+        <h2>Nothing enters the dataset on the agent's word</h2>
+        <p>A generated video can look right and still contradict its labels. Machine checks and an independent reviewer compare every render with its simulated state, and reject failures like these.</p>
+      </div>
+      <div class="cases">
+        <div class="case rv"><h3>Phantom arm</h3><p>An arm the simulator does not contain.</p>
+          <div class="pair"><div><img src="static/demo/b_phantom_sim.jpg" alt="Simulator frame" loading="lazy"><span class="chip">simulator</span></div>
+            <div class="rej"><img src="static/demo/b_phantom_gen.jpg" alt="Rejected render with an extra arm" loading="lazy"><span class="chip red"><i class="fas fa-times"></i> render: rejected</span></div></div></div>
+        <div class="case rv"><h3>Future state drawn early</h3><p>The block is in the drawer before the simulator puts it there.</p>
+          <div class="pair"><div><img src="static/demo/b_future_sim.jpg" alt="Simulator frame" loading="lazy"><span class="chip">simulator</span></div>
+            <div class="rej"><img src="static/demo/b_future_gen.jpg" alt="Rejected render with the block already in the drawer" loading="lazy"><span class="chip red"><i class="fas fa-times"></i> render: rejected</span></div></div></div>
+        <div class="case rv"><h3>Invented cloth</h3><p>A wrist view adds towel where the simulation is empty.</p>
+          <div class="pair"><div><img src="static/demo/b_invent_sim_f5.jpg" alt="Simulator frame" loading="lazy"><span class="chip">simulator</span></div>
+            <div class="rej"><img src="static/demo/b_invent_gen_f5.jpg" alt="Rejected render with invented cloth" loading="lazy"><span class="chip red"><i class="fas fa-times"></i> render: rejected</span></div></div></div>
+      </div>
+    </div>
+
+    <div class="evidence">
+      <div class="rv">
+        <figure class="paper-fig"><img src="static/images/data_comparison.jpg" alt="Real, simulator, Sim + DR, and farm frames for five tasks" loading="lazy" width="2400" height="1111"></figure>
+        <p class="cap"><b>Closer to the real cameras.</b> Kernel distance of head-view frames to real camera frames (KID &times;10<sup>3</sup>): <b>0.83&ndash;0.88</b> for farm episodes, against 1.93 for the simulator and 2.50 with domain randomization (Sim + DR). The farm is closer than the simulator on every task.</p>
+      </div>
+      <div class="rv">
+        <figure class="paper-fig"><img src="static/images/flow.jpg" alt="Optical-flow error and agreement between renders and the simulator video, per task" loading="lazy" width="2400" height="1209"></figure>
+        <p class="cap"><b>The simulated motion is kept.</b> Farm renders deviate from the simulator's optical flow by 4.4 pixels and agree on 65% of moving pixels, close to Sim + DR (3.4, 73%), which has exactly the simulated motion; paired with the simulator video half a second later they reach 8.8 pixels and 41%.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Part two: real robot ============ -->
+<div class="part sec" style="padding-bottom:0"><span class="part-n">Part two</span><h2>Does farm data work on a real robot?</h2></div>
+
+<section class="sec" id="results" style="padding-top:48px">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="kicker">Real robot &middot; unseen tablecloth and coloured light</span>
+      <h2>Real-ready: trained only on farm data, run directly on the robot</h2>
+      <p>&pi;<sub>0.5</sub> policies trained on 100 episodes from each source, 20 trials per task and condition, on a dual-arm PiPER robot. Neither training set contains the test tablecloth or the light.</p>
+    </div>
+    <div class="trials-head rv">
+      <div class="tabs" data-group="real" role="tablist" aria-label="Task">
+        <button data-task="cups">Stack cups</button><button data-task="apple">Weigh apple</button><button data-task="drum">Beat drum</button><button data-task="drawer">Pull drawer</button><button data-task="towel">Fold towel</button>
+      </div>
+      <span class="fine" style="margin:0">Real time, no cuts within a clip.</span>
+    </div>
+    <div class="trial-grid rv">
+      <figure class="trial teleop">
+        <div class="trial-label"><i class="fas fa-gamepad"></i> Trained on teleoperation <span class="score" id="real-teleop-score"></span></div>
+        <div class="media"><video id="real-teleop" muted playsinline loop autoplay preload="metadata" poster="static/videos/real_cups_teleop.jpg"><source src="static/videos/real_cups_teleop.mp4" type="video/mp4"></video>
+          <span class="chip grey verdict"><i class="fas fa-times"></i> fails</span></div>
+      </figure>
+      <figure class="trial ours">
+        <div class="trial-label"><i class="fas fa-seedling"></i> Trained only on DataFarm data <span class="score" id="real-ours-score"></span></div>
+        <div class="media"><video id="real-ours" muted playsinline loop autoplay preload="metadata" poster="static/videos/real_cups_ours.jpg"><source src="static/videos/real_cups_ours.mp4" type="video/mp4"></video>
+          <span class="chip red verdict"><i class="fas fa-check"></i> succeeds</span></div>
+      </figure>
+    </div>
+
+    <div class="result-big">
+      <div class="rb rv"><span class="rb-k">Original scene &middot; 100 trials</span><div class="rb-v"><b>93</b><span class="vs">84</span><span>DataFarm vs. teleoperation &middot; Sim + DR 26</span></div></div>
+      <div class="rb hot rv"><span class="rb-k">Unseen tablecloth + light &middot; 100 trials</span><div class="rb-v"><b>87</b><span class="vs">46</span><span>DataFarm vs. teleoperation &middot; Sim + DR 21</span></div></div>
+    </div>
+
+    <div class="chart-card rv">
+      <div class="card-head">
+        <div class="seg" role="tablist" aria-label="Test condition">
+          <button class="seg-btn" data-cond="ood" role="tab">Unseen tablecloth + coloured light</button>
+          <button class="seg-btn" data-cond="id" role="tab">Original scene</button>
+        </div>
+        <div class="legend"><span class="sw teleop"></span>Teleop data<span class="sw simdr"></span>Sim + DR<span class="sw ours"></span>DataFarm (ours)</div>
+      </div>
+      <div id="rr-chart" class="chart" aria-label="Successes per task"></div>
+      <p class="fine" id="rr-note"></p>
+    </div>
+
+    <div class="cols-2 prose rv">
+      <p><b>On par in the original scene, far ahead under unseen appearance.</b> Farm-trained policies match or exceed teleoperated data on four of five tasks in the original scene. Under the unseen tablecloth and light, they lead on every task, by 11, 6, 12, 7, and 5 of 20 trials.</p>
+      <p><b>Rendering with real images is what transfers.</b> Sim + DR shares the grounding, the expert, and the actions with DataFarm and differs only in how the frames are produced. The farm varies surfaces and lighting around fixed, exact trajectories, so the policy cannot rely on how the table looks.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Cost ============ -->
+<section class="sec alt" id="cost">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="kicker">Cost</span>
+      <h2>Pay once per task, then only per episode</h2>
+      <p>The farm pays once to adapt a task, with no person in the loop, then only for simulating, rendering, and reviewing each episode; a new appearance is a text change. The farm's figures below count only published or measured inputs; the teleoperation figures are labour in North America and a quote from China.</p>
+    </div>
+    <div class="cost-cards">
+      <div class="cc rv"><span class="cc-k">One-time, per task</span><span class="cc-v">$21</span><span class="cc-t">mean agent cost to adapt a task ($10&ndash;37 over five tasks), plus $5 for a render contract</span></div>
+      <div class="cc rv"><span class="cc-k">Per farm episode</span><span class="cc-v">$0.80</span><span class="cc-t">mean marginal cost of an admitted episode ($0.26&ndash;1.41): simulation, rendering, re-rendering, review</span></div>
+      <div class="cc rv"><span class="cc-k">Average at 100 episodes</span><span class="cc-v">$1.06</span><span class="cc-t">per episode, one-time and contract costs included ($0.49&ndash;1.84 over five tasks); $0.83 at 1,000. One hour of three-view data per task: $107, against a $117 quote in China and $290* of labour in North America</span></div>
+      <div class="cc rv"><span class="cc-k">New appearance</span><span class="cc-v">+$0</span><span class="cc-t">a new tablecloth or light is a text change in the render request: same cost per episode</span></div>
+    </div>
+    <div class="cost-row">
+      <div class="cost-chart rv" id="cost-chart"><div class="cost-read" id="cost-read"></div></div>
+      <div class="tcard rv">
+        <table class="tbl">
+          <thead><tr><th>Task</th><th>One-time</th><th>Contract</th><th>Farm / ep.</th><th>Avg. / ep.<br>N=100</th><th>Avg. / ep.<br>N=1,000</th><th>Per hour<br>1 h / task</th></tr></thead>
+          <tbody>
+            <tr><td>Stack cups</td><td>18.22</td><td>6.11</td><td>0.93</td><td>1.17</td><td>0.96</td><td>101</td></tr>
+            <tr><td>Weigh apple</td><td>10.33</td><td>4.72</td><td>0.89</td><td>1.04</td><td>0.91</td><td>117</td></tr>
+            <tr><td>Beat drum</td><td>19.25</td><td>4.11</td><td>0.26</td><td>0.49</td><td>0.28</td><td>106</td></tr>
+            <tr><td>Pull drawer</td><td>19.40</td><td>4.49</td><td>0.52</td><td>0.76</td><td>0.54</td><td>79</td></tr>
+            <tr><td>Fold towel</td><td>37.38</td><td>6.23</td><td>1.41</td><td>1.84</td><td>1.45</td><td>132</td></tr>
+            <tr class="us"><td>Mean</td><td>20.92</td><td>5.13</td><td>0.80</td><td>1.06</td><td>0.83</td><td>107</td></tr>
+            <tr><td>Teleop., N. America*</td><td>&ndash;</td><td>&ndash;</td><td>2.86</td><td>2.86</td><td>2.86</td><td>290</td></tr>
+            <tr><td>Teleop., China, quote</td><td>&ndash;</td><td>&ndash;</td><td>1.16</td><td>1.16</td><td>1.16</td><td>117</td></tr>
+          </tbody>
+        </table>
+        <p class="fine">USD. One-time: agent cost from the calibration episode to five admitted simulated episodes, at standard API pricing, with Claude Opus 5.5 in SoL-Pi, and in Claude Code on fold towel. Contract: the render contract. Farm / ep.: rollouts and audit, H3 rendering on rented GPUs, re-rendering of flagged chunks, and independent review per admitted episode. Avg. / ep.: one-time and contract costs spread over N episodes plus the per-episode cost; it falls towards the per-episode cost. Per hour, 1 h / task: the cost of collecting one hour of synchronized three-view data for a task, one-time and contract costs included. Teleop., N. America: *estimated with Claude Opus 5.5, the labour of teleoperated collection (operator, supervision and review, post-processing; no robot, venue, or setup), $190&ndash;520 per usable hour across our assumptions. Teleop., China: a full-service quote for custom data, about RMB 800 per hour. Both per episode at the farm's mean length.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Paper details ============ -->
+<section class="sec" id="details">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="kicker">The paper</span>
+      <h2>Certification is kept apart from production</h2>
+      <p>Because agents write both the expert and its checks, and the video model may alter the scene, every stage is checked by a component other than its producer.</p>
+    </div>
+    <ol class="mini-steps">
+      <li class="rv"><b>Grounding and simulator qualification.</b> The agent fits the cameras and metric scale, estimates object geometry and articulation, and labels each quantity as measured, fitted, assumed, or unknown; short probes check that the simulator can reproduce the skills the task requires.</li>
+      <li class="rv"><b>Task contract and expert.</b> The expert is developed against a judge it cannot inspect and admitted only on held-out initial states; every admitted trajectory is one continuous execution.</li>
+      <li class="rv"><b>Rendering with real images.</b> The renderer may alter appearance but not geometry, objects, or timing; all cameras are generated together from the simulator's structure.</li>
+      <li class="rv"><b>Verification and admission.</b> Every rendered episode is compared with its simulated state by machine checks and an independent reviewer; all attempts and failures are kept.</li>
+    </ol>
+    <figure class="paper-fig mfig rv"><img src="static/images/teaser.jpg" alt="What the farm delivers" loading="lazy" width="2400" height="1132"></figure>
+    <p class="cap rv" style="margin-top:-16px;margin-bottom:34px"><b>What the farm delivers.</b> (a) The same frame of a simulator rollout and of the farm episode for each task. (b) From a request and one calibration episode, the agent builds the task in simulation, and the video model renders each rollout in the original scene or a scene described by text. (c) Real-robot successes. (d) Mean costs over the five tasks.</p>
+    <figure class="paper-fig mfig rv"><img src="static/images/method.jpg" alt="The DataFarm pipeline on one drawer episode" loading="lazy" width="2400" height="714"></figure>
+    <p class="cap rv" style="margin-top:-16px;margin-bottom:34px"><b>The DataFarm pipeline, followed on one drawer episode.</b> The capability layer is shared by all tasks; everything above it is written for this task.</p>
+    <figure class="paper-fig mfig rv"><img src="static/images/views.jpg" alt="The same simulated frame rendered by direct calls and by DataFarm, with contradictions boxed" loading="lazy" width="2400" height="1152"></figure>
+    <p class="cap rv" style="margin-top:-16px;margin-bottom:34px"><b>Following the simulation in every view.</b> Red boxes mark views that contradict the simulator or the other views of the same frame.</p>
+    <details class="abstract rv">
+      <summary>Abstract</summary>
+      <p>Teleoperation remains the default way to collect robot demonstrations, but every episode costs robot and operator time, and every new task starts from scratch. We ask whether a coding agent can take over the teleoperator's job. In our DataFarm, the agent receives a data request and one calibration episode of the robot in the target scene and rebuilds the task in simulation: it writes the scene, an expert controller, and a success judge. The simulator supplies exact actions, and a video model conditioned on real images renders each rollout as photographic video, generating all camera views together consistently. The output is real-ready data: synchronized camera views labelled with the robot's actions, on which a policy can be trained directly and deployed on the real robot. Independent judges certify the expert and every rendered episode before admission. On five real-robot tasks, policies trained only on farm data match policies trained on as many teleoperated episodes (93 vs. 84 successes in 100 trials), and under an unseen tablecloth and coloured light they keep 87 successes where the teleoperation-trained policies fall to 46. Adapting a task is fully automatic and costs $21 of API usage on average, paid once per task, plus $5 for a render contract; every further episode costs $0.80 on average for simulation, rendering, and review, with no robot or operator. One hour of three-view data for a task costs $107 on average, these costs included, slightly below a quote of $117 for teleoperation in China and below $290 in labour alone in North America.</p>
+    </details>
+  </div>
+</section>
+
+<section class="sec alt" id="bibtex">
+  <div class="wrap narrow">
+    <div class="bib-head"><h2>BibTeX</h2><button class="pill copy" id="copy-bib" type="button"><i class="fas fa-copy"></i><span>Copy</span></button></div>
+    <pre id="bibtex-code"><code>@article{zhang2026datafarm,
+  title={PyRUA-DataFarm: LLM Agent as a Cost-Efficient Teleoperator for Real-Ready Robot Data},
+  author={Zhang, Kewei and Ma, Juncheng and Lv, Guodong and Wang, Duomin and Ruan, Feixiang and Si, Ruiyang and Zhang, Chuanrui and Chen, Yuxuan and Chen, Hao and Liu, Yichen and Zhang, Yintianrun and Deng, Yufan and Xie, Enze and Zhou, Daquan},
+  journal={arXiv preprint},
+  year={2026}
+}</code></pre>
+  </div>
+</section>
+
+<section class="closing">
+  <div class="wordmark"><span class="wm-py">PyRUA</span><span class="wm-dash">-</span><span class="wm-farm">DataFarm</span></div>
+  <p>One calibration episode in. Real-ready robot data out.</p>
+</section>
+
+<script type="application/json" id="site-data">{
+  "tasks": ["Stack cups", "Weigh apple", "Beat drum", "Pull drawer", "Fold towel", "Total"],
+  "keys": ["cups", "apple", "drum", "drawer", "towel"],
+  "id":  {"teleop": [19, 16, 17, 17, 15, 84], "simdr": [5, 0, 7, 8, 6, 26], "ours": [18, 20, 20, 19, 16, 93], "n": [20, 20, 20, 20, 20, 100],
+          "note": "Original scene: DataFarm 93, teleop data 84, Sim + DR 26 successes in 100 trials."},
+  "ood": {"teleop": [6, 12, 8, 11, 9, 46], "simdr": [4, 0, 7, 6, 4, 21], "ours": [17, 18, 20, 18, 14, 87], "n": [20, 20, 20, 20, 20, 100],
+          "note": "Unseen tablecloth and coloured light: DataFarm 87, teleop data 46, Sim + DR 21 successes in 100 trials."},
+  "wipe": {
+    "cups":   {"line": "Stack cups. Arm pose, cups, and timing follow the simulator; the look comes from the real scene.", "speed": ""},
+    "apple":  {"line": "Weigh apple. The scale gets a real lit display, and the apple moves exactly as simulated. Rendered on a new tabletop.", "speed": "2×"},
+    "drum":   {"line": "Beat drum. Every strike lands where, and when, the simulator puts it. Rendered on a marble table.", "speed": "1.5×"},
+    "drawer": {"line": "Pull drawer. The cabinet takes on its real material, and the block drops in on the simulated schedule.", "speed": ""},
+    "towel":  {"line": "Fold towel. The simulator models how the cloth moves; the renderer gives it the texture of the real towel.", "speed": ""}
+  },
+  "views": {
+    "drawer": "The simulator has already placed the block in the open top drawer. Both direct calls still show it on the table with the drawers closed, and their wrist views show the arms from outside. DataFarm shows the block in the drawer in every view.",
+    "cups": "Two cups are stacked and one is still to be placed. Called directly on one canvas, the video model shows a finished stack and cups lying on their side; per camera, extra grippers and other stacks appear. DataFarm agrees with the simulator in every view."
+  },
+  "appearance": ["light-wood table, warm lamp light", "blue felt, cool light", "marble table", "brushed steel"],
+  "cost": {"adapt": [24.33, 15.05, 23.36, 23.89, 43.61], "m": [0.93, 0.89, 0.26, 0.52, 1.41], "nmin": 10, "nmax": 1000, "teleop": 2.86, "teleopCn": 1.16}
+}</script>
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    <span class="bar-brand small"><span class="wm-py">PyRUA</span><span class="wm-dash">-</span><span class="wm-farm">DataFarm</span></span>
+    <span>Peking University &middot; NVIDIA &middot; 2026</span>
+  </div>
+</footer>
+<button class="to-top" id="to-top" type="button" aria-label="Back to top"><i class="fas fa-chevron-up"></i></button>
+</body>
+</html>
