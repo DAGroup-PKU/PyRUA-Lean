@@ -3,7 +3,7 @@
 ![PyRUA-Lean: Python for Lean Robot-Use Agents](../assets/logo-dark.svg#only-dark){ width="60%" }
 </div>
 
-# Fewer Tokens, Better Action: GPT-6 Astra Robot Agents with 14% Higher Success Rate but 65% Fewer Tokens
+<p align="center"><b>Fewer Tokens, Better Action: GPT-6 Astra Robot Agents with 14% Higher Success Rate but 65% Fewer Tokens</b></p>
 
 <p align="center">
   <a href="https://dagroup-pku.github.io/PyRUA-Lean/"><img src="https://img.shields.io/badge/Project-Page-8C0000.svg" alt="Project page"></a>
