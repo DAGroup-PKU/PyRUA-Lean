@@ -295,7 +295,10 @@ note lists what its component does not guarantee, for example:
   author = {Zhang, Kewei and Ma, Juncheng and Lv, Guodong and Wang, Duomin and Ruan, Feixiang and Si, Ruiyang and
             Zhang, Chuanrui and Chen, Yuxuan and Chen, Hao and Liu, Yichen and Zhang, Yintianrun and Deng, Yufan and
             Xie, Enze and Zhou, Daquan},
-  year   = {2026}
+  year   = {2026},
+  eprint = {2611.05320},
+  archivePrefix = {arXiv},
+  url    = {https://arxiv.org/abs/2611.05320}
 }
 ```
 
