@@ -59,22 +59,17 @@ export const MEDIA = {
       "property": "Precision \u00b7 long-horizon",
       "poster": "assets/tasks/tower-of-hanoi.png",
       "sources": [
-        "native8x/hanoi/adaptive.m3u8",
+        "media/hanoi-full-v2/index.m3u8",
         null,
         null
       ],
-      "videoPoster": "media/hanoi-full-poster.jpg?v=16",
+      "videoPoster": "media/hanoi-full-v2/poster.jpg",
       "trace": null,
-      "recordingNote": "Complete recording \u00b7 Original framing",
+      "recordingNote": "Stacking then unstacking \u00b7 8x \u00b7 Full scene",
       "cameraNames": [
         "FULL VIEW",
         "LEFT WRIST",
         "RIGHT WRIST"
-      ],
-      "originalSources": [
-        "media/streams/hanoi/index.m3u8?v=15",
-        null,
-        null
       ],
       "playbackRate": 1,
       "timelineScale": 8
