@@ -31,14 +31,14 @@ export function mountCinematic(root, items = [], reel = []) {
   }
   on(heroes[0].video,'playing',warmNext);
   if(!heroes[0].video.paused&&heroes[0].video.readyState>=3)warmNext();
-  function play(entry,allowed){
-    if(!allowed){entry.video.pause();entry.video.preload='none';return;}
+  function play(entry,allowed,warm=false){
+    if(!allowed){entry.video.pause();entry.video.preload=warm?'auto':'none';return;}
     if(!entry.video.paused||entry.pending)return;
     entry.pending=true;Promise.resolve(entry.video.play()).catch(error=>{if(heroes.includes(entry)&&error.name==='NotAllowedError')playback.hidden=false;}).finally(()=>{entry.pending=false;if(destroyed||paused||!visible||doc.hidden)entry.video.pause();});
   }
   function sync(){
     const enabled=!destroyed&&!paused&&visible&&!doc.hidden;
-    heroes.forEach((e,i)=>play(e,enabled&&(i===active||fading)));
+    heroes.forEach((e,i)=>play(e,enabled&&(i===active||fading),enabled&&nextWarmed));
     entries.forEach(e=>play(e,enabled&&progress>0));
     root.dataset.motion=paused?'paused':'playing';
   }

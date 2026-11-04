@@ -70,7 +70,7 @@ export function mountGallery(root, media){
       sync(card);
       }else{card.hlsNeeded=false;sync(card);}
       };
-      const playButton=make('button','gallery-play','Play');playButton.type='button';playButton.setAttribute('aria-label',`Play ${item.title}`);card.playButton=playButton;frame.append(playButton);playButton.addEventListener('click',()=>{paused=false;card.userPaused=false;selectedCard=card;card.retries=0;delete frame.dataset.streamError;if(card.hls&&video.error)card.hls.recoverMediaError();else if(!card.hls&&video.error)video.load();updateMotion();});
+      const playButton=make('button','gallery-play','Play');playButton.hidden=true;playButton.type='button';playButton.setAttribute('aria-label',`Play ${item.title}`);card.playButton=playButton;frame.append(playButton);playButton.addEventListener('click',()=>{paused=false;card.userPaused=false;selectedCard=card;card.retries=0;delete frame.dataset.streamError;if(card.hls&&video.error)card.hls.recoverMediaError();else if(!card.hls&&video.error)video.load();updateMotion();});
       video.addEventListener('progress',updateMotion);
       video.addEventListener('playing',()=>{card.retries=0;delete frame.dataset.streamError;playButton.hidden=true;});
       const expand=make('button','gallery-expand','⛶');expand.type='button';expand.setAttribute('aria-label',`Expand ${item.title}`);frame.append(expand);
