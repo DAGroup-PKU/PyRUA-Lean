@@ -1,0 +1,20 @@
+{
+  "sources": [
+    {
+      "file": "hanoi_stack.mp4",
+      "duration_seconds": 370.933333
+    },
+    {
+      "file": "hanoi_unstack.mp4",
+      "duration_seconds": 544.366667
+    }
+  ],
+  "order": [
+    "stack",
+    "unstack"
+  ],
+  "speed": 8,
+  "join_playback_seconds": 46.366666625,
+  "framing": "full original 1280x720; no crop",
+  "code_alignment": "phase-linked reference, not per-instruction log alignment"
+}
