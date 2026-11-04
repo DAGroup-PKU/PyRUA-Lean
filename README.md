@@ -7,6 +7,7 @@ Yuxuan Chen<sup>1</sup>, Hao Chen<sup>1</sup>, Yichen Liu<sup>1</sup>, Yintianru
 
 <sup>1</sup>Peking University &nbsp; <sup>2</sup>NVIDIA &nbsp; <sup>*</sup>Equal contribution &nbsp; <sup>†</sup>Project lead
 
+[![arXiv](https://img.shields.io/badge/arXiv-2611.05320-b31b1b.svg)](https://arxiv.org/abs/2611.05320)
 [![Project page](https://img.shields.io/badge/project-page-8b1515.svg)](https://xiwen1.github.io/PyRUA-DataFarm/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](pyproject.toml)

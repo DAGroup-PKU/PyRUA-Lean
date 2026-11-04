@@ -66,3 +66,7 @@ preferred-citation:
       family-names: Xie
     - given-names: Daquan
       family-names: Zhou
+  url: "https://arxiv.org/abs/2611.05320"
+  identifiers:
+    - type: other
+      value: "arXiv:2611.05320"
