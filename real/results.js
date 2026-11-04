@@ -1,4 +1,4 @@
-import {leaderboardMarkup, mountLeaderboard} from './leaderboard.js?v=18';
+import {leaderboardMarkup, mountLeaderboard} from './leaderboard.js?v=19';
 import {RESULT_DATA as DATA} from './results-data.js?v=20';
 import {mountPaperCharts} from './paper-charts.js';
 

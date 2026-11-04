@@ -6,7 +6,7 @@ export const LEADERBOARD = {
   "selection": "Top three across all entries by Average SR (also the top three by Score); highest pure WAM and VLA entries; GPT-6-Astra. Deduplicated.",
   "models": [
     {
-      "name": "PyRUA-RSI (ours)",
+      "name": "PyRUA-REAL (ours)",
       "kind": "ours",
       "tag": "Fixed programs \u00b7 seed 0",
       "values": {

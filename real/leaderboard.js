@@ -1,10 +1,10 @@
-import {LEADERBOARD} from './leaderboard-data.js?v=18';
+import {LEADERBOARD} from './leaderboard-data.js?v=19';
 const dimensions=[['average','Average'],['generalization','Generalization'],['precision','Precision'],['longHorizon','Long-Horizon'],['memory','Memory'],['open','Open']];
 const display=value=>value.toFixed(2);
 export function leaderboardMarkup(){
   return `<div class="lb-panel">
     <div class="lb-controls"><div class="lb-tabs" role="group" aria-label="Capability dimension">${dimensions.map(([key,label],i)=>`<button type="button" data-dimension="${key}" aria-pressed="${i===0}">${label}</button>`).join('')}</div><div class="lb-tabs lb-metric" role="group" aria-label="Leaderboard metric"><button type="button" data-metric="sr" aria-pressed="true">SR</button><button type="button" data-metric="score" aria-pressed="false">Score</button></div></div>
-    <div class="lb-legend"><span><i class="lb-ours"></i>PyRUA-RSI (ours)</span><span><i class="lb-astra"></i>GPT-6-Astra, direct control</span><span><i class="lb-baseline"></i>Selected board entries</span></div>
+    <div class="lb-legend"><span><i class="lb-ours"></i>PyRUA-REAL (ours)</span><span><i class="lb-astra"></i>GPT-6-Astra, direct control</span><span><i class="lb-baseline"></i>Selected board entries</span></div>
     <div class="lb-chart" role="img" aria-label="Average success rate comparison"><div class="lb-rows">${LEADERBOARD.models.map((m,i)=>`<div class="lb-row" data-model="${i}" data-kind="${m.kind}"><div class="lb-name"><strong>${m.name}</strong><span>${m.tag}</span></div><div class="lb-track"><div class="lb-bar"><span class="lb-value"></span></div></div></div>`).join('')}</div><div class="lb-axis" aria-hidden="true">${[0,25,50,75,100].map(n=>`<span style="left:${n}%">${n}</span>`).join('')}</div></div>
     <div class="lb-status" role="status" aria-live="polite"></div>
   </div>`;
