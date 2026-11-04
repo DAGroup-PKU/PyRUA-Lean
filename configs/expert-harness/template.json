@@ -1,0 +1,361 @@
+{
+  "schema": "datafarm.expert-harness.adapter/1",
+  "task_id": "example-task",
+  "title": "<one-line task description>",
+  "status": "available",
+  "notes": [
+    "Copy this file for a new task and replace every <placeholder>."
+  ],
+  "vars": {
+    "W": "${WORKSPACE}",
+    "assets": "{W}/runs/<task>/assets",
+    "runner": "{W}/runs/<task>/run_rollout.py",
+    "judge": "{W}/runs/<task>/judge.py",
+    "isaac_python": "${ISAAC_PYTHON}",
+    "isaac_kit": "${ISAAC_KIT}",
+    "analysis_env": "${ANALYSIS_ENV}",
+    "analysis_python": "{analysis_env}/bin/python",
+    "gpu_scheduler": "${GPU_SCHEDULER}",
+    "harness_home": "${WORKSPACE}/runs/expert-harness"
+  },
+  "task_ir": {
+    "summary": "<what the robot must do, in one sentence>",
+    "contract": "<task contract file>",
+    "judge": "<how success is decided>"
+  },
+  "brief": {
+    "template": "template-brief.md",
+    "first_round_md": "No handoff bundle was given for this round: start from the interface below.",
+    "facts": {
+      "physics": "<certified simulation parameters and where they are recorded>",
+      "task_ir": "<task contract and the fields the expert may rely on>",
+      "analysis_python": "{analysis_python}",
+      "default_class": "TaskExpert",
+      "allowed_imports": "`numpy`, `scipy`, `math`, `dataclasses`, `typing`, `collections`"
+    }
+  },
+  "verifier": {
+    "version": "v1",
+    "name": "<task> judge",
+    "judge_points": [
+      "terminal"
+    ],
+    "success_metric": "success",
+    "criteria": [
+      "Replace with the exact pass criteria the judge applies."
+    ],
+    "criteria_tokens": [],
+    "files": [
+      "{judge}"
+    ]
+  },
+  "runtime_facts": [
+    {
+      "id": "tool_call_cap",
+      "title": "Keep each tool call short",
+      "must_mention": [
+        "4 min"
+      ],
+      "text": "Keep every tool call under about **4 min**: the prompt cache expires after 5 min of silence and the next turn then rewrites the whole context (cache writes can dominate a session's cost). `xh wait` therefore never blocks longer than the harness wait cap; call it again."
+    },
+    {
+      "id": "rollout_wall",
+      "title": "Rollout wall time",
+      "must_mention": [
+        "<minutes>"
+      ],
+      "text": "One rollout takes **<minutes>** of wall-clock time including simulator start-up."
+    }
+  ],
+  "forbidden": [
+    "Web search or any network access other than your own model API.",
+    "Changing the simulation parameters, initial-state generator, runner or judge: they are read-only for you and hashed by the harness.",
+    "Expert code that reaches past observations and joint plans: no simulator or state access, no file I/O, no dynamic code.",
+    "Stopping, restarting or inspecting GPU jobs; the harness owns them."
+  ],
+  "deliverables": [
+    {
+      "file": "expert.py",
+      "what": "the expert in your workspace, with a docstring that explains the strategy; submit it with `xh submit`."
+    },
+    {
+      "file": "REPORT.md",
+      "what": "what you changed and why, what failed, and known weaknesses."
+    },
+    {
+      "file": "NOTES.md",
+      "what": "running notes, kept current after every result."
+    }
+  ],
+  "seeds": {
+    "dev": {
+      "ranges": [
+        [
+          0,
+          999
+        ]
+      ]
+    }
+  },
+  "holdout": {
+    "seeds_file": "{harness_home}/private/<task>/holdout.json",
+    "targets": "all",
+    "max_targets": 6,
+    "max_concurrent": 8,
+    "retry_infra": 2,
+    "verified_pass_rate": 0.6,
+    "timeout_s": 43200
+  },
+  "budgets": {
+    "wall_per_session_s": 3600,
+    "total_wall_s": 14400,
+    "max_counted_rollouts": 80,
+    "max_concurrent_rollouts": 6,
+    "max_sessions": 16,
+    "max_usd": 60,
+    "max_infra_failures": 20,
+    "max_idle_sessions": 3,
+    "final_grace_s": 600,
+    "wait_cap_s": 200,
+    "warn_before_wall_s": 900
+  },
+  "agent": {
+    "backend": "claude",
+    "model": "claude-opus-5-5",
+    "cli": "/usr/local/bin/claude",
+    "effort": null,
+    "tools": [
+      "Bash",
+      "Read",
+      "Edit",
+      "Write",
+      "Glob",
+      "Grep",
+      "TodoWrite"
+    ],
+    "disallowed_tools": [
+      "WebFetch",
+      "WebSearch",
+      "Task"
+    ],
+    "permission_mode": "bypassPermissions",
+    "setting_sources": "user",
+    "price_table": "prices.json",
+    "auth": {
+      "env_passthrough": [
+        "ANTHROPIC_API_KEY",
+        "ANTHROPIC_AUTH_TOKEN",
+        "ANTHROPIC_BASE_URL",
+        "CLAUDE_CODE_OAUTH_TOKEN",
+        "OPENAI_API_KEY",
+        "OPENAI_BASE_URL"
+      ],
+      "ro_bind": []
+    },
+    "codex": {
+      "cli": "/usr/local/bin/codex",
+      "extra_args": []
+    },
+    "env": {}
+  },
+  "expert": {
+    "default_file": "expert.py",
+    "default_class": "TaskExpert",
+    "max_bytes": 400000,
+    "allowed_imports": [
+      "__future__",
+      "math",
+      "cmath",
+      "dataclasses",
+      "typing",
+      "collections",
+      "itertools",
+      "functools",
+      "copy",
+      "enum",
+      "abc",
+      "numbers",
+      "heapq",
+      "bisect",
+      "statistics",
+      "json",
+      "numpy",
+      "scipy"
+    ]
+  },
+  "workspace": {
+    "readable": [
+      "{assets}"
+    ],
+    "protected": [
+      "{judge}",
+      "{harness_home}/private"
+    ]
+  },
+  "isolation": {
+    "agent": {
+      "mode": "bwrap",
+      "fallback": "unshare",
+      "allow_degraded_fallback": false,
+      "base": "allowlist",
+      "run_as": {
+        "uid": 65534,
+        "gid": 65534
+      },
+      "share_net": true,
+      "extra_ro": [
+        "{analysis_env}"
+      ],
+      "extra_masked": []
+    },
+    "rollout": {
+      "mode": "bwrap",
+      "fallback": "unshare",
+      "base": "root_ro",
+      "dev": "host",
+      "private_tmp": true,
+      "run_as": null,
+      "share_net": true,
+      "writable": [
+        "{isaac_kit}/data",
+        "{isaac_kit}/logs",
+        "{env:HOME}/.cache",
+        "{env:HOME}/.nv",
+        "{env:HOME}/.nvidia-omniverse",
+        "{env:HOME}/.local/share/ov"
+      ],
+      "tmpfs": [
+        "{isaac_kit}/cache",
+        "/run/user/0"
+      ],
+      "extra_masked": [
+        "/root",
+        "/etc/shadow",
+        "/etc/gshadow",
+        "/etc/ssh",
+        "{env:HOME}/.ssh",
+        "{env:HOME}/.claude",
+        "{env:HOME}/.claude.json",
+        "{env:HOME}/.codex",
+        "{env:HOME}/.netrc",
+        "{env:HOME}/.aws",
+        "{env:HOME}/.docker",
+        "{env:HOME}/.git-credentials",
+        "{env:HOME}/.config/gh",
+        "{env:HOME}/.config/gcloud"
+      ]
+    }
+  },
+  "rollout": {
+    "backend": "command",
+    "submit": {
+      "argv": [
+        "{gpu_scheduler}",
+        "submit",
+        "--gpus",
+        "1",
+        "--min-free-mb",
+        "40000",
+        "--name",
+        "{job_name}",
+        "--cwd",
+        "{run_dir}",
+        "--",
+        "bash",
+        "{job_script}"
+      ],
+      "timeout_s": 120
+    },
+    "poll_interval_s": 15,
+    "heartbeat_interval_s": 30,
+    "stale_after_s": 900,
+    "max_wall_s": 3600,
+    "sim": {
+      "argv": [
+        "{isaac_python}",
+        "{runner}",
+        "--expert",
+        "{run_dir}/expert_snapshot.py:{expert_class}",
+        "--seed",
+        "{seed}",
+        "--output-dir",
+        "{run_dir}/sim"
+      ],
+      "cwd": "{run_dir}",
+      "log": "sim.log",
+      "timeout_s": 2700,
+      "requires_output": "sim/state_trace.npz"
+    },
+    "judge": [
+      {
+        "name": "judge",
+        "argv": [
+          "{analysis_python}",
+          "{judge}",
+          "{run_dir}"
+        ],
+        "stdout": "verdict.stdout",
+        "outputs": [
+          "verdict.json"
+        ]
+      }
+    ],
+    "verdict": {
+      "name": "judge",
+      "file": "verdict.json",
+      "success": "success",
+      "fields": {
+        "success": "success",
+        "failures": "failures"
+      },
+      "failure_fields": [
+        "failures"
+      ]
+    },
+    "init_state": {
+      "file": "sim/initial_state.json",
+      "valid": "valid",
+      "family": "family"
+    },
+    "classify": {
+      "infra_regex": [
+        "camera returned invalid RGBA shape",
+        "CUDA error",
+        "cudaError",
+        "CUDA out of memory",
+        "Failed to create .*context",
+        "Segmentation fault",
+        "core dumped",
+        "ERROR_DEVICE_LOST",
+        "No CUDA-capable device"
+      ],
+      "expert_error_regex": [
+        "expert_snapshot\\.py"
+      ]
+    },
+    "record_digests": [
+      "{runner}",
+      "{assets}"
+    ]
+  },
+  "manifest": {
+    "files": [
+      "{runner}",
+      "{assets}"
+    ]
+  },
+  "handoff": {
+    "copy_workspace_files": [
+      "REPORT.md",
+      "NOTES.md"
+    ]
+  },
+  "capabilities": {
+    "rollout": true,
+    "submit": true,
+    "flag_for_human": true,
+    "sim_snapshot_restore": false,
+    "query_state": false,
+    "notes": "Describe what the simulator can and cannot do for the agent."
+  }
+}

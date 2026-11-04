@@ -1,0 +1,69 @@
+{
+  "schema": "datafarm.batch-task-config/1.0.0",
+  "batch_id": "<task>-render",
+  "items": [
+    "<task>-000",
+    "<task>-001",
+    "<task>-002"
+  ],
+  "work_dir": "${WORKSPACE}/runs/<task>/render-supervisor",
+  "launch": {
+    "argv": [
+      "${ANALYSIS_PYTHON}",
+      "<your-render-entry-point>.py",
+      "--item",
+      "{item}",
+      "--out",
+      "{attempt_dir}"
+    ],
+    "cwd": "${WORKSPACE}"
+  },
+  "result": {
+    "path": "{attempt_dir}/result.json",
+    "required_keys": [
+      "status",
+      "assembly",
+      "frames"
+    ],
+    "match": {
+      "item": "{item}"
+    }
+  },
+  "verify": {
+    "result_status": {
+      "key": "status",
+      "pass": [
+        "generated_pending_review"
+      ],
+      "reject": {}
+    }
+  },
+  "ledger": {
+    "column": "render/generate"
+  },
+  "policy": {
+    "max_concurrency": 1,
+    "max_attempts_per_item": 1,
+    "max_crash_retries_per_item": 2,
+    "max_rounds": 8,
+    "systematic_min_items": 8,
+    "max_wall_seconds": 604800,
+    "poll_interval_s": 15,
+    "max_consecutive_unknown": 8,
+    "provider_probe_interval_s": 60,
+    "systematic_share": 0.75,
+    "max_provider_pause_s": 604800
+  },
+  "crash_classes": [
+    {
+      "pattern": "waiting for prerequisite:",
+      "kind": "provider_down"
+    },
+    {
+      "pattern": "bounded upload attempts exhausted",
+      "kind": "provider_down"
+    }
+  ],
+  "description": "One bounded render attempt per item. Technical generation is not training admission.",
+  "upstream_batch_state": "${WORKSPACE}/runs/<task>/export/state/state.json"
+}

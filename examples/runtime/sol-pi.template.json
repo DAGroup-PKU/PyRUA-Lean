@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "actionFusion": true,
+  "observationPack": true,
+  "evidencePreservingReducer": true,
+  "evidencePreservingReducerProvider": "<provider>",
+  "evidencePreservingReducerModel": "<model>",
+  "onlineContextCompact": true,
+  "cacheWriteReadRatio": 12.5
+}

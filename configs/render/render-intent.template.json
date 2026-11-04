@@ -1,0 +1,23 @@
+{
+  "schema": "datafarm.render-intent/1",
+  "run_id": null,
+  "task_id": null,
+  "cohort_id": null,
+  "request_source": null,
+  "mode": "unresolved",
+  "mode_confirmation": null,
+  "real_baseline": null,
+  "authorized_ood_axes": [],
+  "appearance_views": [],
+  "appearance_requirements": {
+    "robot_body": {"required": true, "description": null},
+    "attached_cameras_and_cables": {"required": false, "description": null},
+    "task_objects": {"required": true, "description": null},
+    "table_and_background": {"required": true, "description": null},
+    "photographic_character": {"required": true, "description": null}
+  },
+  "appearance_invariants": [],
+  "real_references": [],
+  "code_commit": null,
+  "budget": null
+}

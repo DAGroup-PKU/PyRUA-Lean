@@ -1,0 +1,1178 @@
+diff --git a/examples/minimax_h3_fun/predict_v2v_control.py b/examples/minimax_h3_fun/predict_v2v_control.py
+index e5ca046..f1e8dc9 100644
+--- a/examples/minimax_h3_fun/predict_v2v_control.py
++++ b/examples/minimax_h3_fun/predict_v2v_control.py
+@@ -1,3 +1,4 @@
++import json
+ import os
+ import sys
+ 
+@@ -5,6 +6,36 @@ import numpy as np
+ import torch
+ from PIL import Image
+ 
++
++def env_bool(name, default):
++    value = os.environ.get(name)
++    if value is None:
++        return default
++    return value.lower() in {"1", "true", "yes", "on"}
++
++
++def env_int(name, default):
++    value = os.environ.get(name)
++    return default if value is None else int(value)
++
++
++def env_float(name, default):
++    value = os.environ.get(name)
++    return default if value is None else float(value)
++
++
++def env_sample_size(default):
++    value = os.environ.get("H3_SAMPLE_SIZE")
++    return default if value is None else [int(part) for part in value.split(",")]
++
++
++def env_prompt(default):
++    prompt_file = os.environ.get("H3_PROMPT_FILE")
++    if prompt_file:
++        with open(prompt_file, "r", encoding="utf-8") as handle:
++            return handle.read().strip()
++    return os.environ.get("H3_PROMPT", default)
++
+ current_file_path = os.path.abspath(__file__)
+ project_roots = [os.path.dirname(current_file_path), os.path.dirname(os.path.dirname(current_file_path)), os.path.dirname(os.path.dirname(os.path.dirname(current_file_path)))]
+ for project_root in project_roots:
+@@ -17,7 +48,7 @@ from videox_fun.models import (AutoencoderKLMiniMaxH3,
+                                Qwen2TokenizerFast,
+                                Qwen3VLForConditionalGeneration,
+                                Qwen3VLProcessor)
+-from videox_fun.pipeline import MiniMaxH3ControlPipeline
++from videox_fun.pipeline import MiniMaxH3ControlPipeline, MiniMaxH3ImageReference
+ from videox_fun.utils import (MiniMaxH3Scheduler, register_auto_device_hook,
+                               safe_enable_group_offload)
+ from videox_fun.utils.fp8_optimization import (convert_model_weight_to_float8,
+@@ -43,7 +74,7 @@ from videox_fun.utils.utils import (get_video_to_video_latent,
+ # 
+ # sequential_cpu_offload means that each layer of the model will be moved to the CPU after use, 
+ # resulting in slower speeds but saving a large amount of GPU memory.
+-GPU_memory_mode     = "model_group_offload"
++GPU_memory_mode     = os.environ.get("H3_GPU_MEMORY_MODE", "model_group_offload")
+ # Multi GPUs config
+ # Please ensure that the product of ulysses_degree and ring_degree equals the number of GPUs used. 
+ # For example, if you are using 8 GPUs, you can set ulysses_degree = 2 and ring_degree = 4.
+@@ -52,29 +83,29 @@ GPU_memory_mode     = "model_group_offload"
+ # `torchrun --nproc_per_node=2 examples/minimax_h3_fun/predict_v2v_control.py` for ulysses_degree=2, ring_degree=1.
+ # It is incompatible with the *cpu_offload* memory modes (accelerate offload hooks own a single device);
+ # use model_full_load / model_full_load_and_qfloat8 there, with fsdp_dit to save memory.
+-ulysses_degree      = 1
+-ring_degree         = 1
++ulysses_degree      = env_int("H3_ULYSSES_DEGREE", 1)
++ring_degree         = env_int("H3_RING_DEGREE", 1)
+ # Use FSDP to save more GPU memory in multi gpus. The Qwen3-VL conditioner is ~62 GB, so with fsdp_dit alone every
+ # rank still replicates it; fsdp_text_encoder shards it too. Note it must wrap the inner `text_encoder.model`
+ # (Qwen3VLModel): encode_prompt calls that submodule directly, so a wrap on the top-level module would never fire.
+-fsdp_dit            = False
+-fsdp_text_encoder   = True
++fsdp_dit            = env_bool("H3_FSDP_DIT", False)
++fsdp_text_encoder   = env_bool("H3_FSDP_TEXT_ENCODER", True)
+ # Compile will give a speedup in fixed resolution and need a little GPU memory. 
+ # The compile_dit is not compatible with sequential_cpu_offload.
+-compile_dit         = False
++compile_dit         = env_bool("H3_COMPILE_DIT", False)
+ 
+ # model path
+-model_name          = "models/Diffusion_Transformer/MiniMax-H3"
++model_name          = os.environ.get("H3_MODEL_NAME", "models/Diffusion_Transformer/MiniMax-H3")
+ # Control branch layout, must match the yaml `train_control.py` ran with: `control_blocks_places` selects the
+ # layers the control blocks attach to and `control_in_dim` the channels the control rows carry (49 for an
+ # `--enable_inpaint` checkpoint, whose `control_proj_in` is widened with the mask channels). Leaving it None
+ # builds the default 24-channel branch, which cannot load an inpaint checkpoint.
+-config_path         = "config/minimax_h3/minimax_h3_control.yaml"
++config_path         = os.environ.get("H3_CONFIG_PATH", "config/minimax_h3/minimax_h3_control.yaml")
+ 
+ # Load pretrained model if need. The control branch is not part of the released MiniMax-H3 weights, so a base
+ # `model_name` starts the side branch as an identity (`after_proj` is zero) and the c ontrol video has no effect;
+ # point `transformer_path` at a control checkpoint trained by `scripts/minimax_h3_fun/train_control.py`.
+-transformer_path    = "models/Diffusion_Transformer/MiniMax-H3-Fun-Controlnet-Union/MiniMax-H3-Fun-Controlnet-Union.safetensors"
++transformer_path    = os.environ.get("H3_TRANSFORMER_PATH", "models/Diffusion_Transformer/MiniMax-H3-Fun-Controlnet-Union/MiniMax-H3-Fun-Controlnet-Union.safetensors")
+ vae_path            = None
+ lora_path           = None
+ 
+@@ -84,39 +115,54 @@ lora_path           = None
+ # a short control video is never padded (the duration has to stay under 15 seconds), capped by video_length.
+ # Control inference fits the control video onto this canvas with the training's resize + crop geometry, so
+ # sample_size must be set (it cannot be None).
+-sample_size         = [1280, 704]
+-video_length        = 243
+-fps                 = 24
++sample_size         = env_sample_size([1280, 704])
++video_length        = env_int("H3_VIDEO_LENGTH", 243)
++fps                 = env_int("H3_FPS", 24)
+ # Scale applied to every control skip before it is added to the main branch. 0.0 switches the control branch off,
+ # values below 1.0 weaken the guidance of the control video.
+-control_context_scale = 1.00
++control_context_scale = env_float("H3_CONTROL_CONTEXT_SCALE", 1.00)
+ 
+ # Use torch.float16 if GPU does not support torch.bfloat16
+ # ome graphics cards, such as v100, 2080ti, do not support torch.bfloat16
+ weight_dtype        = torch.bfloat16
+-control_video       = "asset/pose.mp4"
++control_video       = os.environ.get("H3_CONTROL_VIDEO", "asset/pose.mp4")
+ # Inpaint inputs, only read by checkpoints trained with `--enable_inpaint` (control_in_dim widened, e.g. 49):
+ # `inpaint_video` is the source video behind the mask and `inpaint_video_mask` marks the regions to regenerate
+ # (white = repaint, black = keep). With an inpaint checkpoint but no inpaint inputs given, the pipeline zero-pads
+ # the mask channels and the run degrades to pure generation; a mask-less checkpoint rejects them outright.
+-inpaint_video       = None
+-inpaint_video_mask  = None
+-prompt              = "视频中，一位年轻女性站在阳光洒满的沙滩上，背景是无垠碧蓝的大海与澄澈如洗的天空，构成一幅充满夏日度假氛围的画面。她身穿一件深海军蓝吊带泳衣，线条简约贴身，凸显健康匀称的身材曲线；外搭一条纯白色背带短裙，裙摆轻盈飘逸，随风微微扬起，增添了几分俏皮与少女感。她的长发柔顺披肩，发梢微卷，在阳光下泛着自然光泽，耳畔垂挂着一对小巧精致的珍珠吊坠耳环，为整体造型注入一丝温柔优雅的气息。她面带甜美笑容，嘴角上扬，露出整齐洁白的牙齿，眼神清澈明亮，直视镜头时流露出真诚与自信，仿佛在与观众分享此刻的快乐。起初，她双臂向两侧张开，手掌舒展，像是在拥抱整个大海与天空；随后手臂缓缓收回并向前挥动，动作节奏轻快而富有韵律，如同在跳舞或做简单的热身操，展现出轻松自在、无忧无虑的状态。她的腿部微微分开站立，姿态稳健又不失灵动，裙摆随着动作轻轻摇曳，与海风形成自然互动。远处海浪轻拍沙滩，发出柔和的“哗哗”声，虽无声但可想象其韵律，与她的动作相得益彰，营造出宁静而愉悦的听觉联想。"
++inpaint_video       = os.environ.get("H3_INPAINT_VIDEO") or None
++inpaint_video_mask  = os.environ.get("H3_INPAINT_VIDEO_MASK") or None
++prompt_image_path   = os.environ.get("H3_PROMPT_IMAGE") or None
++reference_image_path = os.environ.get("H3_REFERENCE_IMAGE") or None
++prompt              = env_prompt("A young woman stands on a sunlit beach.")
+ negative_prompt     = "色调艳丽，过曝，静态，细节模糊不清，字幕，风格，作品，画作，画面，静止，整体发灰，最差质量，低质量，JPEG压缩残留，丑陋的，残缺的，多余的手指，画得不好的手部，画得不好的脸部，畸形的，毁容的，形态畸形的肢体，手指融合，静止不动的画面，杂乱的背景，三条腿，背景人很多，倒着走"
+-seed                = 43
++seed                = env_int("H3_SEED", 43)
+ # Number of denoising steps, i.e. of model evaluations: num_inference_steps = 40 runs 40 of them.
+-num_inference_steps = 40
++num_inference_steps = env_int("H3_NUM_INFERENCE_STEPS", 40)
+ # The released checkpoint is guidance-distilled: leave guidance_scale at 1 to run one forward pass per step
+ # with no CFG — the distill checkpoints of train_control_distill.py already bake the teacher's CFG target into
+ # the weights, so any value above 1 applies guidance twice and degrades the output. A value above 1 enables
+ # classifier-free guidance with a negative_prompt, running two passes.
+-guidance_scale      = 1.0
++guidance_scale      = env_float("H3_GUIDANCE_SCALE", 1.0)
+ negative_prompt     = "色调艳丽，过曝，静态，细节模糊不清，字幕，风格，作品，画作，画面，静止，整体发灰，最差质量，低质量，JPEG压缩残留，丑陋的，残缺的，多余的手指，画得不好的手部，画得不好的脸部，畸形的，毁容的，形态畸形的肢体，手指融合，静止不动的画面，杂乱的背景，三条腿，背景人很多，倒着走"
+ # The exponential sigma shifts of the two schedules. None keeps the ones of the checkpoint (12.0 video, 3.0 audio).
+ flow_shift          = None
+ audio_flow_shift    = None
+ lora_weight         = 0.55
+-save_path           = "samples/minimax-h3-videos-v2v-control"
++save_path           = os.environ.get("H3_SAVE_PATH", "samples/minimax-h3-videos-v2v-control")
++
++if prompt_image_path is not None and reference_image_path is not None:
++    raise ValueError("Use either H3_PROMPT_IMAGE or H3_REFERENCE_IMAGE, not both.")
++if reference_image_path is not None:
++    model_index_path = os.path.join(model_name, "model_index.json")
++    with open(model_index_path, "r", encoding="utf-8") as handle:
++        model_index = json.load(handle)
++    partition = model_index.get("_minimax_h3", {}).get("partition")
++    if partition != "ref2va":
++        raise ValueError(
++            "H3_REFERENCE_IMAGE requires a Ref2VA base checkpoint, but "
++            f"{model_index_path} declares partition={partition!r}."
++        )
+ 
+ device = set_multi_gpus_devices(ulysses_degree, ring_degree)
+ 
+@@ -261,6 +307,26 @@ else:
+ 
+ generator = torch.Generator(device=device).manual_seed(seed)
+ 
++prompt_images = None
++if prompt_image_path is not None:
++    prompt_image = Image.open(prompt_image_path).convert("RGB")
++    prompt_images = [prompt_image]
++    if os.environ.get("RANK", "0") == "0":
++        print(
++            f"visual prompt: path={prompt_image_path}, size={prompt_image.size}, mode={prompt_image.mode}",
++            flush=True,
++        )
++
++references = None
++if reference_image_path is not None:
++    references = [MiniMaxH3ImageReference.from_file(reference_image_path)]
++    if os.environ.get("RANK", "0") == "0":
++        print(
++            f"Ref2VA latent reference: path={reference_image_path}, "
++            f"size={references[0].image.size}, mode={references[0].image.mode}",
++            flush=True,
++        )
++
+ if lora_path is not None:
+     pipeline = merge_lora(pipeline, lora_path, lora_weight, device=device, dtype=weight_dtype)
+ 
+@@ -276,7 +342,17 @@ def snap_num_frames(actual_num_frames, max_num_frames):
+     return max(num_frames, 5)
+ 
+ with torch.no_grad():
++    if inpaint_video_mask is not None and inpaint_video is None:
++        raise ValueError("H3_INPAINT_VIDEO_MASK requires H3_INPAINT_VIDEO")
+     control_video, _, _, _ = get_video_to_video_latent(control_video, video_length=video_length, sample_size=sample_size, fps=fps, ref_image=None, keep_aspect_ratio=True)
++    if os.environ.get("RANK", "0") == "0":
++        print(
++            "control tensor: "
++            f"shape={tuple(control_video.shape)}, dtype={control_video.dtype}, "
++            f"min={control_video.min().item():.6f}, max={control_video.max().item():.6f}, "
++            f"mean={control_video.mean().item():.6f}, nonzero={(control_video > 1 / 255).float().mean().item():.6f}",
++            flush=True,
++        )
+ 
+     # Generate at the control video's actual length, never padding; only control videos below the 5 frames the
+     # video VAE can encode are raised to 5.
+@@ -294,9 +370,26 @@ with torch.no_grad():
+         # Binarize the grayscale mask onto one channel: 1 marks the regions to regenerate, mirroring the training
+         # `get_random_mask` convention the visibility map `1 - mask` is built from.
+         mask_video = (inpaint_video_mask[:, :1] > 0.5).to(inpaint_video_mask.dtype)
++        if inpaint_video.shape[2] < num_frames or mask_video.shape[2] < num_frames:
++            raise ValueError(
++                "inpaint source and mask must cover every generated frame: "
++                f"source={inpaint_video.shape[2]}, mask={mask_video.shape[2]}, output={num_frames}"
++            )
++        if os.environ.get("RANK", "0") == "0":
++            print(
++                "inpaint tensors: "
++                f"source_shape={tuple(inpaint_video.shape)}, "
++                f"source_min={inpaint_video.min().item():.6f}, "
++                f"source_max={inpaint_video.max().item():.6f}, "
++                f"mask_shape={tuple(mask_video.shape)}, "
++                f"mask_regenerate_fraction={mask_video.mean().item():.6f}",
++                flush=True,
++            )
+ 
+     output = pipeline(
+         prompt=prompt,
++        prompt_images=prompt_images,
++        references=references,
+         control_video=control_video,
+         control_context_scale=control_context_scale,
+         mask_video=mask_video,
+diff --git a/tools/prepare_hed_control.py b/tools/prepare_hed_control.py
+new file mode 100644
+index 0000000..abe4af1
+--- /dev/null
++++ b/tools/prepare_hed_control.py
+@@ -0,0 +1,104 @@
++#!/usr/bin/env python3
++"""Generate a soft-HED control video for the low-contrast simulator render."""
++
++import argparse
++import json
++import os
++import sys
++from pathlib import Path
++
++import cv2
++import numpy as np
++import torch
++
++
++# directory that contains tools/controlnet/annotator/{hed,util.py} (ControlNet v1.1 annotator, Apache-2.0)
++if not os.environ.get("H3_HED_ANNOTATOR_REPO"):
++    raise SystemExit("set H3_HED_ANNOTATOR_REPO to the directory containing tools/controlnet/annotator/hed")
++ANNOTATOR_REPO = Path(os.environ["H3_HED_ANNOTATOR_REPO"])
++sys.path.insert(0, str(ANNOTATOR_REPO))
++from tools.controlnet.annotator.hed import ControlNetHED_Apache2  # noqa: E402
++
++
++def main():
++    parser = argparse.ArgumentParser()
++    parser.add_argument("--input", required=True)
++    parser.add_argument("--output", required=True)
++    parser.add_argument("--checkpoint", required=True)
++    parser.add_argument("--width", type=int, default=1024)
++    parser.add_argument("--height", type=int, default=768)
++    parser.add_argument("--max-frames", type=int, default=90)
++    parser.add_argument(
++        "--min-edge-intensity",
++        type=int,
++        default=0,
++        help="zero HED intensities below this value; 0 preserves the historical soft map",
++    )
++    args = parser.parse_args()
++
++    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
++    model = ControlNetHED_Apache2().float().to(device).eval()
++    state = torch.load(args.checkpoint, map_location="cpu", weights_only=True)
++    model.load_state_dict(state)
++
++    capture = cv2.VideoCapture(args.input)
++    if not capture.isOpened():
++        raise RuntimeError(f"could not open input: {args.input}")
++    fps = capture.get(cv2.CAP_PROP_FPS)
++    output = Path(args.output)
++    output.parent.mkdir(parents=True, exist_ok=True)
++    writer = cv2.VideoWriter(
++        str(output), cv2.VideoWriter_fourcc(*"mp4v"), fps, (args.width, args.height)
++    )
++    if not writer.isOpened():
++        raise RuntimeError(f"could not open writer: {output}")
++
++    frames = 0
++    active_sum = 0.0
++    mean_sum = 0.0
++    with torch.inference_mode():
++        while frames < args.max_frames:
++            ok, frame = capture.read()
++            if not ok:
++                break
++            frame = cv2.resize(frame, (args.width, args.height), interpolation=cv2.INTER_AREA)
++            rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
++            tensor = torch.from_numpy(rgb.copy()).float().permute(2, 0, 1).unsqueeze(0).to(device)
++            projections = model(tensor)
++            maps = []
++            for projection in projections:
++                item = projection[0, 0].float().cpu().numpy()
++                maps.append(cv2.resize(item, (args.width, args.height), interpolation=cv2.INTER_LINEAR))
++            logits = np.mean(np.stack(maps, axis=2), axis=2).astype(np.float64)
++            edge = 1.0 / (1.0 + np.exp(-logits))
++            edge = (edge * 255.0).clip(0, 255).astype(np.uint8)
++            if args.min_edge_intensity:
++                edge[edge < args.min_edge_intensity] = 0
++            writer.write(cv2.cvtColor(edge, cv2.COLOR_GRAY2BGR))
++            active_sum += float(np.mean(edge > 20))
++            mean_sum += float(np.mean(edge) / 255.0)
++            frames += 1
++
++    capture.release()
++    writer.release()
++    metadata = {
++        "schema_version": "hed_control/1.0.0",
++        "input": str(Path(args.input).resolve()),
++        "output": str(output.resolve()),
++        "checkpoint": str(Path(args.checkpoint).resolve()),
++        "device": str(device),
++        "fps": fps,
++        "width": args.width,
++        "height": args.height,
++        "frames": frames,
++        "mean_active_fraction_gt20": active_sum / frames,
++        "mean_normalized_intensity": mean_sum / frames,
++        "min_edge_intensity": args.min_edge_intensity,
++    }
++    metadata_path = output.with_suffix(".json")
++    metadata_path.write_text(json.dumps(metadata, indent=2) + "\n", encoding="utf-8")
++    print(json.dumps(metadata, indent=2))
++
++
++if __name__ == "__main__":
++    main()
+diff --git a/videox_fun/dist/minimax_h3_xfuser.py b/videox_fun/dist/minimax_h3_xfuser.py
+index da2add1..5f56109 100644
+--- a/videox_fun/dist/minimax_h3_xfuser.py
++++ b/videox_fun/dist/minimax_h3_xfuser.py
+@@ -1,3 +1,5 @@
++import os
++
+ import torch
+ 
+ from .fuser import xFuserLongContextAttention
+@@ -23,7 +25,22 @@ class MiniMaxH3MultiGPUsAttnProcessor:
+     def __init__(self):
+         if xFuserLongContextAttention is not None:
+             try:
+-                self.hybrid_seq_parallel_attn = xFuserLongContextAttention()
++                attention_kwargs = {}
++                # xFuser defaults to the separately installed flash-attn package.  The B20Z
++                # environment used by H3 does not ship that extension, but PyTorch itself
++                # provides a fused CUDA SDPA kernel.  yunchang exposes that kernel through
++                # TORCH_FLASH and its ring reduction still receives the required log-sum-exp.
++                # Keep an explicit environment override for hosts where another backend is
++                # known to work.
++                from yunchang.globals import HAS_FLASH_ATTN
++                from yunchang.kernels import AttnType
++
++                requested = os.environ.get("H3_XFUSER_ATTN_TYPE", "").strip().upper()
++                if requested:
++                    attention_kwargs["attn_type"] = AttnType[requested]
++                elif not HAS_FLASH_ATTN:
++                    attention_kwargs["attn_type"] = AttnType.TORCH_FLASH
++                self.hybrid_seq_parallel_attn = xFuserLongContextAttention(**attention_kwargs)
+             except Exception:
+                 self.hybrid_seq_parallel_attn = None
+         else:
+diff --git a/videox_fun/models/attention_utils.py b/videox_fun/models/attention_utils.py
+index e10948a..7fbf701 100644
+--- a/videox_fun/models/attention_utils.py
++++ b/videox_fun/models/attention_utils.py
+@@ -12,7 +12,9 @@ except ModuleNotFoundError:
+ 
+ try:
+     import flash_attn
+-    FLASH_ATTN_2_AVAILABLE = True
++    # A namespace-only package can import successfully while the compiled
++    # kernel is absent. Test the callable that this module actually uses.
++    FLASH_ATTN_2_AVAILABLE = callable(getattr(flash_attn, "flash_attn_varlen_func", None))
+ except ModuleNotFoundError:
+     FLASH_ATTN_2_AVAILABLE = False
+ 
+@@ -422,4 +424,4 @@ class SparseLinearAttention(nn.Module):
+         if return_sparsity:
+             return o, real_topk / sparse_map.shape[-1]
+         else:
+-            return o
+\ No newline at end of file
++            return o
+diff --git a/videox_fun/models/minimax_h3_conversion.py b/videox_fun/models/minimax_h3_conversion.py
+index 7dd8f85..9cad350 100644
+--- a/videox_fun/models/minimax_h3_conversion.py
++++ b/videox_fun/models/minimax_h3_conversion.py
+@@ -769,7 +769,7 @@ def load_original_audio_vae_state_dict(checkpoint_path):
+     return state_dict
+ 
+ 
+-def assign_original_tensors(model, tensors):
++def assign_original_tensors(model, tensors, allowed_missing_prefixes=()):
+     r"""
+     Assign `(key, tensor)` pairs onto `model` in place and verify every model parameter / buffer was covered.
+ 
+@@ -787,7 +787,10 @@ def assign_original_tensors(model, tensors):
+         _assign_tensor(model, key, tensor)
+         assigned.add(key)
+ 
+-    missing = sorted(expected_keys - assigned)
++    missing = sorted(
++        key for key in expected_keys - assigned
++        if not key.startswith(tuple(allowed_missing_prefixes))
++    )
+     if missing:
+         raise KeyError(f"{len(missing)} parameter(s) of {type(model).__name__} left unassigned, e.g. {missing[:5]}.")
+     return model
+diff --git a/videox_fun/models/minimax_h3_transformer3d.py b/videox_fun/models/minimax_h3_transformer3d.py
+index 6bc31aa..f04828d 100644
+--- a/videox_fun/models/minimax_h3_transformer3d.py
++++ b/videox_fun/models/minimax_h3_transformer3d.py
+@@ -536,7 +536,9 @@ class MiniMaxH3Transformer3DModel(MiniMaxH3MixedPrecisionLoaderMixin, ModelMixin
+         self.all_gather = None
+ 
+     @classmethod
+-    def from_pretrained_original(cls, checkpoint_path, torch_dtype=None, device=None):
++    def from_pretrained_original(
++        cls, checkpoint_path, torch_dtype=None, device=None, allowed_missing_prefixes=(), **model_kwargs
++    ):
+         r"""
+         Load an *original* MiniMax-H3 checkpoint partition (e.g. `MiniMax-H3/FL2VA`) without converting it on disk.
+ 
+@@ -560,13 +562,17 @@ class MiniMaxH3Transformer3DModel(MiniMaxH3MixedPrecisionLoaderMixin, ModelMixin
+             iter_original_transformer_tensors,
+         )
+ 
++        config = dict(MINIMAX_H3_TRANSFORMER_CONFIG)
++        config.update(model_kwargs)
+         with torch.device("meta"):
+-            model = cls(**MINIMAX_H3_TRANSFORMER_CONFIG)
++            model = cls(**config)
+         # `rope.inv_freq` is a float32 constant of the config rather than a checkpoint weight, and the meta build
+         # left it as a meta tensor: recompute it on the CPU.
+         model.rope.inv_freq = model.rope._compute_inv_freq()
+         assign_original_tensors(
+-            model, iter_original_transformer_tensors(checkpoint_path, torch_dtype=torch_dtype)
++            model,
++            iter_original_transformer_tensors(checkpoint_path, torch_dtype=torch_dtype),
++            allowed_missing_prefixes=allowed_missing_prefixes,
+         )
+         if device is not None:
+             model.to(device)
+diff --git a/videox_fun/models/minimax_h3_transformer3d_control.py b/videox_fun/models/minimax_h3_transformer3d_control.py
+index a9393ca..ca981ea 100644
+--- a/videox_fun/models/minimax_h3_transformer3d_control.py
++++ b/videox_fun/models/minimax_h3_transformer3d_control.py
+@@ -321,14 +321,20 @@ class MiniMaxH3ControlTransformer3DModel(MiniMaxH3Transformer3DModel):
+         return model
+ 
+     @classmethod
+-    def from_pretrained_original(cls, checkpoint_path, torch_dtype=None, device=None):
++    def from_pretrained_original(cls, checkpoint_path, torch_dtype=None, device=None, **model_kwargs):
+         r"""
+         Load an original MiniMax-H3 partition and initialise the control branch it does not carry.
+ 
+         The base implementation would `Module.to(device)` while the control branch is still on the meta device, which
+         raises "Cannot copy out of meta tensor", so the branch is initialised before the model is moved.
+         """
+-        model = super().from_pretrained_original(checkpoint_path, torch_dtype=torch_dtype, device=None)
++        model = super().from_pretrained_original(
++            checkpoint_path,
++            torch_dtype=torch_dtype,
++            device=None,
++            allowed_missing_prefixes=("control_blocks.", "control_proj_in."),
++            **model_kwargs,
++        )
+         model.materialize_missing_control_params()
+         if device is not None:
+             model.to(device)
+diff --git a/videox_fun/pipeline/__init__.py b/videox_fun/pipeline/__init__.py
+index d2cd082..8ff832c 100755
+--- a/videox_fun/pipeline/__init__.py
++++ b/videox_fun/pipeline/__init__.py
+@@ -20,6 +20,7 @@ from .pipeline_ltx2_i2v import LTX2I2VPipeline
+ from .pipeline_ltx2_latent_upsample import LTX2LatentUpsamplePipeline
+ from .pipeline_minimax_h3 import (MiniMaxH3AudioReference,
+                                   MiniMaxH3ImageReference,
++                                  MiniMaxH3NativeGuide,
+                                   MiniMaxH3Pipeline,
+                                   MiniMaxH3VideoReference)
+ from .pipeline_minimax_h3_control import MiniMaxH3ControlPipeline
+@@ -52,4 +53,4 @@ WanFunPipeline = WanPipeline
+ WanI2VPipeline = WanFunInpaintPipeline
+ 
+ Wan2_2FunPipeline = Wan2_2Pipeline
+-Wan2_2I2VPipeline = Wan2_2FunInpaintPipeline
+\ No newline at end of file
++Wan2_2I2VPipeline = Wan2_2FunInpaintPipeline
+diff --git a/videox_fun/pipeline/pipeline_minimax_h3.py b/videox_fun/pipeline/pipeline_minimax_h3.py
+index e4864a5..caf8661 100644
+--- a/videox_fun/pipeline/pipeline_minimax_h3.py
++++ b/videox_fun/pipeline/pipeline_minimax_h3.py
+@@ -142,6 +142,26 @@ class MiniMaxH3Reference:
+     """
+ 
+ 
++@dataclass
++class MiniMaxH3NativeGuide:
++    r"""A pre-encoded AV clip pinned to an arbitrary frame of the generated target.
++
++    The tensors use MiniMax-H3's normalized latent space, before the video/audio VAE
++    denormalization performed by ``output_type="latent"``.  This makes the class suitable for
++    continuation: a preceding sample can be normalized once, sliced on the native token grid,
++    and injected without a decode/encode round trip.
++
++    Attributes:
++        frame_index (`int`): Pixel-frame index where the guide starts on the target timeline.
++        video_latents (`torch.Tensor`): Shape ``(1, 24, T, H, W)``.
++        audio_latents (`torch.Tensor`, optional): Shape ``(2, 32, T_audio)``.
++    """
++
++    frame_index: int
++    video_latents: torch.Tensor
++    audio_latents: Optional[torch.Tensor] = None
++
++
+ @dataclass
+ class MiniMaxH3ImageReference(MiniMaxH3Reference):
+     r"""
+@@ -1416,6 +1436,234 @@ def build_ref2va_packed_sequence(
+     )
+ 
+ 
++def _native_guide_frame_count(num_latent_frames: int) -> int:
++    """Number of pixel frames represented by a cycle-aligned native H3 latent clip."""
++    return sum(
++        _ROPE_FRAMES_PER_LATENT[index % len(_ROPE_FRAMES_PER_LATENT)]
++        for index in range(num_latent_frames)
++    )
++
++
++def build_ref2va_guided_packed_sequence(
++    text_token_tags: torch.Tensor,
++    references: List[MiniMaxH3Reference],
++    condition_latents: List[torch.Tensor],
++    audio_condition_latents: List[torch.Tensor],
++    num_latent_frames: int,
++    latent_height: int,
++    latent_width: int,
++    num_audio_latents: int,
++    patch_size: Tuple[int, int, int],
++    native_guides: List[MiniMaxH3NativeGuide],
++) -> MiniMaxH3PackedSequence:
++    r"""Build H3's official ``[text | guides | refs | target]`` continuation layout.
++
++    Guide rows are physically before Ref2VA rows but use positions on the target timeline after
++    every reference span.  This is the key detail that permits an undecoded prior latent tail to
++    preserve temporal state while the ordinary references remain responsible for appearance.
++    """
++    if not native_guides:
++        return build_ref2va_packed_sequence(
++            text_token_tags,
++            references,
++            condition_latents,
++            audio_condition_latents,
++            num_latent_frames,
++            latent_height,
++            latent_width,
++            num_audio_latents,
++            patch_size,
++        )
++
++    _, patch_h, patch_w = patch_size
++    audio_channels = MINIMAX_H3_AUDIO_CHANNELS
++    num_text_tokens = text_token_tags.shape[0]
++    rows_per_target_frame = (latent_height // patch_h) * (latent_width // patch_w)
++    num_target_video_rows = num_latent_frames * rows_per_target_frame
++    num_target_audio_rows = num_audio_latents * audio_channels
++
++    visual_geometries = [tuple(latents.shape[2:5]) for latents in condition_latents]
++    audio_row_counts = [rows.shape[0] for rows in audio_condition_latents]
++    reference_blocks = []
++    visual_index = 0
++    audio_index = 0
++    target_origin = float(num_text_tokens)
++    for reference in references:
++        block = {"kind": reference.kind}
++        if reference.kind == "image":
++            block["visual"] = visual_geometries[visual_index]
++            visual_index += 1
++            target_origin += 1.0
++        elif reference.kind == "audio":
++            block["audio_rows"] = audio_row_counts[audio_index]
++            audio_index += 1
++            target_origin += float(block["audio_rows"] // audio_channels)
++        elif reference.kind == "video":
++            block["audio_rows"] = audio_row_counts[audio_index] if reference.has_audio else 0
++            if reference.has_audio:
++                audio_index += 1
++            block["visual"] = visual_geometries[visual_index]
++            visual_index += 1
++            latent_frames = block["visual"][0]
++            video_span = sum(
++                _ROPE_FRAME_RESCALE * _ROPE_FRAMES_PER_LATENT[index % len(_ROPE_FRAMES_PER_LATENT)]
++                for index in range(latent_frames)
++            )
++            target_origin += max(float(block["audio_rows"] // audio_channels), video_span)
++        else:
++            raise ValueError(f"A reference must be an 'image', a 'video' or an 'audio', got {reference.kind!r}.")
++        reference_blocks.append(block)
++    if visual_index != len(visual_geometries) or audio_index != len(audio_row_counts):
++        raise ValueError("The Ref2VA references and their encoded visual/audio latent lists do not agree.")
++
++    num_guide_video_rows = 0
++    num_guide_audio_rows = 0
++    for index, guide in enumerate(native_guides):
++        if guide.video_latents.ndim != 5 or guide.video_latents.shape[:2] != (1, 24):
++            raise ValueError(
++                f"native_guides[{index}].video_latents must have shape (1, 24, T, H, W), "
++                f"got {tuple(guide.video_latents.shape)}."
++            )
++        if tuple(guide.video_latents.shape[3:]) != (latent_height, latent_width):
++            raise ValueError(
++                f"native_guides[{index}] has latent canvas {tuple(guide.video_latents.shape[3:])}, "
++                f"target is {(latent_height, latent_width)}; native guides cannot be resized."
++            )
++        guide_frames = _native_guide_frame_count(guide.video_latents.shape[2])
++        if guide.frame_index < 0 or guide.frame_index + guide_frames > _native_guide_frame_count(num_latent_frames):
++            raise ValueError(
++                f"native_guides[{index}] spans target frames {guide.frame_index}:"
++                f"{guide.frame_index + guide_frames}, outside the "
++                f"{_native_guide_frame_count(num_latent_frames)}-frame target."
++            )
++        num_guide_video_rows += guide.video_latents.shape[2] * rows_per_target_frame
++        if guide.audio_latents is not None:
++            if guide.audio_latents.ndim != 3 or guide.audio_latents.shape[:2] != (2, 32):
++                raise ValueError(
++                    f"native_guides[{index}].audio_latents must have shape (2, 32, T), "
++                    f"got {tuple(guide.audio_latents.shape)}."
++                )
++            remaining_audio = int(np.floor(num_audio_latents - _ROPE_FRAME_RESCALE * guide.frame_index))
++            if guide.audio_latents.shape[-1] > remaining_audio:
++                raise ValueError(
++                    f"native_guides[{index}] has {guide.audio_latents.shape[-1]} audio latents but only "
++                    f"{remaining_audio} fit after target frame {guide.frame_index}."
++                )
++            num_guide_audio_rows += guide.audio_latents.shape[-1] * audio_channels
++
++    num_reference_video_rows = sum(
++        frames * (height // patch_h) * (width // patch_w)
++        for frames, height, width in visual_geometries
++    )
++    num_reference_audio_rows = sum(audio_row_counts)
++    sequence_length = (
++        num_text_tokens
++        + num_guide_video_rows
++        + num_guide_audio_rows
++        + num_reference_video_rows
++        + num_reference_audio_rows
++        + num_target_audio_rows
++        + num_target_video_rows
++    )
++    position_ids = torch.zeros(sequence_length, 3, dtype=torch.float64)
++    position_ids[:num_text_tokens, 0] = torch.arange(num_text_tokens, dtype=torch.float64)
++    target_frame_grid, target_width_grid = _frame_position_grid(
++        latent_height, latent_width, patch_h, patch_w
++    )
++    video_indices, audio_indices = [], []
++    cursor = num_text_tokens
++
++    for guide in native_guides:
++        guide_time = target_origin + _ROPE_FRAME_RESCALE * float(guide.frame_index)
++        guide_latent_frames = guide.video_latents.shape[2]
++        num_rows = guide_latent_frames * rows_per_target_frame
++        rows = slice(cursor, cursor + num_rows)
++        cursor = rows.stop
++        video_indices.append(torch.arange(rows.start, rows.stop))
++        frame_time = _temporal_position_grid(guide_latent_frames, guide_time)
++        position_ids[rows, 0] = frame_time.repeat_interleave(target_frame_grid.shape[0])
++        position_ids[rows, 1:] = target_frame_grid.repeat(guide_latent_frames, 1)
++        if guide.audio_latents is not None:
++            guide_audio_frames = guide.audio_latents.shape[-1]
++            num_rows = guide_audio_frames * audio_channels
++            rows = slice(cursor, cursor + num_rows)
++            cursor = rows.stop
++            audio_indices.append(torch.arange(rows.start, rows.stop))
++            _fill_audio_positions(
++                position_ids, rows, guide_audio_frames, guide_time, target_width_grid, audio_channels
++            )
++
++    rotary_time = float(num_text_tokens)
++    for reference, block in zip(references, reference_blocks):
++        if reference.kind == "image":
++            latent_frames, reference_height, reference_width = block["visual"]
++            frame_grid, _ = _frame_position_grid(reference_height, reference_width, patch_h, patch_w)
++            num_rows = latent_frames * frame_grid.shape[0]
++            rows = slice(cursor, cursor + num_rows)
++            cursor = rows.stop
++            video_indices.append(torch.arange(rows.start, rows.stop))
++            position_ids[rows, 0] = rotary_time
++            position_ids[rows, 1:] = frame_grid
++            rotary_time += 1.0
++        elif reference.kind == "audio":
++            num_rows = block["audio_rows"]
++            audio_frames = num_rows // audio_channels
++            rows = slice(cursor, cursor + num_rows)
++            cursor = rows.stop
++            audio_indices.append(torch.arange(rows.start, rows.stop))
++            _fill_audio_positions(position_ids, rows, audio_frames, rotary_time, target_width_grid, audio_channels)
++            rotary_time += float(audio_frames)
++        else:
++            num_audio_rows = block["audio_rows"]
++            audio_frames = num_audio_rows // audio_channels
++            latent_frames, reference_height, reference_width = block["visual"]
++            frame_grid, width_grid = _frame_position_grid(reference_height, reference_width, patch_h, patch_w)
++            audio_rows = slice(cursor, cursor + num_audio_rows)
++            video_rows = slice(audio_rows.stop, audio_rows.stop + latent_frames * frame_grid.shape[0])
++            cursor = video_rows.stop
++            audio_indices.append(torch.arange(audio_rows.start, audio_rows.stop))
++            video_indices.append(torch.arange(video_rows.start, video_rows.stop))
++            _fill_audio_positions(position_ids, audio_rows, audio_frames, rotary_time, width_grid, audio_channels)
++            frame_time = _temporal_position_grid(latent_frames, rotary_time)
++            position_ids[video_rows, 0] = frame_time.repeat_interleave(frame_grid.shape[0])
++            position_ids[video_rows, 1:] = frame_grid.repeat(latent_frames, 1)
++            video_span = sum(
++                _ROPE_FRAME_RESCALE * _ROPE_FRAMES_PER_LATENT[index % len(_ROPE_FRAMES_PER_LATENT)]
++                for index in range(latent_frames)
++            )
++            rotary_time += max(float(audio_frames), video_span)
++
++    if abs(rotary_time - target_origin) > 1e-9:
++        raise RuntimeError(f"Ref2VA target origin changed between layout passes: {target_origin} vs {rotary_time}.")
++    audio_start = cursor
++    video_start = audio_start + num_target_audio_rows
++    _fill_audio_positions(
++        position_ids, slice(audio_start, video_start), num_audio_latents,
++        rotary_time, target_width_grid, audio_channels,
++    )
++    frame_time = _temporal_position_grid(num_latent_frames, rotary_time)
++    position_ids[video_start:, 0] = frame_time.repeat_interleave(target_frame_grid.shape[0])
++    position_ids[video_start:, 1:] = target_frame_grid.repeat(num_latent_frames, 1)
++
++    video_indices = torch.cat(video_indices + [torch.arange(video_start, sequence_length)])
++    audio_indices = torch.cat(audio_indices + [torch.arange(audio_start, video_start)])
++    text_indices = torch.arange(num_text_tokens)
++    token_tags = torch.empty(sequence_length, dtype=torch.long)
++    token_tags[text_indices] = text_token_tags.to(torch.long)
++    token_tags[audio_indices] = MINIMAX_H3_AUDIO_TAG
++    token_tags[video_indices] = MINIMAX_H3_VIDEO_TAG
++    return MiniMaxH3PackedSequence(
++        sequence_length=sequence_length,
++        position_ids=position_ids,
++        token_tags=token_tags,
++        video_indices=video_indices,
++        audio_indices=audio_indices,
++        text_indices=text_indices,
++        num_condition_video_rows=num_guide_video_rows + num_reference_video_rows,
++        num_condition_audio_rows=num_guide_audio_rows + num_reference_audio_rows,
++    )
++
++
+ def ref2va_condition_rows(
+     scheduler,
+     condition_latents: List[torch.Tensor],
+@@ -1730,7 +1978,12 @@ class MiniMaxH3Pipeline(DiffusionPipeline):
+         # to hold for: 346 frames would otherwise pass the check and then be rounded up to 362, i.e. 15.083 seconds.
+         aligned_num_frames = align_num_frames(num_frames)
+         duration = aligned_num_frames / MINIMAX_H3_FPS
+-        if not self._min_duration <= duration <= self._max_duration:
++        experimental_long_context = os.environ.get(
++            "MINIMAX_H3_ALLOW_EXPERIMENTAL_LONG_CONTEXT", ""
++        ).lower() in {"1", "true", "yes"}
++        if not self._min_duration <= duration or (
++            duration > self._max_duration and not experimental_long_context
++        ):
+             raise ValueError(
+                 f"MiniMax-H3 generates between {self._min_duration} and {self._max_duration} seconds at "
+                 f"{MINIMAX_H3_FPS} fps, so `num_frames`, rounded up to the next `17 * n + 5` the video VAE can "
+@@ -1738,6 +1991,15 @@ class MiniMaxH3Pipeline(DiffusionPipeline):
+                 f"{int(self._max_duration * MINIMAX_H3_FPS)}, got {num_frames} (rounded up to "
+                 f"{aligned_num_frames})."
+             )
++        if duration > self._max_duration:
++            logger.warning(
++                "Experimental long-context override enabled: %.3f seconds (%d aligned frames) exceeds the "
++                "released %.3f-second MiniMax-H3 contract. This configuration is unsupported and must be "
++                "validated for memory, motion and terminal-state quality.",
++                duration,
++                aligned_num_frames,
++                self._max_duration,
++            )
+ 
+     def _mm_token_type_ids(self, token_ids: List[int]) -> List[int]:
+         r"""
+@@ -2258,6 +2520,7 @@ class MiniMaxH3Pipeline(DiffusionPipeline):
+         image: Optional[Image.Image] = None,
+         last_image: Optional[Image.Image] = None,
+         references: Optional[List[MiniMaxH3Reference]] = None,
++        native_guides: Optional[List[MiniMaxH3NativeGuide]] = None,
+         height: Optional[int] = None,
+         width: Optional[int] = None,
+         num_frames: int = 124,
+@@ -2299,6 +2562,10 @@ class MiniMaxH3Pipeline(DiffusionPipeline):
+                 only ones. Decode files with each class's `from_file` classmethod, which brings the rates along. The
+                 `ref2va` checkpoint is guidance-distilled with no unconditional branch, so `references` needs
+                 `guidance_scale <= 1`, and it needs a transformer loaded from `transformer_ref`.
++            native_guides (`list[MiniMaxH3NativeGuide]`, *optional*):
++                Pre-encoded H3 AV clips pinned to the generated target timeline. They preserve a preceding sample's
++                native latent state without an RGB decode/encode round trip. This continuation path is defined only
++                for Ref2VA requests and, like the released Ref2VA checkpoint, requires `guidance_scale <= 1`.
+             height (`int`, *optional*):
+                 Height of the generated video in pixels, a multiple of 32. Defaults to MiniMax-H3's own canvas for the
+                 aspect ratio of the first keyframe, or 16:9 without one.
+@@ -2353,6 +2620,14 @@ class MiniMaxH3Pipeline(DiffusionPipeline):
+         # `ref2va` is a task of its own: the keyframes of `fl2va` are mutually exclusive with it, and the released
+         # `ref2va` checkpoint is guidance-distilled with no unconditional branch, so there is no CFG to run.
+         do_ref2va = bool(references)
++        native_guides = list(native_guides or [])
++        if native_guides and not do_ref2va:
++            raise ValueError("`native_guides` are continuation conditions for a Ref2VA request; supply `references`.")
++        if native_guides and guidance_scale > 1.0:
++            raise ValueError(
++                "Native H3 continuation guides require `guidance_scale <= 1`; the Ref2VA checkpoint has no "
++                "unconditional guide layout."
++            )
+         if do_ref2va:
+             if image is not None or last_image is not None:
+                 raise ValueError(
+@@ -2439,7 +2714,20 @@ class MiniMaxH3Pipeline(DiffusionPipeline):
+             )
+ 
+         # 4. Build the packed layout and its fp64 rotary grid.
+-        if do_ref2va:
++        if native_guides:
++            layout = build_ref2va_guided_packed_sequence(
++                text_token_tags,
++                references,
++                condition_latents,
++                audio_condition_latents,
++                num_latent_frames,
++                latent_height,
++                latent_width,
++                num_audio_latents,
++                self.patch_size,
++                native_guides,
++            )
++        elif do_ref2va:
+             layout = build_ref2va_packed_sequence(
+                 text_token_tags,
+                 references,
+@@ -2488,9 +2776,11 @@ class MiniMaxH3Pipeline(DiffusionPipeline):
+         # 5. Draw the noise of the generated rows and prepend the conditioning rows. The reference noise is the
+         # request's *first* draw — ahead of the video and audio noise below — and the order is part of what the
+         # generator reproduces.
++        all_condition_latents = ([guide.video_latents for guide in native_guides] + condition_latents) \
++            if do_ref2va else None
+         if do_ref2va:
+             condition_rows = ref2va_condition_rows(
+-                self.scheduler, condition_latents, self.patch_size, generator=generator, device=device
++                self.scheduler, all_condition_latents, self.patch_size, generator=generator, device=device
+             )
+         latents, audio_latents = self.prepare_latents(
+             num_latent_frames,
+@@ -2504,17 +2794,21 @@ class MiniMaxH3Pipeline(DiffusionPipeline):
+         )
+         if do_ref2va:
+             latents = torch.cat([condition_rows, latents])
+-            if audio_condition_latents:
+-                num_reference_audio_rows = sum(rows.shape[0] for rows in audio_condition_latents)
+-                if num_reference_audio_rows != num_condition_audio_rows:
++            native_audio_condition_rows = [
++                guide.audio_latents.to(torch.float32).permute(0, 2, 1).reshape(-1, self.audio_latent_channels)
++                for guide in native_guides
++                if guide.audio_latents is not None
++            ]
++            all_audio_condition_rows = native_audio_condition_rows + audio_condition_latents
++            if all_audio_condition_rows:
++                actual_condition_audio_rows = sum(rows.shape[0] for rows in all_audio_condition_rows)
++                if actual_condition_audio_rows != num_condition_audio_rows:
+                     raise ValueError(
+                         f"The layout reserved {num_condition_audio_rows} reference audio rows but the encoded "
+-                        f"soundtracks pack into {num_reference_audio_rows}. The references the layout was built from "
+-                        "and the ones the audio conditioning was encoded from do not agree."
++                        f"guides/references pack into {actual_condition_audio_rows}."
+                     )
+-                # Soundtracks are never noised: a reference soundtrack conditions clean, at `t = 0`.
+                 audio_latents = torch.cat(
+-                    [rows.to(device) for rows in audio_condition_latents] + [audio_latents]
++                    [rows.to(device) for rows in all_audio_condition_rows] + [audio_latents]
+                 )
+         elif condition_latents is not None:
+             latents = torch.cat([condition_latents, latents])
+diff --git a/videox_fun/pipeline/pipeline_minimax_h3_control.py b/videox_fun/pipeline/pipeline_minimax_h3_control.py
+index 8aba921..f350d79 100644
+--- a/videox_fun/pipeline/pipeline_minimax_h3_control.py
++++ b/videox_fun/pipeline/pipeline_minimax_h3_control.py
+@@ -8,11 +8,11 @@ r"""
+ MiniMax-H3 control to video + audio pipeline.
+ 
+ The control video guides the generated video through the transformer's side branch rather than through the packed
+-sequence: it never occupies rows of its own, so the layout, the rotary grid and the two schedules are exactly the
+-ones of [`MiniMaxH3Pipeline`]. The control rows line up one-to-one with the video rows of the packed sequence, and
+-the released control checkpoints are trained on the `t2va` layout alone, so this pipeline covers text plus control
+-video only: a keyframe request (`image` / `last_image`) adds conditioning *video* rows and belongs to
+-[`MiniMaxH3Pipeline`].
++sequence: it never occupies rows of its own. The released control checkpoints were trained on the `t2va` layout.
++The standard route therefore lines control rows up one-to-one with generated video rows. An experimental Ref2VA
++hybrid is also exposed: immutable reference rows are prepended to the packed sequence, zero control rows cover
++them, and the actual control rows still cover generated target rows only. This is an inference compatibility probe,
++not a claim that the released control checkpoint was trained on Ref2VA layouts.
+ 
+ A freshly initialised control branch is an identity (`after_proj` is zero), so a control model that has not been
+ trained yet reproduces the base model regardless of `control_context_scale`.
+@@ -22,14 +22,23 @@ from typing import Any, Callable, Dict, List, Optional, Union
+ 
+ import torch
+ import torch.nn.functional as F
++from PIL import Image
+ 
+ from .pipeline_minimax_h3 import (MINIMAX_H3_KEYFRAME_NOISE_AUG,
+                                   MINIMAX_H3_PIXEL_MEAN, MINIMAX_H3_PIXEL_STD,
++                                  MiniMaxH3Reference,
++                                  MiniMaxH3NativeGuide,
+                                   MiniMaxH3Pipeline, MiniMaxH3PipelineOutput,
+                                   _offload_scope, align_num_frames,
+                                   audio_latent_num_frames,
+-                                  build_packed_sequence, build_row_timesteps,
+-                                  logger, patchify_video_latents,
++                                  build_packed_sequence,
++                                  build_ref2va_packed_sequence,
++                                  build_ref2va_guided_packed_sequence,
++                                  build_row_timesteps,
++                                  check_ref2va_references, logger,
++                                  normalize_ref2va_references,
++                                  patchify_video_latents,
++                                  ref2va_condition_rows,
+                                   resolve_canvas_size,
+                                   video_latent_num_frames)
+ 
+@@ -286,6 +295,9 @@ class MiniMaxH3ControlPipeline(MiniMaxH3Pipeline):
+     def __call__(
+         self,
+         prompt: str = None,
++        prompt_images: Optional[List[Image.Image]] = None,
++        references: Optional[List[MiniMaxH3Reference]] = None,
++        native_guides: Optional[List[MiniMaxH3NativeGuide]] = None,
+         control_video: Optional[torch.Tensor] = None,
+         control_context_scale: float = 1.0,
+         mask_video: Optional[torch.Tensor] = None,
+@@ -313,6 +325,20 @@ class MiniMaxH3ControlPipeline(MiniMaxH3Pipeline):
+         Same contract as [`~MiniMaxH3Pipeline.__call__`], minus the keyframe arguments (`image` / `last_image`), plus:
+ 
+         Args:
++            prompt_images (`list[PIL.Image.Image]`, *optional*):
++                Appearance/context images encoded only by Qwen-VL alongside the prompt. They do not add keyframe
++                latent rows and therefore do not replace `control_video` or `inpaint_video` as geometry authority.
++                This is a visual-prompt path, not Ref2VA latent conditioning.
++            references (`list[MiniMaxH3Reference]`, *optional*):
++                Experimental true Ref2VA references. Unlike `prompt_images`, these are encoded by the video/audio
++                VAEs and occupy immutable conditioning rows in the packed sequence. Control and inpaint rows are
++                applied only to the generated target rows; zero rows cover the reference rows. The released
++                ControlNet checkpoint was trained on the T2VA layout, so this hybrid is an inference experiment,
++                not a claim of trained Ref2VA-ControlNet compatibility.
++            native_guides (`list[MiniMaxH3NativeGuide]`, *optional*):
++                Normalized, pre-encoded AV clips pinned on the target timeline. These rows use H3's native
++                arbitrary-frame guide layout and are never decoded or re-encoded by the pipeline. A continuation
++                window normally pins the preceding latent tail at frame 0 and discards the regenerated overlap.
+             control_video (`torch.Tensor` of shape `(1, 3, num_frames, height, width)`, *optional*):
+                 The control video in the `[0, 1]` range. `None` disables the control branch, which makes the call
+                 identical to the base pipeline.
+@@ -339,9 +365,29 @@ class MiniMaxH3ControlPipeline(MiniMaxH3Pipeline):
+         self._attention_kwargs = attention_kwargs
+         device = self._execution_device
+ 
++        do_ref2va = bool(references)
++        native_guides = list(native_guides or [])
++        if native_guides and guidance_scale > 1.0:
++            raise ValueError(
++                "Native H3 continuation guides currently require `guidance_scale <= 1`; the released "
++                "Ref2VA checkpoint is guidance-distilled and the CFG negative layout has no guide rows."
++            )
++        if do_ref2va:
++            if prompt_images:
++                raise ValueError(
++                    "`references` already supplies Ref2VA visual conditioning and is mutually exclusive with "
++                    "the weaker Qwen-only `prompt_images` path."
++                )
++            if guidance_scale > 1.0:
++                raise ValueError(
++                    "The `ref2va` checkpoint is guidance-distilled and has no unconditional branch, so "
++                    f"`references` needs `guidance_scale <= 1`, got {guidance_scale}."
++                )
++            references = check_ref2va_references(list(references))
++
+         # 1. Resolve the plan: the canvas, the frame count the video VAE can decode and the latent geometry every
+-        # later step keys off. The layout is the `t2va` one — no keyframe conditioning rows — so its video rows are
+-        # the generated rows alone and the control rows cover them one-to-one.
++        # later step keys off. A normal request uses only generated T2VA rows; an experimental Ref2VA request adds
++        # immutable reference rows later while leaving the target canvas unchanged.
+         if height is None:
+             height, width = resolve_canvas_size(16, 9)
+ 
+@@ -357,30 +403,67 @@ class MiniMaxH3ControlPipeline(MiniMaxH3Pipeline):
+         latent_height = height // self.vae_spatial_compression_ratio
+         latent_width = width // self.vae_spatial_compression_ratio
+         num_audio_latents = audio_latent_num_frames(num_frames)
++        if do_ref2va:
++            references = normalize_ref2va_references(references, num_frames, self.audio_sampling_rate)
+ 
+         # 2. Encode MiniMax-H3's presentation of the request. The released checkpoint is guidance-distilled, so the
+         # default guidance_scale of 1 runs one forward pass per step with no CFG; a guidance_scale above 1 enables
+         # classifier-free guidance with a negative prompt. The control rows are handed to both passes.
+         do_cfg = guidance_scale > 1.0
+-        prompt_embeds, text_token_tags = self.encode_prompt(
+-            prompt, [], device=device, dtype=self.transformer.dtype
+-        )
++        if do_ref2va:
++            prompt_embeds, text_token_tags = self.encode_prompt(
++                prompt, references=references, device=device, dtype=self.transformer.dtype
++            )
++        else:
++            prompt_embeds, text_token_tags = self.encode_prompt(
++                prompt, prompt_images or [], device=device, dtype=self.transformer.dtype
++            )
+         if do_cfg:
+             negative_prompt = negative_prompt if negative_prompt is not None else ""
+             negative_prompt_embeds, negative_text_token_tags = self.encode_prompt(
+                 negative_prompt, [], device=device, dtype=self.transformer.dtype
+             )
+ 
+-        # 3. Build the packed layout and its fp64 rotary grid.
+-        layout = build_packed_sequence(
+-            text_token_tags,
+-            num_latent_frames,
+-            latent_height,
+-            latent_width,
+-            num_audio_latents,
+-            self.patch_size,
+-            (),
+-        )
++        # 3. Encode true Ref2VA anchors, when requested, and build the packed layout. The references occupy their
++        # own immutable video/audio rows; target control never overwrites those rows.
++        condition_latents, audio_condition_latents = [], []
++        if do_ref2va:
++            condition_latents, audio_condition_latents = self.encode_reference_latents(references, device=device)
++        if native_guides:
++            layout = build_ref2va_guided_packed_sequence(
++                text_token_tags,
++                references or [],
++                condition_latents,
++                audio_condition_latents,
++                num_latent_frames,
++                latent_height,
++                latent_width,
++                num_audio_latents,
++                self.patch_size,
++                native_guides,
++            )
++        elif do_ref2va:
++            layout = build_ref2va_packed_sequence(
++                text_token_tags,
++                references,
++                condition_latents,
++                audio_condition_latents,
++                num_latent_frames,
++                latent_height,
++                latent_width,
++                num_audio_latents,
++                self.patch_size,
++            )
++        else:
++            layout = build_packed_sequence(
++                text_token_tags,
++                num_latent_frames,
++                latent_height,
++                latent_width,
++                num_audio_latents,
++                self.patch_size,
++                (),
++            )
+         position_ids = layout.position_ids.to(device)
+         token_tags = layout.token_tags.to(device)
+         video_indices = layout.video_indices.to(device)
+@@ -419,19 +502,20 @@ class MiniMaxH3ControlPipeline(MiniMaxH3Pipeline):
+             )
+         control_rows = None
+         if control_video is not None or mask_video is not None:
++            num_target_video_rows = video_indices.shape[0] - num_condition_video_rows
+             if control_video is not None:
+                 control_rows = self.encode_control_video(control_video, height, width, num_frames, device=device)
+             else:
+                 patch_columns = self.patch_size[0] * self.patch_size[1] * self.patch_size[2]
+                 control_rows = torch.zeros(
+-                    video_indices.shape[0], self.vae_latent_channels * patch_columns,
++                    num_target_video_rows, self.vae_latent_channels * patch_columns,
+                     device=device, dtype=torch.float32,
+                 )
+-            if control_rows.shape[0] != video_indices.shape[0]:
++            if control_rows.shape[0] != num_target_video_rows:
+                 raise ValueError(
+                     f"The control video maps to {control_rows.shape[0]} rows but the packed sequence holds "
+-                    f"{video_indices.shape[0]} video rows. One control row per video row is required, in the same "
+-                    "order."
++                    f"{num_target_video_rows} generated video rows (plus {num_condition_video_rows} immutable "
++                    "reference rows). One control row per generated row is required, in the same order."
+                 )
+             if mask_video is not None:
+                 inpaint_rows = self.encode_inpaint_condition(
+@@ -439,9 +523,28 @@ class MiniMaxH3ControlPipeline(MiniMaxH3Pipeline):
+                 )
+                 control_rows = torch.cat([control_rows, inpaint_rows], dim=-1)
+             control_rows = self.align_control_rows_width(control_rows)
++            if num_condition_video_rows:
++                reference_control_rows = torch.zeros(
++                    num_condition_video_rows,
++                    control_rows.shape[-1],
++                    device=control_rows.device,
++                    dtype=control_rows.dtype,
++                )
++                control_rows = torch.cat([reference_control_rows, control_rows], dim=0)
++            if control_rows.shape[0] != video_indices.shape[0]:
++                raise ValueError(
++                    f"The hybrid control tensor has {control_rows.shape[0]} rows after reference padding, but "
++                    f"the packed sequence has {video_indices.shape[0]} video rows."
++                )
+             control_rows = control_rows[None].to(device)
+ 
+-        # 5. Draw the noise of the generated rows.
++        # 5. Draw the reference-conditioning noise first, then target video/audio noise, preserving Ref2VA's
++        # generator order. Reference rows are prepended and remain immutable throughout denoising.
++        all_condition_latents = [guide.video_latents for guide in native_guides] + condition_latents
++        if all_condition_latents:
++            condition_rows = ref2va_condition_rows(
++                self.scheduler, all_condition_latents, self.patch_size, generator=generator, device=device
++            )
+         latents, audio_latents = self.prepare_latents(
+             num_latent_frames,
+             latent_height,
+@@ -452,6 +555,24 @@ class MiniMaxH3ControlPipeline(MiniMaxH3Pipeline):
+             latents,
+             audio_latents,
+         )
++        if all_condition_latents:
++            latents = torch.cat([condition_rows, latents])
++            native_audio_condition_rows = [
++                guide.audio_latents.to(torch.float32).permute(0, 2, 1).reshape(-1, self.audio_latent_channels)
++                for guide in native_guides
++                if guide.audio_latents is not None
++            ]
++            all_audio_condition_rows = native_audio_condition_rows + audio_condition_latents
++            if all_audio_condition_rows:
++                actual_condition_audio_rows = sum(rows.shape[0] for rows in all_audio_condition_rows)
++                if actual_condition_audio_rows != num_condition_audio_rows:
++                    raise ValueError(
++                        f"The layout reserved {num_condition_audio_rows} reference audio rows but the encoded "
++                        f"guides/references pack into {actual_condition_audio_rows}."
++                    )
++                audio_latents = torch.cat(
++                    [rows.to(device) for rows in all_audio_condition_rows] + [audio_latents]
++                )
+ 
+         # 6. Initialize the two schedules and stage the row-to-timestep plan of every step. One forward serves every
+         # modality and every noise level at once.

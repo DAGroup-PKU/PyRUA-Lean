@@ -1,0 +1,193 @@
+{
+  "schema_version": "datafarm.render-verifier-spec/1.0.0",
+  "spec_id": "<task>-v1",
+  "task_family": "<task>",
+  "task_ir_roles": [
+    "<object>",
+    "robot"
+  ],
+  "layout_size": [
+    1280,
+    1080
+  ],
+  "fps": 30.0,
+  "work_scale": 0.5,
+  "stride": 2,
+  "panels": [
+    {
+      "name": "head",
+      "box": [
+        0,
+        0,
+        1280,
+        720
+      ],
+      "motion": "fixed",
+      "camera": "head_camera",
+      "native_size": [
+        640,
+        360
+      ]
+    },
+    {
+      "name": "left_wrist",
+      "box": [
+        0,
+        720,
+        640,
+        360
+      ],
+      "motion": "moving",
+      "camera": "left_wrist_camera",
+      "native_size": [
+        640,
+        360
+      ]
+    },
+    {
+      "name": "right_wrist",
+      "box": [
+        640,
+        720,
+        640,
+        360
+      ],
+      "motion": "moving",
+      "camera": "right_wrist_camera",
+      "native_size": [
+        640,
+        360
+      ]
+    }
+  ],
+  "entities": [
+    {
+      "role": "<object>",
+      "carrier_keys": [
+        {
+          "lower": [
+            6,
+            60,
+            70
+          ],
+          "upper": [
+            20,
+            150,
+            125
+          ]
+        }
+      ],
+      "target_keys": [
+        {
+          "lower": [
+            3,
+            30,
+            20
+          ],
+          "upper": [
+            30,
+            255,
+            230
+          ]
+        }
+      ],
+      "checks": [
+        "missing",
+        "unsupported",
+        "extent"
+      ],
+      "min_area_frac": 0.0015,
+      "real_keys": [
+        {
+          "lower": [
+            8,
+            50,
+            40
+          ],
+          "upper": [
+            24,
+            255,
+            215
+          ]
+        }
+      ],
+      "state_objects": "<object>_*",
+      "geometry": {
+        "type": "frustum",
+        "radius_bottom": 0.028,
+        "radius_top": 0.04,
+        "height": 0.088
+      }
+    },
+    {
+      "role": "robot",
+      "carrier_keys": [
+        {
+          "lower": [
+            0,
+            0,
+            40
+          ],
+          "upper": [
+            179,
+            35,
+            95
+          ]
+        }
+      ],
+      "target_keys": [
+        {
+          "lower": [
+            0,
+            0,
+            0
+          ],
+          "upper": [
+            179,
+            255,
+            60
+          ]
+        },
+        {
+          "lower": [
+            0,
+            0,
+            60
+          ],
+          "upper": [
+            179,
+            90,
+            80
+          ]
+        }
+      ],
+      "checks": [
+        "missing",
+        "semantic_unsupported"
+      ],
+      "min_area_frac": 0.004,
+      "adaptive": false,
+      "real_keys": [
+        {
+          "lower": [
+            0,
+            0,
+            0
+          ],
+          "upper": [
+            179,
+            255,
+            45
+          ]
+        }
+      ]
+    }
+  ],
+  "realism": {
+    "mode": "sim2real",
+    "real_reference": "grounding:<task>-real-tlayout-30fps",
+    "real_frames": 24
+  },
+  "chunked": true,
+  "waivers": {}
+}

@@ -1,0 +1,97 @@
+{
+  "schema": "datafarm.h3-render-recipe/1",
+  "name": "h3-control-hybrid-v1",
+  "status": "default H3 render recipe; a task-agnostic starting point, not a task qualification",
+  "description": "MiniMax-H3 Ref2VA + H3-Fun ControlNet-Union (soft-HED) + white inpaint hybrid, rendered by src/datafarm/render/h3/h3_control_worker.py. Control rows cover generated target rows only; reference rows get zero control rows. Copy to <run>/recipes/<name>.json, set name/bundle_variant, keep every algorithmic field unless a task canary shows a reason, and qualify it per task (full-episode canary + independent blind review).",
+  "provenance": {
+    "doc": "docs/reference/rendering.md"
+  },
+  "backend": "control-hybrid",
+  "canvas": "t3-guttered-1024x768",
+  "denoise_forwards": 4,
+  "worker_profile": "control-turbo",
+  "chunk": {
+    "frames": 192,
+    "advance": 120,
+    "keep_head": 72
+  },
+  "seed_base": 1000,
+  "references": "contract",
+  "control": {
+    "type": "soft-hed",
+    "hed_tool": "${H3_VIDEOX_FUN}/tools/prepare_hed_control.py",
+    "hed_checkpoint": "${H3_VIDEOX_FUN}/models/annotators/ControlNetHED.pth",
+    "hed_min_intensity": 0,
+    "edge_gate": {
+      "type": "luma-step",
+      "tau": 25,
+      "window": 7,
+      "dilate": 5
+    },
+    "context_scale": 1.0,
+    "inpaint_source": "white",
+    "mask": "active-repaint",
+    "guidance_scale": 1.0,
+    "white_video_reference": 39,
+    "base_model": "${H3_MODELS}/MiniMax-H3/Ref2VA",
+    "control_checkpoint": "${H3_MODELS}/MiniMax-H3-Fun-Controlnet-Union/MiniMax-H3-Fun-Controlnet-Union.safetensors",
+    "control_config": "${H3_VIDEOX_FUN}/config/minimax_h3/minimax_h3_control.yaml",
+    "videox_fun_repo": "${H3_VIDEOX_FUN}"
+  },
+  "prompt_lowering": "h3-caption-chunkvis-notask",
+  "assembly": {
+    "seam": "min-diff",
+    "min_lead": 56
+  },
+  "worker": {
+    "tool": "src/datafarm/render/h3/h3_control_worker.py",
+    "launcher": "src/datafarm/render/h3/launch_control_worker.sh (default profile control-turbo)",
+    "turbo_lora": "${H3_TURBO_LORA}",
+    "turbo_lora_fuse": {"alpha": 8, "scale": 1.0},
+    "memory_mode": "full",
+    "gpus_per_worker": 1,
+    "min_free_mb_per_gpu": 172000,
+    "chunks_are_independent": true
+  },
+  "seeds": {
+    "count": 8,
+    "seed_offsets": [0, 1, 2, 3, 4, 5, 6, 7],
+    "screen": {
+      "kind": "producer-side VLM per-chunk seed screen (not acceptance)",
+      "composites": "src/datafarm/render/h3/h3_screen_prep.py",
+      "prompt": "evaluations/render-h3/prompts/seed-screen.txt",
+      "merge": "src/datafarm/render/h3/h3_screen_prep.py merge",
+      "choice_schema": "h3.seed-screen/1",
+      "select_and_assemble": "src/datafarm/render/h3/h3_finalize.py select",
+      "ood_preference": "one seed for all chunks when it is clean in every chunk (consistent OOD look)"
+    }
+  },
+  "postprocess": {
+    "exposure_lock": {
+      "tool": "src/datafarm/render/h3/h3_exposure_lock.py (via h3_finalize.py)",
+      "anchor": "first chunk",
+      "model": "per panel/channel exposure gain through the origin (median output/white brightness); gains only, no pixel moved or retimed"
+    }
+  },
+  "references_policy": {
+    "real_scene": "one state-matched real full-view T-layout frame per episode: the task state (e.g. device display on/off, container open/closed, object placement) must match the white carrier at the render start; prefer an object-free real plate derived from the episode (h3_clean_references.py) when objects move",
+    "robot": "a real robot sheet that keeps the real arm appearance (dark links, shoulder motor, gripper, wrist camera) and no cables; without real dark links the model copies the white sim arm from the white video reference",
+    "objects": "no isolated object sheets: they make the generator re-insert the object on the table (the scene frame and the carrier carry object appearance and position)",
+    "order": "contract real references first (images-first); the white carrier clip is appended as a 39-frame video reference by the worker",
+    "derivation": "references are task artifacts the agent derives from the current real episode; see src/datafarm/render/h3/BUNDLE-SCHEMA.md"
+  },
+  "per_task_knobs": {
+    "prompt_lowering": "h3-caption-chunkvis-notask (default) | h3-caption-chunkvis-noevents; keep notask when whole-task text draws future states",
+    "chunk.event_aware": "{\"before\": 24, \"min_advance\": 48} moves a chunk start ahead of an arm entering/leaving the head view",
+    "bundle_variant": "the task's reference bundle variant"
+  },
+  "evaluation": {
+    "automatic": "evaluations/render-h3/h3eval.py score --white-cos --dino ${H3_EVAL_DINO} --realpool <run>/eval/realpool/<task>.npz",
+    "acceptance": "independent blind review per evaluations/render-h3/reviewer-instructions-v1.md (EVAL-v1); the producer and the seed screen never certify"
+  },
+  "requirements": {
+    "mode": "explicit current-user mode (and OOD axes) recorded in the task bundle mode_confirmations; never inferred from this recipe",
+    "gpu": "one GPU with >= 172 GB free per worker",
+    "licence": "MiniMax-H3 LICENSE V.3 restricts using outputs to improve other models and excludes territories; see docs/reference/rendering.md"
+  }
+}

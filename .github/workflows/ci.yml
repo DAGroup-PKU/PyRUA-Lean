@@ -1,0 +1,15 @@
+name: ci
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: sudo apt-get update && sudo apt-get install -y ffmpeg bubblewrap
+      - run: python -m pip install '.[dev,workflow]'
+      - run: CUDA_VISIBLE_DEVICES='' PYTHONPATH=src:tests python -m pytest -q tests
+      - run: python tools/lint_standing_rules.py
+      - run: python tools/audit_instruction_layers.py

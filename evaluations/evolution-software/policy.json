@@ -1,0 +1,12 @@
+{
+  "schema": "datafarm.evolution-policy/1",
+  "evidence_level": "software",
+  "allowed_paths": ["src/", "tools/", "tests/", ".agents/skills/", "prompts/"],
+  "assets": ["check.py"],
+  "checks": [{
+    "id": "contracts",
+    "argv": ["python", "{suite}/check.py", "--source", "{repo}", "--output", "{report}"],
+    "timeout": 60
+  }],
+  "metrics": {"contracts.correct_cases": "max", "contracts.failed_cases": "min"}
+}

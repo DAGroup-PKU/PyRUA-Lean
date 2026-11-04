@@ -1,0 +1,260 @@
+{
+  "schema": "datafarm.standing-rules/1",
+  "purpose": "Project rules that constrain what pipeline code, prompts, reviewers and verifier specs may demand. This file is the single machine-readable source: when a rule changes, update it here first, then the prompts and specs it covers. tools/lint_standing_rules.py checks the rules that declare patterns or required values. Rules with a review_audit block are also used by tools/calibrate_vlm_reviewer.py to audit VLM reviewer verdicts and prompts.",
+  "rules": [
+    {
+      "id": "SR-001-render-lighting",
+      "statement": "Renders are judged against the real world, not the simulator proxy. Lighting variety, hard cast shadows and directional light are acceptable: sim2real renders follow the real episodes (including hard shadows when the real ones have them) and OOD renders allow lighting variation only within current task-scoped authorization; there is no universal soft-light constraint. Prompts, reviewers and verifiers must not require soft or diffuse light, forbid directional light, or treat hard shadows as defects. Only lighting or background changes over time within one video that nothing in the scene explains are defects. A specific recipe may narrow lighting only by an explicit user decision, recorded as a waiver below with its date and scope. Both modes require actual real-world image references and photographic output.",
+      "globs": [
+        "configs/**/*.txt",
+        "configs/**/*.json",
+        "tools/*.py",
+        "src/**/*.py",
+        "prompts/**/*",
+        ".agents/skills/**/*.md"
+      ],
+      "forbidden": [
+        {
+          "regex": "shadows?\\s+should\\s+be\\s+soft",
+          "why": "requires soft shadows"
+        },
+        {
+          "regex": "target\\s+is\\s+(?:a\\s+)?broad\\s+low-contrast\\s+diffuse",
+          "why": "makes diffuse fill the target look"
+        },
+        {
+          "regex": "(?:avoid|without|forbid\\w*|\\bno)\\s+(?:long\\s+|crisp\\s+|harsh\\s+|sharp\\s+)*hard\\s+shadows",
+          "why": "forbids hard shadows"
+        },
+        {
+          "regex": "long\\s+hard\\s+shadows",
+          "why": "lists hard shadows as a defect"
+        },
+        {
+          "regex": "(?:do\\s+not\\s+use|avoid)\\s+(?:a\\s+)?directional\\s+(?:key\\s+)?light",
+          "why": "forbids directional light"
+        },
+        {
+          "regex": "forbid\\w*[^.\\n]{0,24}cast\\s+shadows?",
+          "why": "forbids cast shadows"
+        }
+      ],
+      "waivers": [],
+      "known_violations": [],
+      "review_audit": {
+        "scopes": [
+          "criterion",
+          "evidence",
+          "prompt"
+        ],
+        "forbidden_criteria": [
+          "hard_shadows_beams"
+        ],
+        "exempt_criteria": [
+          "temporal_appearance"
+        ],
+        "forbidden_phrases": [
+          "soft light",
+          "softened",
+          "diffuse ambient",
+          "diffuse ambience",
+          "low-contrast",
+          "hard shadow",
+          "long shadow",
+          "diffuse light"
+        ]
+      },
+      "scope": "universal"
+    },
+    {
+      "id": "SR-002-exposure-gross-guard",
+      "statement": "Global exposure drift is only a gross guard (default background_mean_drift_max = 60). Realism and appearance thresholds are calibrated on human labels, not engineering guesses.",
+      "globs": [
+        "src/datafarm/verify/spec.py",
+        "configs/render-verifier/*.json",
+        "prompts/**/*",
+        ".agents/skills/**/*.md"
+      ],
+      "numeric_min": [
+        {
+          "key": "background_mean_drift_max",
+          "min": 60.0,
+          "why": "exposure drift must stay a gross guard"
+        }
+      ],
+      "review_audit": {
+        "scopes": [
+          "evidence",
+          "prompt"
+        ],
+        "exempt_criteria": [
+          "temporal_appearance"
+        ],
+        "forbidden_phrases": [
+          "overexposed",
+          "underexposed",
+          "over-exposed",
+          "under-exposed",
+          "overexposure",
+          "underexposure"
+        ]
+      },
+      "scope": "universal"
+    },
+    {
+      "id": "SR-003-real-object-authority",
+      "statement": "Object appearance and size are judged against the real objects; drifting away from the simulator proxy toward the real object is desired. Geometry gates check pose, motion and event alignment, not silhouette fidelity to the proxy.",
+      "globs": [
+        "configs/**/*.txt",
+        "configs/**/*.json",
+        "tools/*.py",
+        "src/**/*.py",
+        "prompts/**/*",
+        ".agents/skills/**/*.md"
+      ],
+      "forbidden": [],
+      "scope": "universal"
+    },
+    {
+      "id": "SR-004-pi05-explicit-state-mode",
+      "statement": "Every formal PI0.5 training config declares state_conditioning explicitly as none, and the model flag must match.",
+      "globs": [
+        "configs/training/*.json",
+        "prompts/**/*",
+        ".agents/skills/**/*.md"
+      ],
+      "required_json": [
+        {
+          "key": "state_conditioning",
+          "allowed": [
+            "none"
+          ]
+        }
+      ],
+      "scope": "universal"
+    },
+    {
+      "id": "SR-005-no-literal-credentials",
+      "statement": "Credentials never appear in code, configs, command lines, logs or records; they are loaded at runtime from a keys file whose path the caller supplies.",
+      "globs": [
+        "configs/**/*",
+        "tools/*",
+        "src/**/*.py",
+        "docs/**/*.md",
+        "prompts/**/*",
+        ".agents/skills/**/*.md"
+      ],
+      "forbidden": [
+        {
+          "regex": "\\bsk-(?:ant-)?[A-Za-z0-9_-]{24,}",
+          "why": "literal API key"
+        },
+        {
+          "regex": "\\bhf_[A-Za-z0-9]{30,}",
+          "why": "literal Hugging Face token"
+        },
+        {
+          "regex": "Bearer\\s+[A-Za-z0-9._~+/=-]{32,}",
+          "why": "literal bearer token"
+        }
+      ],
+      "scope": "universal"
+    },
+    {
+      "id": "SR-006-joint-margin",
+      "statement": "Robot demonstrations must reduce sustained near-limit occupancy across all actuated joints in the current robot (both arms and all six joints for a dual-Piper robot). Bind actual joint limits, audit full executed trajectories including home, next-state labels and trim connections; validate task-specific margins, occupancy and dwell caps before scaling. Candidate margins are not hardware limits. Replan and reacquire matched images/actions; never clip labels alone. This is a required review contract, not an implemented automatic admission gate.",
+      "globs": [
+        "configs/joint-margin-requirements.json",
+        "prompts/**/*",
+        ".agents/skills/**/*.md"
+      ],
+      "required_json": [
+        {
+          "key": "limits_source_required",
+          "allowed": [
+            true
+          ]
+        },
+        {
+          "key": "actual_joint_readback_required",
+          "allowed": [
+            true
+          ]
+        },
+        {
+          "key": "label_clipping_allowed",
+          "allowed": [
+            false
+          ]
+        },
+        {
+          "key": "reacquire_images_after_replanning",
+          "allowed": [
+            true
+          ]
+        }
+      ],
+      "scope": "universal"
+    },
+    {
+      "id": "SR-007-explicit-render-mode",
+      "statement": "Before rendering or resuming, bind an explicit user-confirmed sim2real/non-OOD or OOD mode with matching task/run scope. If unresolved, ask and wait. Never infer authorization from provider, model, geometry randomization or a prior OOD recipe.",
+      "globs": [
+        "configs/**/*.txt",
+        "configs/**/*.json",
+        "prompts/**/*",
+        "src/**/*.py",
+        "tools/*.py"
+      ],
+      "forbidden": [],
+      "scope": "universal"
+    },
+    {
+      "id": "SR-008-required-real-image-reference",
+      "statement": "Every mode must actually submit real-world image references with auditable provenance and payload bindings. Source-only, text-only, generated images and structural/continuity frames cannot substitute. Do not remove all real references for diagnostics or leakage workarounds.",
+      "globs": [
+        "configs/**/*.txt",
+        "configs/**/*.json",
+        "prompts/**/*",
+        "src/**/*.py",
+        "tools/*.py"
+      ],
+      "forbidden": [],
+      "scope": "universal"
+    },
+    {
+      "id": "SR-009-real-world-style-review",
+      "statement": "Every generated video must have real-world photographic style and reference adherence, independently reviewed and bound to video/reference/prompt/intent digests. Motion pass does not imply style pass. Missing evidence is unverified and cannot be admitted.",
+      "globs": [
+        "configs/**/*.txt",
+        "configs/**/*.json",
+        "prompts/**/*",
+        "src/**/*.py",
+        "tools/*.py"
+      ],
+      "forbidden": [],
+      "scope": "universal"
+    },
+    {
+      "id": "SR-010-full-scene-real-appearance",
+      "statement": "Every generated video must look like the real episode/image scene as a whole. OOD may make only approved, physically plausible real-world variations from the recorded real baseline; OOD authorization does not permit abandoning that baseline. A producer and independent reviewer must personally inspect decoded real source/reference media beside the generated video. A real-style pass requires bound visual comparison evidence covering the reference baseline, robot body and attached cameras/cables when present, task objects when present, table/background, and photographic consistency in every view declared by the current task (including all head/left-wrist/right-wrist panels for a three-view episode). A local texture or crop cannot stand in for full-scene coverage. Real references supply appearance only: never copy their action/layout or introduce entities absent from the source carrier.",
+      "globs": [
+        "prompts/**/*",
+        ".agents/skills/**/*.md",
+        "src/datafarm/*.py"
+      ],
+      "forbidden": [],
+      "scope": "universal"
+    },
+    {
+      "id": "SR-011-table-support-randomization",
+      "statement": "Simulated expert-trajectory collection applies episode-constant support randomization by default: table height (default uniform +/-20 mm) and table tilt (default magnitude uniform 1-2 degrees, uniform direction). The table and the objects resting on it tilt rigidly about the table-top origin; robot bases and cameras stay fixed. Initial objects rest on the tilted plane and experts read the actual support plane and live object poses instead of assuming a level table. Disabling tilt requires a reason recorded in the plan. Each tilted episode needs a fresh complete physical rollout and independent judging; this geometry axis does not authorize appearance or OOD changes.",
+      "globs": [
+        "prompts/**/*",
+        ".agents/skills/**/*.md"
+      ],
+      "forbidden": [],
+      "scope": "universal"
+    }
+  ]
+}

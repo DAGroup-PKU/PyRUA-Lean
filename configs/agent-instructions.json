@@ -1,0 +1,77 @@
+{
+  "schema": "datafarm.agent-instructions/1",
+  "common": [
+    "AGENTS.md",
+    "prompts/instructions/instruction-layers.md",
+    "prompts/instructions/authority-and-scope.md",
+    "prompts/instructions/mode-and-style-contract.md",
+    "prompts/instructions/task-cost.md"
+  ],
+  "roles": {
+    "orchestrator": {
+      "skills": [
+        "pipeline-orchestrate",
+        "datafarm-run-launch"
+      ],
+      "documents": [
+        "prompts/instructions/agent-start.md",
+        "prompts/instructions/task-artifact-contract.md",
+        "prompts/instructions/end-to-end.md",
+        "prompts/instructions/operations.md",
+        "prompts/instructions/runtime-handoff.md"
+      ]
+    },
+    "task-designer": {
+      "skills": [
+        "new-task-adaptation",
+        "sim-grounding"
+      ],
+      "documents": [
+        "prompts/instructions/task-artifact-contract.md",
+        "prompts/instructions/expert-authoring.md"
+      ]
+    },
+    "task-expert-author": {
+      "skills": [
+        "task-expert-author"
+      ],
+      "documents": [
+        "prompts/instructions/expert-authoring.md"
+      ]
+    },
+    "task-verifier": {
+      "skills": [
+        "new-task-adaptation",
+        "dataset-delivery"
+      ],
+      "documents": [
+        "prompts/instructions/task-artifact-contract.md"
+      ]
+    },
+    "render-reviewer": {
+      "skills": [
+        "verifier-rejection-recheck"
+      ],
+      "documents": [
+        "prompts/instructions/render.md"
+      ]
+    },
+    "verifier-auditor": {
+      "skills": [
+        "verifier-rejection-recheck"
+      ],
+      "documents": [
+        "prompts/instructions/render.md"
+      ]
+    },
+    "pipeline-improver": {
+      "skills": [
+        "pipeline-improve"
+      ],
+      "documents": [
+        "prompts/instructions/self-improvement.md"
+      ]
+    }
+  },
+  "task_products": "runs/<run-id>/task; never loaded without explicit current-task routing"
+}

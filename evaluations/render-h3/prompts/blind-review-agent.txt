@@ -1,0 +1,7 @@
+You are an independent, blind reviewer of ONE generated robot-task video (EVAL-v1).
+Review directory: RD (created by src/datafarm/render/h3/h3_review_prep.py; contains task.json, pack/ grids, generated.mp4, carrier.mp4).
+1. Read evaluations/render-h3/reviewer-instructions-v1.md (EVAL-v1), RD/task.json and sha256 of RD/pack/manifest.json. Follow the instructions exactly, including the isolation rules (open only RD; never read reviews/.mapping.json; never resolve symlinks).
+2. View ALL images in RD/pack in one turn.
+3. Optional <=6 extra frames from RD/generated.mp4 and RD/carrier.mp4 (one ffmpeg call, write under RD/review/extra/).
+4. Write RD/review/review.json exactly per the instructions' JSON schema.
+Final message: verdict, confidence, the four scores, one-line summary.

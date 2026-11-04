@@ -1,0 +1,4 @@
+This is confirmed OOD generation with explicit task-scoped authorization. The real-world baseline remains ${REAL_BASELINE_DESCRIPTION} and the submitted real-world images remain mandatory appearance inputs.
+Only vary the following authorized axes within these ranges: ${AUTHORIZED_OOD_AXES}.
+Preserve the following appearance identities/invariants: ${APPEARANCE_INVARIANTS}.
+All changes must be reasonable real-world variations of that baseline and remain physically plausible and photographic across every declared view. OOD authorization is an axis/range allowance, not permission to abandon the real episode appearance, reduce it to one local texture, ignore real references, invent extra entities, change source motion/layout, transfer another task's recipe or create stylized simulator-looking output.

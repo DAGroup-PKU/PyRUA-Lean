@@ -1,0 +1,22 @@
+{
+  "schema": "datafarm.agent-runtime/1",
+  "driver": {
+    "argv": [
+      "python3",
+      "/path/to/PyRUA-DataFarm/examples/runtime/agent_cli_driver.py",
+      "pi",
+      "--",
+      "--approve"
+    ],
+    "input": "text",
+    "session_identity_protocol": "datafarm.agent-identity/1"
+  },
+  "max_sessions": 16,
+  "timeout": 7200,
+  "poll_seconds": 5,
+  "heartbeat_seconds": 10,
+  "max_retries": 3,
+  "backoff_seconds": 5,
+  "backoff_max_seconds": 120,
+  "log_directory": "logs/agent"
+}

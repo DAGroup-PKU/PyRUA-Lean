@@ -1,0 +1,43 @@
+{
+  "schema": "datafarm.joint-margin-requirements/1",
+  "rule_id": "SR-006-joint-margin",
+  "scope": "new_or_replanned_robot_data",
+  "enforcement": "required_design_and_review_contract_not_automatic_admission_gate",
+  "limits_source_required": true,
+  "actual_joint_readback_required": true,
+  "coverage": [
+    "both_arms_all_six_joints",
+    "all_phases_including_home_wait_recovery",
+    "state_and_next_action",
+    "trim_connections",
+    "available_control_interpolation"
+  ],
+  "report_bands_deg": [
+    1,
+    5,
+    10
+  ],
+  "report_quantiles": [
+    0,
+    0.01,
+    0.05,
+    0.5
+  ],
+  "required_metrics": [
+    "nominal_violations_count_and_max",
+    "near_limit_frames_fraction",
+    "near_limit_seconds_and_longest_run",
+    "affected_episodes",
+    "phase_and_arm_and_joint_breakdown"
+  ],
+  "task_profile_required_before_scale": [
+    "validated_per_joint_margin",
+    "near_limit_fraction_cap",
+    "max_continuous_dwell_seconds",
+    "phase_specific_exceptions",
+    "limit_provenance",
+    "success_collision_contact_and_continuous_ik_evidence"
+  ],
+  "label_clipping_allowed": false,
+  "reacquire_images_after_replanning": true
+}

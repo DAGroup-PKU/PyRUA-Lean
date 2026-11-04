@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyrua-datafarm"
+dynamic = ["version"]
+description = "PyRUA-DataFarm: LLM Agent as a Cost-Efficient Teleoperator for Real-Ready Robot Data"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [{name = "The DataFarm authors"}]
+keywords = ["robot learning", "real-to-sim-to-real", "data generation", "coding agents", "video generation", "simulation"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: POSIX :: Linux",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.11"
+dependencies = ["Pillow>=10,<13"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<10", "pytest-subtests>=0.14,<1"]
+workflow = ["requests>=2.31,<3", "numpy>=1.26,<3", "opencv-python-headless>=4.8,<5", "h5py>=3.10,<4", "pyarrow>=17,<22", "scipy>=1.11,<2", "av>=12,<17"]
+
+[project.scripts]
+datafarm = "datafarm.cli:main"
+
+[tool.setuptools.dynamic]
+version = {attr = "datafarm.__version__"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

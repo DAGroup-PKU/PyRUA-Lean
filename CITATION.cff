@@ -1,0 +1,68 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the paper below."
+title: "PyRUA-DataFarm: LLM Agent as a Cost-Efficient Teleoperator for Real-Ready Robot Data"
+type: software
+license: MIT
+version: 1.0.0
+authors:
+  - given-names: Kewei
+    family-names: Zhang
+  - given-names: Juncheng
+    family-names: Ma
+  - given-names: Guodong
+    family-names: Lv
+  - given-names: Duomin
+    family-names: Wang
+  - given-names: Feixiang
+    family-names: Ruan
+  - given-names: Ruiyang
+    family-names: Si
+  - given-names: Chuanrui
+    family-names: Zhang
+  - given-names: Yuxuan
+    family-names: Chen
+  - given-names: Hao
+    family-names: Chen
+  - given-names: Yichen
+    family-names: Liu
+  - given-names: Yintianrun
+    family-names: Zhang
+  - given-names: Yufan
+    family-names: Deng
+  - given-names: Enze
+    family-names: Xie
+  - given-names: Daquan
+    family-names: Zhou
+preferred-citation:
+  type: article
+  title: "PyRUA-DataFarm: LLM Agent as a Cost-Efficient Teleoperator for Real-Ready Robot Data"
+  year: 2026
+  authors:
+    - given-names: Kewei
+      family-names: Zhang
+    - given-names: Juncheng
+      family-names: Ma
+    - given-names: Guodong
+      family-names: Lv
+    - given-names: Duomin
+      family-names: Wang
+    - given-names: Feixiang
+      family-names: Ruan
+    - given-names: Ruiyang
+      family-names: Si
+    - given-names: Chuanrui
+      family-names: Zhang
+    - given-names: Yuxuan
+      family-names: Chen
+    - given-names: Hao
+      family-names: Chen
+    - given-names: Yichen
+      family-names: Liu
+    - given-names: Yintianrun
+      family-names: Zhang
+    - given-names: Yufan
+      family-names: Deng
+    - given-names: Enze
+      family-names: Xie
+    - given-names: Daquan
+      family-names: Zhou

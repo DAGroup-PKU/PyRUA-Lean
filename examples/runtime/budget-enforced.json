@@ -1,0 +1,8 @@
+{
+  "schema": "datafarm.task-cost-policy/2",
+  "mode": "enforced",
+  "on_excess": "pause",
+  "target_usd": 30,
+  "limit_usd": 50,
+  "scope": "all-model-work-through-white-data"
+}

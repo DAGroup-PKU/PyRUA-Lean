@@ -1,0 +1,18 @@
+{
+  "schema": "datafarm.agent-runtime/1",
+  "driver": {
+    "type": "codex",
+    "input": "messages",
+    "executable": "codex",
+    "sandbox": "workspace-write",
+    "reasoning_effort": "high"
+  },
+  "max_sessions": 16,
+  "timeout": 1800,
+  "poll_seconds": 5,
+  "heartbeat_seconds": 10,
+  "max_retries": 3,
+  "backoff_seconds": 5,
+  "backoff_max_seconds": 120,
+  "log_directory": "logs/agent"
+}

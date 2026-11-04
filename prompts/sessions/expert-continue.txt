@@ -1,0 +1,5 @@
+[expert-harness] Session {index} of at most {max_sessions}; the harness resumed your conversation.
+Budget: {counted}/{max_counted} counted rollouts used, {in_flight} in flight (limit {max_concurrent} at once); active wall {active} of {total}; ${usd:.2f} used or reserved against the budget{usd_max}. Audited infrastructure outages are excluded from the session count.
+{finished}{messages}
+Continue the task in {brief}. Wait for rollouts with `xh wait --timeout {wait_cap}` (never block longer than about 4 minutes in one tool call). When you are done, run `xh submit --final "<note>"`; if the task cannot be done in this setup, run `xh flag-for-human "<reason>"`.
+If the current controller has failed physical tests and budget remains, inspect the actual trace, diagnose the failed milestone and test the revised controller before finalizing. A serialized plan or an untested edit is not task success.

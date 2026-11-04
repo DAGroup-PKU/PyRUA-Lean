@@ -1,0 +1,49 @@
+{
+  "schema": "datafarm.h3-ood-recipe/1",
+  "name": "h3-ood-restyle-v1",
+  "status": "default OOD route for tabletop material/colour and light colour temperature on top of an ACCEPTED H3 sim2real render; task-agnostic, not a task qualification",
+  "description": "Output-side OOD appearance edit: content (robot, objects, motion, contacts) is the accepted sim2real video, untouched; only the authorized axes change. Gains and recolouring only: no pixel is moved or retimed.",
+  "authorization": {
+    "required": "mode=ood with authorized_ood_axes from the current user's in-scope instruction (task bundle mode_confirmations.ood); this file grants no OOD authorization",
+    "supported_axes": [
+      "tabletop material/colour",
+      "light colour temperature/tint"
+    ],
+    "unsupported": "any robot, task-object, camera, layout or background change; textured tabletop materials in moving wrist cameras (the texture cannot follow the camera: re-render the white carrier with a textured table in simulation instead)"
+  },
+  "source": {
+    "requires": "the accepted sim2real package of the same episode (final-t3-<fps>fps.mp4 + carrier-t3-<fps>fps.mp4 + assembled.json), e.g. the h3-control-hybrid-v1 exposure-lock output",
+    "review_status_required": "accepted by the independent blind review (EVAL-v1)"
+  },
+  "steps": [
+    {
+      "tool": "src/datafarm/render/h3/h3_sam2_table_masks.py",
+      "per_panel": [
+        "head",
+        "left_wrist",
+        "right_wrist"
+      ],
+      "args": {
+        "every": 96
+      },
+      "output": "<run>/ood-masks/<task>-<panel>.npy (tabletop masks tracked on the GENERATED video, re-prompted every 96 frames)",
+      "binding": "H3_SAM2"
+    },
+    {
+      "tool": "src/datafarm/render/h3/h3_ood_restyle.py",
+      "args": {
+        "masks": "<run>/ood-masks/<task>",
+        "material_bgr": "<B,G,R of the authorized material, e.g. 104,98,92 for slate-grey laminate>",
+        "light": "one of warm-amber-2700k | warm-3000k | neutral-5000k | cool-6500k | cool-blue-7500k (mean-preserving BGR gains)"
+      },
+      "method": "table pixels = target material x (generated luminance / smooth table luminance), keeping generated shadows, contacts and noise; carrier-known white objects are subtracted from the SAM mask and table cast shadows are added; when SAM loses the table the carrier-measured table is used for that frame"
+    }
+  ],
+  "generation_side_alternative": {
+    "route": "render the white carrier with h3-control-hybrid-v1 in mode=ood (OOD contract) and assemble ONE seed across all chunks"
+  },
+  "evaluation": {
+    "automatic": "evaluations/render-h3/h3eval.py score (OOD packages are scored like sim2real; KID against the real pool is expected to rise with the authorized change)",
+    "acceptance": "independent blind review per evaluations/render-h3/reviewer-instructions-v1.md with mode=ood and the stated OOD change"
+  }
+}

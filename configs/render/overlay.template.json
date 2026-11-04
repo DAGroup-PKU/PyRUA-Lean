@@ -1,0 +1,7 @@
+{
+  "TASK_DESCRIPTION": "<generate from the current episode>",
+  "SOURCE_VIDEO_ROLE": "<generate from the current episode>",
+  "CAMERA_TIMING_CONTRACT": "<generate from the current episode>",
+  "TASK_EVENT_CONTRACT": "<generate from the current episode>",
+  "CONTINUITY_CONTRACT": "<generate from the current episode>"
+}

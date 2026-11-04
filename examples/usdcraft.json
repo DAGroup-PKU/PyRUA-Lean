@@ -1,0 +1,7 @@
+{
+  "checkout": "/path/to/usdcraft",
+  "launcher": ["uv", "run", "--frozen", "usdcraft"],
+  "model": "your-model-id",
+  "reasoning": "low",
+  "timeout_seconds": null
+}

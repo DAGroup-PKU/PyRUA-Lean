@@ -1,0 +1,21 @@
+{
+  "schema": "datafarm.task-cost-policy/2",
+  "target_usd": 30,
+  "limit_usd": 50,
+  "scope": "all-model-work-through-white-data",
+  "includes": [
+    "orchestration",
+    "implementation",
+    "expert",
+    "review",
+    "retries",
+    "repair"
+  ],
+  "excludes": [
+    "render-stage",
+    "gpu-compute"
+  ],
+  "currency_basis": "deployment-declared-api-equivalent-or-provider-cost",
+  "mode": "advisory",
+  "on_excess": "warn"
+}

@@ -1,0 +1,39 @@
+{
+  "schema": "datafarm.phase-run/1",
+  "harness": "pi",
+  "extra_args": [
+    "--approve"
+  ],
+  "prices_usd_per_mtok": {
+    "claude-opus-5-5": {
+      "input": 4,
+      "cache_read": 0.2,
+      "cache_write_5m": 5,
+      "output": 20
+    },
+    "gpt-6-luna": {
+      "input": 0.1,
+      "cache_read": 0.01,
+      "cache_write_5m": 0.125,
+      "output": 0.5
+    }
+  },
+  "task_cap_usd": 100,
+  "phase_caps_usd": {
+    "P1": 25,
+    "R1": 10,
+    "P2": 35,
+    "P2r": 30,
+    "R2": 15,
+    "RI": 8,
+    "R3": 10,
+    "P4": 8,
+    "R3b": 6
+  },
+  "poll_seconds": 30,
+  "freshness_forbidden": [],
+  "environment": [
+    "Simulator python: <path>. Project tools python: <path>.",
+    "Run simulator jobs with: <your scheduler or wrapper command>."
+  ]
+}

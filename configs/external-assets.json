@@ -1,0 +1,185 @@
+{
+  "schema": "datafarm.external-assets/1",
+  "files": [
+    {
+      "name": "paligemma-tokenizer",
+      "path": "${OPENPI_CACHE}/big_vision/paligemma_tokenizer.model",
+      "profiles": [
+        "training"
+      ],
+      "sha256": "8986bb4f423f07f8c7f70d0dbe3526fb2316056c17bae71b1ea975e77a168fc6",
+      "bytes": 4264023,
+      "acquisition": "openpi downloads it from gs://big_vision/paligemma_tokenizer.model into OPENPI_CACHE; verify sha256."
+    },
+    {
+      "name": "h3-control/MiniMax-H3-Fun-Controlnet-Union.safetensors",
+      "path": "${H3_MODELS}/MiniMax-H3-Fun-Controlnet-Union/MiniMax-H3-Fun-Controlnet-Union.safetensors",
+      "profiles": [
+        "h3-control"
+      ],
+      "sha256": "919a48acb525dc8fc70287fcd94ec1f5e5e289a77f1df14d01099c6ce204eb02",
+      "bytes": 6806843904,
+      "acquisition": "MiniMax-H3-Fun-Controlnet-Union (VideoX-Fun ControlNet-Union for MiniMax-H3, MiniMax-H3 community licence); download the exact checkpoint and verify sha256."
+    },
+    {
+      "name": "h3-control/MiniMax-H3/Ref2VA/model_index.json",
+      "path": "${H3_MODELS}/MiniMax-H3/Ref2VA/model_index.json",
+      "profiles": [
+        "h3-control"
+      ],
+      "sha256": "b160b13700bf08aea7fce1bc3dd0d3a49ea15036298c50082ec107f87843b90c",
+      "bytes": 707,
+      "acquisition": "MiniMaxAI/MiniMax-H3 Ref2VA partition in the VideoX-Fun diffusers layout used by MiniMaxH3ControlPipeline (accept the MiniMax-H3 terms); the index files pin the layout, the 13 transformer shards are not hashed here."
+    },
+    {
+      "name": "h3-control/MiniMax-H3/Ref2VA/transformer/config.json",
+      "path": "${H3_MODELS}/MiniMax-H3/Ref2VA/transformer/config.json",
+      "profiles": [
+        "h3-control"
+      ],
+      "sha256": "f619093a231fcfbcc3d035bec26c50ad864e7331a500d5c519f5045dc1e50458",
+      "bytes": 604,
+      "acquisition": "As MiniMax-H3/Ref2VA/model_index.json."
+    },
+    {
+      "name": "h3-control/MiniMax-H3/Ref2VA/transformer/model.safetensors.index.json",
+      "path": "${H3_MODELS}/MiniMax-H3/Ref2VA/transformer/model.safetensors.index.json",
+      "profiles": [
+        "h3-control"
+      ],
+      "sha256": "fb457a26ffa6294660e249b0ddd03a337f2e5393f770b5c34c8b8f90a29a7efb",
+      "bytes": 38323,
+      "acquisition": "As MiniMax-H3/Ref2VA/model_index.json."
+    },
+    {
+      "name": "h3-control/minimax_h3_ref2v_turbo_4step_v0.1_bf16.safetensors",
+      "path": "${H3_TURBO_LORA}",
+      "profiles": [
+        "h3-control"
+      ],
+      "sha256": "9e642fc8749c74f8da5e2382877ab5c7aa37b9a73b7fd0d6d457bd1b3cb1ae99",
+      "bytes": 1383677768,
+      "acquisition": "Hugging Face lightx2v/Minimax-h3-Turbo, file minimax_h3_ref2v_turbo_4step_v0.1_bf16.safetensors; fused by the worker (src/datafarm/render/h3/h3_lora.py)."
+    },
+    {
+      "name": "h3-control/ControlNetHED.pth",
+      "path": "${H3_VIDEOX_FUN}/models/annotators/ControlNetHED.pth",
+      "profiles": [
+        "h3-control"
+      ],
+      "sha256": "5ca93762ffd68a29fee1af9d495bf6aab80ae86f08905fb35472a083a4c7a8fa",
+      "bytes": 29444406,
+      "acquisition": "ControlNet v1.1 HED annotator weights (lllyasviel Annotators, ControlNetHED.pth); place under the VideoX-Fun checkout."
+    },
+    {
+      "name": "h3-control/videox_fun/pipeline/pipeline_minimax_h3_control.py",
+      "path": "${H3_VIDEOX_FUN}/videox_fun/pipeline/pipeline_minimax_h3_control.py",
+      "profiles": [
+        "h3-control"
+      ],
+      "sha256": "0ef9380d82dd0c2f9536534c96c67de1e0ad633d3f41fdc8947e8ed1c9585915",
+      "bytes": 38295,
+      "acquisition": "VideoX-Fun 6f3fb60 + vendor/videox_fun/videox-fun-datafarm.patch (vendor/videox_fun/README.md)."
+    },
+    {
+      "name": "h3-control/videox_fun/pipeline/pipeline_minimax_h3.py",
+      "path": "${H3_VIDEOX_FUN}/videox_fun/pipeline/pipeline_minimax_h3.py",
+      "profiles": [
+        "h3-control"
+      ],
+      "sha256": "4a2f876a19d638ab493ebc6c47b00a1f3deb412805b0daaab32ce13e2249015f",
+      "bytes": 148597,
+      "acquisition": "As pipeline_minimax_h3_control.py."
+    },
+    {
+      "name": "h3-control/config/minimax_h3/minimax_h3_control.yaml",
+      "path": "${H3_VIDEOX_FUN}/config/minimax_h3/minimax_h3_control.yaml",
+      "profiles": [
+        "h3-control"
+      ],
+      "sha256": "e3c53d17baa7af20a924a0eb8e2c49d52903deeb25bb149bb696ccf1ac460d92",
+      "bytes": 170,
+      "acquisition": "Upstream VideoX-Fun file, unchanged."
+    },
+    {
+      "name": "h3-control/controlnet-annotator/hed/__init__.py",
+      "path": "${H3_HED_ANNOTATOR_REPO}/tools/controlnet/annotator/hed/__init__.py",
+      "profiles": [
+        "h3-control"
+      ],
+      "sha256": "93d90ba8bd65fba60a6e95e8d91fa821aeae7ebb403440dce6850230b3eefeae",
+      "bytes": 4289,
+      "acquisition": "ControlNet v1.1 annotator ControlNetHED_Apache2 (Apache-2.0) imported by tools/prepare_hed_control.py of the patched VideoX-Fun."
+    },
+    {
+      "name": "h3-control/controlnet-annotator/util.py",
+      "path": "${H3_HED_ANNOTATOR_REPO}/tools/controlnet/annotator/util.py",
+      "profiles": [
+        "h3-control"
+      ],
+      "sha256": "dda88bb3f3719b4e85852e4861d2ed13b0228eadaddf3dd8ddb3b471ae9cf0f8",
+      "bytes": 2544,
+      "acquisition": "As controlnet-annotator/hed/__init__.py."
+    },
+    {
+      "name": "h3-control/dinov2-base/model.safetensors",
+      "path": "${H3_EVAL_DINO}/model.safetensors",
+      "profiles": [
+        "h3-control"
+      ],
+      "sha256": "d73036b56966966d07975d696bde331762f37297e2f095de8cea0040c3aa0841",
+      "bytes": 346345912,
+      "acquisition": "Hugging Face facebook/dinov2-base; used by the frozen EVAL-v1 scorer (evaluations/render-h3/h3eval.py --dino)."
+    },
+    {
+      "name": "h3-control/dinov2-base/config.json",
+      "path": "${H3_EVAL_DINO}/config.json",
+      "profiles": [
+        "h3-control"
+      ],
+      "sha256": "f7ff4cfa73d2f70647dbf6950541ad25d73082d54c2e7e9bded160c7656b2a70",
+      "bytes": 548,
+      "acquisition": "As dinov2-base/model.safetensors."
+    },
+    {
+      "name": "h3-ood/sam2.1-hiera-large/model.safetensors",
+      "path": "${H3_SAM2}/model.safetensors",
+      "profiles": [
+        "h3-ood"
+      ],
+      "sha256": "dc407dce21301fd94abb395c5099b4f2c455fdc8a8f261ac3d0ea6d4cd197230",
+      "bytes": 897897416,
+      "acquisition": "Hugging Face facebook/sam2.1-hiera-large (transformers Sam2/Sam2Video format); OOD tabletop segmentation only."
+    },
+    {
+      "name": "h3-ood/sam2.1-hiera-large/config.json",
+      "path": "${H3_SAM2}/config.json",
+      "profiles": [
+        "h3-ood"
+      ],
+      "sha256": "00446988cf4d617118d2d347eabe2c46aebed744628facdd540508be30b69ec3",
+      "bytes": 5705,
+      "acquisition": "As sam2.1-hiera-large/model.safetensors."
+    }
+  ],
+  "not_bundled": [
+    "Isaac Sim and its GPU dependencies",
+    "RoboTwin and robot assets",
+    "pi0.5 base checkpoint",
+    "real episodes and reference media"
+  ],
+  "repositories": [
+    {
+      "name": "VideoX-Fun (H3 control hybrid)",
+      "binding": "H3_VIDEOX_FUN",
+      "profiles": [
+        "h3-control"
+      ],
+      "upstream": "https://github.com/aigc-apps/VideoX-Fun",
+      "upstream_commit": "6f3fb60dad9b6a60ff6f962e62cffa11cafb084b",
+      "hed_tool_sha256": "cc0efa6715983c98619a4b4a2eaef96d69efba953f6525057a03261459bb03f6",
+      "patch": "vendor/videox_fun/videox-fun-datafarm.patch",
+      "patch_sha256": "a8257dae7b635342fd091987bde760dc0f522790ab1018c5311ff51bba8343d7"
+    }
+  ]
+}

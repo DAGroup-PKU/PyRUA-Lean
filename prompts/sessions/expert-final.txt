@@ -1,0 +1,2 @@
+[expert-harness] The counted-rollout budget is exhausted and no rollout is running.
+Freeze your best expert now: update REPORT.md and run `xh submit --final "<note>"`. No further rollouts are possible. You have about {minutes} minutes.

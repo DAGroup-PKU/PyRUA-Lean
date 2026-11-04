@@ -1,0 +1,3 @@
+This is confirmed non-OOD (sim2real) generation. Match the target real-world images: ${REAL_BASELINE_DESCRIPTION}.
+Do not introduce new OOD table/wall/material/color/lighting variants beyond the actual target described by those references. Preserve ${APPEARANCE_INVARIANTS}.
+Simulator geometry variation recorded in the source does not authorize appearance-domain changes. Photographic realism and actual real-image conditioning remain mandatory.
