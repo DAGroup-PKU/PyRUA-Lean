@@ -437,7 +437,6 @@
   },
   "tower-of-hanoi": {
     "file": "grasp_any_disk.py",
-    "label": "Phase-linked code reference",
     "lines": [
       "log(\"stack_round\", round=round_, on_table=[(d[\"id\"], d[\"colour\"], round(d[\"D_snap_m\"] * 1000, 1)) for d in todo], stacked=stack_count)",
       "# …",
@@ -468,18 +467,16 @@
         "start": 0,
         "end": 370.933333,
         "startLine": 0,
-        "endLine": 12,
-        "label": "Stacking · code reference"
+        "endLine": 12
       },
       {
         "start": 370.933333,
         "end": 915.3,
         "startLine": 14,
-        "endLine": 22,
-        "label": "Unstacking · code reference"
+        "endLine": 22
       }
     ],
-    "alignmentNote": "Phase boundary matches the concatenation of hanoi_stack.mp4 and hanoi_unstack.mp4. Scrolling within each phase is a code reference, not a measured per-instruction execution trace."
+    "hideLabel": true
   },
   "block-sorting": {
     "file": "sorter.py",

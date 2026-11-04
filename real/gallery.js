@@ -26,11 +26,11 @@ export function mountGallery(root, media){
   }
   function attachCode(card){
     const trace=overlays[card.item.id];if(!trace?.lines?.length)return;
-    const panel=make('aside','gallery-code');panel.setAttribute('aria-label',`${card.item.title} — ${trace.label||'Source excerpt'}`);
-    panel.title=`${trace.file} · ${trace.label||'Source excerpt'}`;
+    const panel=make('aside','gallery-code');panel.setAttribute('aria-label',trace.hideLabel?`${card.item.title} code`:`${card.item.title} — ${trace.label||'Source excerpt'}`);
+    panel.title=trace.hideLabel?trace.file:`${trace.file} · ${trace.label||'Source excerpt'}`;
     const label=make('div','gallery-code-label',trace.label||'Source excerpt'),viewport=make('div','gallery-code-viewport'),track=make('div','gallery-code-track');
     const lines=trace.lines.map((line,i)=>{const row=make('div','gallery-code-line');row.append(make('span','gallery-line-number',String(i+1).padStart(2,'0')),make('code','',line||' '));track.append(row);return row;});
-    viewport.append(track);panel.append(label,viewport);card.frame.append(panel);card.trace={...trace,track,lines,viewport,labelElement:label,lastLine:-1};updateCode(card);
+    viewport.append(track);if(!trace.hideLabel)panel.append(label);panel.append(viewport);card.frame.append(panel);card.trace={...trace,track,lines,viewport,lastLine:-1};updateCode(card);
   }
   function updateCode(card){
     const trace=card.trace;if(!trace)return;const time=card.video.currentTime*(card.item.timelineScale||1);
@@ -40,7 +40,6 @@ export function mountGallery(root, media){
       const phase=trace.phases.findLast(p=>p.start<=time)||trace.phases[0];
       const progress=Math.max(0,Math.min(1,(time-phase.start)/(phase.end-phase.start)));
       line=phase.startLine+Math.floor(progress*(phase.endLine-phase.startLine));
-      trace.labelElement.textContent=phase.label;
     }
     else if(trace.cues?.length){const cue=trace.cues.findLast(c=>c.time<=time);line=cue?.line??0;hasCue=!!cue;}
     else if(card.video.duration)line=Math.floor(card.video.currentTime/card.video.duration*Math.max(0,trace.lines.length-4));
@@ -106,6 +105,6 @@ export function mountGallery(root, media){
   document.addEventListener('visibilitychange',updateMotion);
   document.addEventListener('fullscreenchange',()=>cards.forEach(updateCode));
   render();
-  fetch('assets/code-overlays.json?v=16').then(r=>r.ok?r.json():{}).then(data=>{overlays=data;cards.filter(c=>c.video&&domain==='real').forEach(attachCode);}).catch(()=>{});
+  fetch('assets/code-overlays.json?v=17').then(r=>r.ok?r.json():{}).then(data=>{overlays=data;cards.filter(c=>c.video&&domain==='real').forEach(attachCode);}).catch(()=>{});
   return {pause(){paused=true;updateMotion();},resume(){paused=false;updateMotion();}};
 }
