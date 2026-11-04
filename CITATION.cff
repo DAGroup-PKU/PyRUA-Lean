@@ -4,6 +4,7 @@ title: "PyRUA-DataFarm: LLM Agent as a Cost-Efficient Teleoperator for Real-Read
 type: software
 license: MIT
 version: 1.0.0
+repository-code: "https://github.com/DAGroup-PKU/PyRUA-Lean/tree/DataFarm"
 authors:
   - given-names: Kewei
     family-names: Zhang

@@ -25,7 +25,8 @@ assert pathlib.Path(args[-1][1:]).read_text()
 tokens = int(os.environ.get('STUB_OUTPUT', '1000'))
 model = os.environ.get('STUB_MODEL', 'route/model-a')
 stop = os.environ.get('STUB_STOP', 'stop')
-print(json.dumps({'type': 'session', 'id': sid}), flush=True)
+print(json.dumps({'type': 'session', 'id': sid}, separators=(',', ':')), flush=True)
+print(json.dumps({'type': 'message_update', 'delta': 'x'}, separators=(',', ':')), flush=True)
 with (root / f'{uuid.uuid4()}.jsonl').open('w') as log:
     log.write(json.dumps({'type': 'session', 'id': sid}) + '\\n')
     log.write(json.dumps({'type': 'message', 'id': str(uuid.uuid4()), 'timestamp': 't', 'message': {'role': 'assistant', 'model': model,
@@ -97,6 +98,7 @@ def test_pi_phase_is_priced_from_session_files_and_recorded(task):
     assert row['status'] == 'done' and row['phase_usd'] == pytest.approx(.012)
     assert row['session_id'] and row['role'] == 'producer'
     assert (task / 'phases/P1/final.md').read_text().strip() == 'final words'
+    assert 'message_update' not in (task / 'phases/P1/stream.jsonl').read_text()
     assert 'brief text' in (task / 'phases/P1/prompt.md').read_text()
     assert 'instructions for any coding agent' in (task / 'phases/P1/prompt.md').read_text()
     assert phases.cost_status(task)['task_usd'] == pytest.approx(.012)
@@ -225,6 +227,13 @@ def test_templates_render_and_name_real_files(task, template):
         assert '> claim one\n> claim two' in text
     for ref in re.findall(re.escape(str(ROOT)) + r'/([\w./-]+)', text):
         assert (ROOT / ref.rstrip('./')).exists(), ref
+
+
+def test_review_template_requires_all_views_and_raw_hashes():
+    text = (ROOT / 'prompts/phases/R3.md').read_text()
+    assert 'Look at every contact sheet' in text and '`raw_files`' in text and '"sha256"' in text
+    assert '`raw_files`' in (ROOT / 'prompts/phases/R3b.md').read_text()
+    assert '`--status`' in (ROOT / 'prompts/phases/R2.md').read_text()
 
 
 def test_missing_brief_value_is_refused(task):

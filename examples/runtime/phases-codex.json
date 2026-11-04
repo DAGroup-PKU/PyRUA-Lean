@@ -34,6 +34,7 @@
   "freshness_forbidden": [],
   "environment": [
     "Simulator python: <path>. Project tools python: <path>.",
-    "Run simulator jobs with: <your scheduler or wrapper command>."
+    "Run simulator jobs with: <your scheduler or wrapper command>. Run up to <N> seeds at once per GPU.",
+    "Robot hardware assets (URDF and meshes, read-only): <path>."
   ]
 }

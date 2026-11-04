@@ -12,7 +12,7 @@ Use only the original episode input (the files in `work/input.json`), the genera
 2. **Satisfiability.** Check each threshold against hardware limits (joint ranges, gripper aperture and force, reach) and modelled object dimensions.
 3. **Asset plausibility.** Compare object dimensions, mass, density and friction with the real episode (pixels with a camera fit, robot readings such as the gripper opening while holding) and with physical norms.
 4. **Headless CPU first.** Build a headless simulator runner on day one and confirm it matches an image-enabled run. Develop on dev seeds. Pre-register a held-out seed list with a timestamp before repair work, and run it once after freezing source hashes. Observed seeds are never fresh again.
-5. **Infrastructure.** Confirm which GPU hosts render correctly before batch capture. Every judge and evaluator has an internal timeout below the worker deadline.
+5. **Infrastructure.** Confirm which GPU hosts render correctly before batch capture. Every judge and evaluator has an internal timeout below the worker deadline, set from a run measured on a busy node.
 
 ## Agent economy
 

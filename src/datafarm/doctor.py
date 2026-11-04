@@ -9,7 +9,7 @@ import sys
 
 from datafarm.runtime import expand, load_bindings, source_root
 
-PROFILES = ("core", "seedance", "training", "h3-control", "h3-ood")
+PROFILES = ("core", "seedance", "training", "h3-control", "h3-ood", "usdcraft")
 
 
 def doctor(root: Path, profile: str) -> dict:
@@ -20,7 +20,7 @@ def doctor(root: Path, profile: str) -> dict:
     check("python", sys.version_info >= (3, 11), "Python >= 3.11 required")
     for name in ("configs", "tools", "vendor"):
         check(name, (root / name).is_dir(), f"missing {name}/: run from a complete source checkout")
-    if profile != "core":
+    if profile not in ("core", "usdcraft"):
         for name in ("ffmpeg", "ffprobe"):
             check(name, shutil.which(name), "required media executable")
         for name in ("numpy", "cv2", "requests", "h5py", "pyarrow", "PIL"):
@@ -29,13 +29,16 @@ def doctor(root: Path, profile: str) -> dict:
         "core": [], "seedance": ["ARK_CREDENTIALS"],
         "training": ["TRAINING_PYTHON", "TRAINER", "OPENPI_CACHE", "GPU_SCHEDULER"],
         "h3-control": ["H3_PYTHON", "H3_MODELS", "H3_VIDEOX_FUN", "H3_TURBO_LORA", "H3_EVAL_DINO", "GPU_SCHEDULER"],
-        "h3-ood": ["H3_PYTHON", "H3_SAM2"],
+        "h3-ood": ["H3_PYTHON", "H3_SAM2"], "usdcraft": ["USDCRAFT"],
     }[profile]
     for name in required:
         path = Path(bindings[name])
         check(name, path.exists(), str(path))
         if name.endswith("CREDENTIALS") and path.exists():
             check(name + "-permissions", path.stat().st_mode & 0o077 == 0, "file must be mode 0600")
+    if profile == "usdcraft":
+        for name in ("uv", "codex"):
+            check(name, shutil.which(name), "required on PATH; see docs/reference/usdcraft.md")
     manifest = root / "configs/external-assets.json"
     if manifest.is_file():
         from datafarm.core.source_lock import sha256_file

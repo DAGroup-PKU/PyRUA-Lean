@@ -1,10 +1,11 @@
-"""Optional USDCraft CLI bridge. No upstream imports or credentials are required to plan."""
+"""USDCraft (https://github.com/NVlabs/USDCraft) CLI bridge. No upstream imports or credentials are required to plan."""
 from __future__ import annotations
 import fcntl
 import json
 import math
 import os
 from datafarm.common import atomic_write_json, sha256_file
+from datafarm.runtime import expand, load_bindings, source_root
 from pathlib import Path
 import re
 import signal
@@ -28,11 +29,21 @@ def evidence(path):
     return {'path': str(p), 'sha256': sha256_file(p)}
 
 
+def upstream_version(root, source):
+    """Record the checkout's commit. A different commit may work, so it is reported rather than refused."""
+    assets = read(source / 'configs/external-assets.json')
+    tested = next(r['upstream_commit'] for r in assets['repositories'] if r.get('binding') == 'USDCRAFT')
+    result = subprocess.run(['git', '-C', str(root), 'rev-parse', 'HEAD'], capture_output=True, text=True)
+    commit = result.stdout.strip() if result.returncode == 0 else None
+    return {'commit':commit, 'tested_commit':tested, 'tested':commit == tested}
+
+
 def plan(config, observation, output):
     cfg, obs = read(config), read(observation)
-    root = Path(cfg['checkout']).expanduser().resolve(strict=True)
+    source = source_root()
+    root = Path(expand(cfg['checkout'], load_bindings(source))).expanduser().resolve(strict=True)
     if not (root / 'usdcraft/cli.py').is_file():
-        raise ValueError('checkout must be an extracted USDCraft source tree')
+        raise ValueError('checkout must be a USDCraft source tree')
     model, reasoning = cfg['model'], cfg['reasoning']
     if not all(isinstance(x, str) and x for x in (model, reasoning)):
         raise ValueError('model and reasoning must both be explicit')
@@ -65,7 +76,7 @@ def plan(config, observation, output):
     refs += [evidence(config), evidence(observation), evidence(root / 'usdcraft/cli.py'), evidence(root / 'pyproject.toml')]
     result = {'schema':'datafarm.usdcraft-plan/1', 'object_id':obs['object_id'], 'mode':mode,
               'cwd':str(root), 'argv':argv, 'inputs':refs, 'observation':obs,
-              'timeout_seconds':cfg.get('timeout_seconds'),
+              'timeout_seconds':cfg.get('timeout_seconds'), 'upstream':upstream_version(root, source),
               'qualification':'unverified', 'cost':{'basis':'unknown','amount_usd':None},
               'image_semantics':'inferred-geometry' if mode == 'generation' else 'mesh-and-photo-reference'}
     timeout = result['timeout_seconds']

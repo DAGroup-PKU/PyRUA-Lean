@@ -3,7 +3,7 @@
   "driver": {
     "argv": [
       "python3",
-      "/path/to/PyRUA-DataFarm/examples/runtime/agent_cli_driver.py",
+      "/path/to/PyRUA-Lean/examples/runtime/agent_cli_driver.py",
       "claude",
       "--",
       "--permission-mode",

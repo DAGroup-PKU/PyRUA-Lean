@@ -160,6 +160,16 @@
       "sha256": "00446988cf4d617118d2d347eabe2c46aebed744628facdd540508be30b69ec3",
       "bytes": 5705,
       "acquisition": "As sam2.1-hiera-large/model.safetensors."
+    },
+    {
+      "name": "usdcraft/usdcraft/cli.py",
+      "path": "${USDCRAFT}/usdcraft/cli.py",
+      "profiles": [
+        "usdcraft"
+      ],
+      "sha256": "2b9eec3ffcaf9d50b2d88001d52be8ddfe1cecddff2e8dcaa44f3a8e37f122dd",
+      "bytes": 62921,
+      "acquisition": "git clone https://github.com/NVlabs/USDCraft.git, then git checkout 46fec187bdce40845c30863a56143047edc4a263; see docs/reference/usdcraft.md."
     }
   ],
   "not_bundled": [
@@ -180,6 +190,15 @@
       "hed_tool_sha256": "cc0efa6715983c98619a4b4a2eaef96d69efba953f6525057a03261459bb03f6",
       "patch": "vendor/videox_fun/videox-fun-datafarm.patch",
       "patch_sha256": "a8257dae7b635342fd091987bde760dc0f522790ab1018c5311ff51bba8343d7"
+    },
+    {
+      "name": "USDCraft",
+      "binding": "USDCRAFT",
+      "profiles": [
+        "usdcraft"
+      ],
+      "upstream": "https://github.com/NVlabs/USDCraft",
+      "upstream_commit": "46fec187bdce40845c30863a56143047edc4a263"
     }
   ]
 }

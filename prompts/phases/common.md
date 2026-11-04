@@ -6,5 +6,6 @@
 - Mandatory rules: `{SOURCE}/prompts/phases/protocol.md`. User intent: `W/input.json` (`request`). Also do not open: {FORBIDDEN}.
 - Spend: this task has a hard cap of ${TASK_CAP} across all phases, and this phase a hard cap of ${PCAP}. The host kills the session at either. Check the running total with `{COST_COMMAND}`. If you approach a cap, write your outputs and stop.
 - Economy: summarize tool outputs and never dump large files or images in bulk.
+- Run independent seeds in parallel where the environment notes allow it. Waiting for the simulator usually takes far longer than the model does.
 - Do not start other model or agent sessions yourself. The host launches independent reviews as separate sessions. If your phase needs a review, write the request file and stop.
 {ENVIRONMENT}

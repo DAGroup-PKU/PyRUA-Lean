@@ -19,7 +19,7 @@ simulators, services or data that it does not contain.
 |---|---|---|
 | MiniMax-H3 weights | default renderer (`docs/reference/rendering.md`) | Obtain from their publishers. The MiniMax-H3 model license restricts some uses of generated outputs (including training other AI models) and some territories. Review it before rendering training data with H3; this repository grants no rights to the model or its outputs. |
 | Seedance API | second renderer | Hosted service under its provider's terms. |
-| USDCraft | optional object-asset generation (`docs/reference/usdcraft.md`) | Its own license; install it separately. |
+| [USDCraft](https://github.com/NVlabs/USDCraft) | optional object-asset generation (`docs/reference/usdcraft.md`) | Apache-2.0; install it separately. |
 | RoboTwin 2.0, SAPIEN, Isaac Sim | simulation | Their own licenses. |
 | GPU scheduler | job placement (`docs/deployment.md`) | Supplied by the deployment. |
 | PiPER robot description and SDK | robot model, joint limits | From the robot vendor. |

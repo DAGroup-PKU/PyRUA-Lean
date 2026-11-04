@@ -18,7 +18,7 @@
 | Author and reviewer identity | taken from the Codex thread | taken from the session ID in the CLI's stream |
 | Output | `stdout.log` | also `agent-output.jsonl` in the session folder |
 
-Set `/path/to/PyRUA-DataFarm` in the config to the absolute path of your checkout, because the driver
+Set `/path/to/PyRUA-Lean` in the config to the absolute path of your checkout, because the driver
 runs from the task directory. Anything after `--` in `argv` goes to the CLI, for example `"--model", "<model>"`.
 
 To confirm that SoL-Pi loaded, look in a session's `pi-sessions/*.jsonl` for a `sol-pi-online-context-state-v1` entry

@@ -17,7 +17,7 @@ $EDITOR bindings.json                               # point bindings at your ins
 datafarm doctor [--workspace DIR] --profile core    # no API or GPU calls
 ```
 
-`doctor` profiles: `core`, `seedance`, `training`, `h3-control`, `h3-ood`.
+`doctor` profiles: `core`, `seedance`, `training`, `h3-control`, `h3-ood`, `usdcraft`.
 
 A minimal `bindings.json` holds path strings for the keys you use:
 

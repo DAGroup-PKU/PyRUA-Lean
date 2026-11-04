@@ -33,6 +33,7 @@ def defaults(workspace: Path) -> dict[str, str]:
         "H3_TURBO_LORA": w + "/external/h3-models/Minimax-h3-Turbo/minimax_h3_ref2v_turbo_4step_v0.1_bf16.safetensors",
         "H3_EVAL_DINO": w + "/external/models/dinov2-base", "H3_SAM2": w + "/external/models/sam2.1-hiera-large",
         "H3_HED_ANNOTATOR_REPO": w + "/external/controlnet-annotator",
+        "USDCRAFT": w + "/external/usdcraft",
         "ARK_CREDENTIALS": w + "/secrets/ark.env", "AGENT_CREDENTIALS": w + "/secrets/agent.env",
         "ISAAC_ENV": w + "/environments/isaac", "ROBOTWIN_PYTHON": w + "/environments/robotwin/bin/python",
         "EPISODES": w + "/data/episodes",

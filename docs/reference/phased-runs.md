@@ -39,7 +39,7 @@ $RUN --phase R3b
 python tools/pipeline_agent.py verify --work /data/task/work
 ```
 
-Before the first run, copy a config from [`examples/runtime/`](../../examples/runtime/README.md) and fill in `environment`. Install the harness first; the [README](../../README.md#quickstart) has the SoL-Pi steps.
+Before the first run, copy a config from [`examples/runtime/`](../../examples/runtime/README.md) and fill in `environment`: the simulator python, how to reach a GPU, the path of the robot assets (this repository does not include them), and how many seeds may run at once. Install the harness first; the [README](../../README.md#quickstart) has the SoL-Pi steps.
 
 Read `phases/<label>/final.md` and the review's `report.json` before starting the next phase. A later phase reads its input from files, and `--quote-final` adds the earlier final message as unverified claims. After a denial, use a new label for each session:
 
@@ -90,12 +90,12 @@ Configs use schema `datafarm.phase-run/1`. Examples: [`phases-solpi.json`](../..
 | `prices_usd_per_mtok` | Per model: `input`, `cache_read`, `cache_write_5m`, `output`, optional `long_prompt` (`above_tokens`, `input_multiplier`, `output_multiplier`). A key matches any model ID that contains it. Check these against your provider |
 | `task_cap_usd`, `phase_caps_usd` | Required. A cap is looked up by label, then by template |
 | `poll_seconds`, `max_phase_seconds` | Usage polling, 30 s by default, and an optional time limit |
-| `environment` | Deployment notes shown to every phase: simulator python, how to reach a GPU |
+| `environment` | Deployment notes shown to every phase: simulator python, GPU access, robot assets, parallel seed limit |
 | `freshness_forbidden` | Further paths agents must not open, such as earlier task outputs |
 
 ## Limitations
 
-- **No complete task has run through this tool yet.** SoL-Pi and Codex have run it on real models with short prompts only, and Claude Code has run it only as a stub. The CPU tests do not show that a task succeeds. That takes a real run and independent review.
+- **Little real use so far.** One complete task, stack cups on SoL-Pi, has run through this tool. Codex has run it with short prompts only, and Claude Code only as a stub. One run does not show that another task will succeed; that takes its own run and independent review.
 - **A cap can overrun by one model response.** Pi and Codex record usage when a response ends, and Claude Code's stream does the same per message, so the overrun is visible as `over_cap` but not prevented.
 - **Costs are API-equivalent estimates from your price table.** Claude Code's reported total replaces the estimate when its run ends.
 - **These costs are outside the task's cost ledger.** `pipeline_agent.py cost-status` does not include them.

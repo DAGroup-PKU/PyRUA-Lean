@@ -1,14 +1,29 @@
-# Object assets with USDCraft (optional)
+# Object assets with USDCraft
 
-DataFarm needs simulation assets for objects seen in a real episode. USDCraft is an optional external tool that lets a coding agent generate an object as Python source and export a jointed URDF or USD model. It is not part of this repository; the adapter calls an external checkout. The pipeline still owns scene placement, robot interaction and independent task validation.
+DataFarm needs simulation assets for objects seen in a real episode. [USDCraft](https://github.com/NVlabs/USDCraft) ([paper](https://arxiv.org/abs/2610.11322)) lets a coding agent write an object as a Python program, then exports it as a jointed URDF and USD model. It is optional and lives in its own repository; the adapter calls its command line and imports none of its code.
 
-## Install separately
+## Install
 
-Install USDCraft in its own environment, following its README, and keep this environment separate from the simulator environment. Native Codex requires an authenticated `codex` executable on `PATH` (or `USDCRAFT_CODEX_BIN`); no API key is needed for the native route. Model and reasoning are explicit paired deployment settings. Do not copy API keys or unrelated tool configuration into the checkout.
+USDCraft needs Linux or macOS, [`uv`](https://docs.astral.sh/uv/), Python 3.12 (`uv` provides it) and Node.js ^20.19 or >=22.12. Keep it in its own environment, apart from the simulator. The adapter was tested with commit `46fec18`:
+
+```bash
+git clone https://github.com/NVlabs/USDCraft.git && cd USDCraft
+git checkout 46fec18
+uv sync --frozen
+uv run --frozen usdcraft setup
+```
+
+The adapter uses USDCraft's Codex workflow, so an authenticated `codex` must be on `PATH`, or named by `USDCRAFT_CODEX_BIN`. It does not use USDCraft's API-key workflow. Set the `USDCRAFT` binding to the checkout, then check the installation:
+
+```bash
+datafarm doctor --profile usdcraft
+```
+
+`doctor` checks `uv`, `codex` and that `usdcraft/cli.py` is the tested version. `plan.json` records the checkout's commit in `upstream`; another commit is allowed, and `tested` shows it was not the one tested here.
 
 ## Describe the actual instance
 
-Copy `examples/usdcraft.json` into your deployment configuration and set `checkout`. Observation paths should be absolute, so a supervised process sees the same files. Save an observation JSON:
+Copy `examples/usdcraft.json` into your deployment configuration. Its `checkout` uses the `USDCRAFT` binding, and an absolute path also works. Observation paths should be absolute, so a supervised process sees the same files. Save an observation JSON:
 
 ```json
 {
@@ -59,6 +74,7 @@ Changed inputs require a new versioned plan. A non-zero exit is kept as `failed`
 
 ## Limitations
 
+- At the tested commit, Generation has run end to end through the adapter with Codex, and SAPIEN loaded the exported URDF with its joints. Reconstruction has been checked only against the command-line options, not run, and Isaac Sim import has not been tested.
 - Exported assets are never simulator-qualified by the adapter, and generation infers geometry.
 - Only `image` reaches the single-image CLI; `context_files` are hashed for provenance only.
 - Costs stay `unknown` until upstream call records are reconciled with the task's budget policy, and enforced budgets cannot be met. The adapter neither enforces a dollar cap nor treats native login as zero-cost usage.

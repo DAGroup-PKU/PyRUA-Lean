@@ -1,5 +1,5 @@
 {
-  "checkout": "/path/to/usdcraft",
+  "checkout": "${USDCRAFT}",
   "launcher": ["uv", "run", "--frozen", "usdcraft"],
   "model": "your-model-id",
   "reasoning": "low",

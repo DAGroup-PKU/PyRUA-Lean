@@ -30,6 +30,17 @@ def test_native_routes_and_mesh_requirement(tmp_path):
     p=plan(c,o,tmp_path/'recon');assert p['mode']=='reconstruction' and '--front-axis=-Y' in p['argv']
 
 
+def test_plan_reports_the_upstream_commit(tmp_path):
+    root,c,o,b=setup(tmp_path);p=plan(c,o,b)
+    assert p['upstream']['tested'] is False and len(p['upstream']['tested_commit'])==40
+
+
+def test_checkout_can_use_the_binding(tmp_path, monkeypatch):
+    root,c,o,b=setup(tmp_path);monkeypatch.setenv('DATAFARM_USDCRAFT',str(root))
+    cfg=read(c);cfg['checkout']='${USDCRAFT}';c.write_text(json.dumps(cfg))
+    assert plan(c,o,b)['cwd']==str(root.resolve())
+
+
 def test_changed_input_never_submits(tmp_path):
     root,c,o,b=setup(tmp_path);plan(c,o,b);o.write_text('{}')
     with pytest.raises(ValueError,match='Input changed'):run(b)

@@ -70,12 +70,22 @@ class Harness:
     def outcome(self, stream):
         raise NotImplementedError
 
+    def compact(self, stream):
+        pass
+
 
 class PiHarness(Harness):
     """Pi, with SoL-Pi when `pi install` has added it. Usage comes from the session files, which also
     hold compaction and reducer calls that the JSON stream does not show."""
 
     name = 'pi'
+
+    def compact(self, stream):
+        # Each token delta repeats the partial message; the finished messages are kept.
+        kept = stream.with_suffix('.tmp')
+        with stream.open(errors='ignore') as lines, kept.open('w') as out:
+            out.writelines(line for line in lines if not line.startswith('{"type":"message_update"'))
+        kept.replace(stream)
 
     def session_root(self, phase_dir, resume):
         return (resume['dir'] if resume else phase_dir) / 'pi-sessions'
@@ -395,6 +405,7 @@ def run_phase(task, config, phase, template, brief, *, source, resume_from=None,
                 stop_group(process)
                 break
     code = process.wait()
+    harness.compact(stream)
     session_id, text, failed = harness.outcome(stream)
     usd, unpriced = harness.usage(phase_dir, stream, session_id, resume)
     spent = max(spent, usd - baseline)

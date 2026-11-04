@@ -8,7 +8,7 @@ Yuxuan Chen<sup>1</sup>, Hao Chen<sup>1</sup>, Yichen Liu<sup>1</sup>, Yintianru
 <sup>1</sup>Peking University &nbsp; <sup>2</sup>NVIDIA &nbsp; <sup>*</sup>Equal contribution &nbsp; <sup>†</sup>Project lead
 
 [![arXiv](https://img.shields.io/badge/arXiv-2611.05320-b31b1b.svg)](https://arxiv.org/abs/2611.05320)
-[![Project page](https://img.shields.io/badge/project-page-8b1515.svg)](https://xiwen1.github.io/PyRUA-DataFarm/)
+[![Project page](https://img.shields.io/badge/project-page-8b1515.svg)](https://dagroup-pku.github.io/PyRUA-Lean/DataFarm/)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](pyproject.toml)
 
@@ -57,7 +57,7 @@ written for the task at hand.
 |---|---|---|
 | Capability layer | Role instructions, skills and rules shared by all tasks, compiled into explicit, hash-pinned agent context | [capability-layer](docs/reference/capability-layer.md) |
 | Agent runtime | Persistent orchestration, independent review sessions, crash recovery | [agent-runtime](docs/reference/agent-runtime.md) |
-| Grounding | Scene, cameras, real references, and a ledger that labels every physical quantity as measured, fitted, assumed or unknown; missing object assets can be generated with USDCraft | [grounding](docs/reference/grounding.md), [usdcraft](docs/reference/usdcraft.md) |
+| Grounding | Scene, cameras, real references, and a ledger that labels every physical quantity as measured, fitted, assumed or unknown; missing object assets can be generated with [USDCraft](https://github.com/NVlabs/USDCraft) | [grounding](docs/reference/grounding.md), [usdcraft](docs/reference/usdcraft.md) |
 | Simulator qualification | A simulator variant certified for the task's skills | [simulator-qualification](docs/reference/simulator-qualification.md) |
 | Task contract and expert | Contract, a judge frozen before the expert exists, and an expert developed in a sandbox and scored on held-out initial states | [expert-harness](docs/reference/expert-harness.md) |
 | Render contract | Sim-to-real or out-of-distribution intent, real references, and checks on every request sent to a video model | [render-contract](docs/reference/render-contract.md) |
@@ -115,7 +115,7 @@ DataFarm needs Linux and Python 3.11 or newer. Media checks use `ffmpeg`, and th
 isolates the expert author uses `bubblewrap`.
 
 ```bash
-git clone https://github.com/DAGroup-PKU/PyRUA-DataFarm.git && cd PyRUA-DataFarm
+git clone --branch DataFarm --single-branch https://github.com/DAGroup-PKU/PyRUA-Lean.git && cd PyRUA-Lean
 pip install -e '.[dev,workflow]'
 ```
 
@@ -166,7 +166,7 @@ agent you choose through a runtime config:
 These are the supported harnesses. To connect another CLI, add a profile to
 [`agent_cli_driver.py`](examples/runtime/agent_cli_driver.py).
 
-For SoL-Pi and Claude Code, replace `/path/to/PyRUA-DataFarm` in the config with the absolute path of
+For SoL-Pi and Claude Code, replace `/path/to/PyRUA-Lean` in the config with the absolute path of
 this checkout. To choose a model, add `"--model", "<model>"` to the end of the driver's `argv`.
 [`claude-code.json`](examples/runtime/claude-code.json) runs Claude Code with `bypassPermissions`, so
 use a dedicated machine or container, and adjust the mode if you need approval prompts.

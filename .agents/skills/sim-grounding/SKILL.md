@@ -30,7 +30,7 @@ joint order/limits, gripper dimensions and existing calibration; these are devic
   and recapture images when necessary. Candidate margins are not hardware limits and do not carry over to a new robot.
 
 When a needed new rigid-body/articulated object asset is found to be missing and not reusable, read `.agents/skills/build-observed-object/SKILL.md`
-and, per the deployment config, generate and validate it with USDCraft, an optional external tool; image inference is not a measured reconstruction, and an export is not simulator admission.
+and, per the deployment config, generate and validate it with USDCraft (`docs/reference/usdcraft.md`); image inference is not a measured reconstruction, and an export is not simulator admission.
 
 grounding.json uses the schema `datafarm.grounding/1`, and physical_quantities lists, item by item, the physical quantities the simulator uses:
 name, unit, value, label (measured/fitted/assumed/unknown). measured/fitted must bind an evidence
