@@ -7,7 +7,7 @@ export const MEDIA = {
       "property": "Reasoning \u00b7 long-horizon",
       "poster": "assets/tasks/tic-tac-toe.png",
       "sources": [
-        "native8x/tic/index.m3u8",
+        "native8x/tic/adaptive.m3u8",
         null,
         null
       ],
@@ -33,7 +33,7 @@ export const MEDIA = {
       "property": "Precision \u00b7 multi-object",
       "poster": "assets/tasks/five-block-stacking.png",
       "sources": [
-        "native8x/stack/index.m3u8",
+        "native8x/stack/adaptive.m3u8",
         null,
         null
       ],
@@ -59,7 +59,7 @@ export const MEDIA = {
       "property": "Precision \u00b7 long-horizon",
       "poster": "assets/tasks/tower-of-hanoi.png",
       "sources": [
-        "native8x/hanoi/index.m3u8",
+        "native8x/hanoi/adaptive.m3u8",
         null,
         null
       ],
@@ -85,7 +85,7 @@ export const MEDIA = {
       "property": "Deformable \u00b7 bimanual",
       "poster": "assets/tasks/towel-folding.png",
       "sources": [
-        "native8x/towel/index.m3u8",
+        "native8x/towel/adaptive.m3u8",
         null,
         null
       ],
@@ -111,7 +111,7 @@ export const MEDIA = {
       "property": "Contact-rich \u00b7 precision",
       "poster": "assets/tasks/push-t.png",
       "sources": [
-        "native8x/push/index.m3u8",
+        "native8x/push/adaptive.m3u8",
         null,
         null
       ],
@@ -137,7 +137,7 @@ export const MEDIA = {
       "property": "Multi-object \u00b7 reasoning",
       "poster": "assets/tasks/block-sorting.png",
       "sources": [
-        "native8x/sorting/index.m3u8",
+        "native8x/sorting/adaptive.m3u8",
         null,
         null
       ],
@@ -163,7 +163,7 @@ export const MEDIA = {
       "property": "Multi-object manipulation",
       "poster": "assets/tasks/block-storage.png",
       "sources": [
-        "native8x/storage/index.m3u8",
+        "native8x/storage/adaptive.m3u8",
         null,
         null
       ],
@@ -189,7 +189,7 @@ export const MEDIA = {
       "property": "Precision \u00b7 online-assisted",
       "poster": "assets/tasks/ethernet-insertion.png",
       "sources": [
-        "native8x/ethernet/index.m3u8",
+        "native8x/ethernet/adaptive.m3u8",
         null,
         null
       ],
@@ -386,7 +386,7 @@ export const CINEMATIC = [
     "title": "Five-block stacking",
     "detail": "Build the tower",
     "speed": 2,
-    "src": "media/stack-1.mp4?v=15",
+    "src": "media/tiles/stack-1.mp4?v=15",
     "poster": "media/stack-1.jpg?v=15"
   },
   {
@@ -395,7 +395,7 @@ export const CINEMATIC = [
     "title": "Tic-tac-toe",
     "detail": "Left wrist \u00b7 Place a piece",
     "speed": 2,
-    "src": "media/tic-2.mp4?v=15",
+    "src": "media/tiles/tic-2.mp4?v=15",
     "poster": "media/tic-2.jpg?v=15"
   },
   {
@@ -404,7 +404,7 @@ export const CINEMATIC = [
     "title": "Block sorting",
     "detail": "DJI original highlight",
     "speed": 2,
-    "src": "media/hero-sorting.mp4?v=15",
+    "src": "media/tiles/hero-sorting.mp4?v=15",
     "poster": "media/hero-sorting.jpg?v=15",
     "view": "DJI"
   },
@@ -414,7 +414,7 @@ export const CINEMATIC = [
     "title": "Ethernet insertion",
     "detail": "Approach and alignment",
     "speed": 2,
-    "src": "media/ethernet-1.mp4?v=15",
+    "src": "media/tiles/ethernet-1.mp4?v=15",
     "poster": "media/ethernet-1.jpg?v=15",
     "view": "Left wrist"
   },
@@ -424,7 +424,7 @@ export const CINEMATIC = [
     "title": "Tower of Hanoi",
     "detail": "Left wrist \u00b7 Lift & transfer",
     "speed": 3,
-    "src": "media/hanoi-2.mp4?v=15",
+    "src": "media/tiles/hanoi-2.mp4?v=15",
     "poster": "media/hanoi-2.jpg?v=15"
   },
   {
@@ -433,7 +433,7 @@ export const CINEMATIC = [
     "title": "Block storage",
     "detail": "Object collection",
     "speed": 1.5,
-    "src": "media/storage-1.mp4?v=15",
+    "src": "media/tiles/storage-1.mp4?v=15",
     "poster": "media/storage-1.jpg?v=15",
     "view": "Head"
   },
@@ -443,7 +443,7 @@ export const CINEMATIC = [
     "title": "Towel folding",
     "detail": "Fold",
     "speed": 1.5,
-    "src": "media/towel-1.mp4?v=15",
+    "src": "media/tiles/towel-1.mp4?v=15",
     "poster": "media/towel-1.jpg?v=15"
   },
   {
@@ -452,7 +452,7 @@ export const CINEMATIC = [
     "title": "Push T",
     "detail": "Fine adjustment",
     "speed": 2,
-    "src": "media/push-2.mp4?v=15",
+    "src": "media/tiles/push-2.mp4?v=15",
     "poster": "media/push-2.jpg?v=15"
   },
   {
@@ -461,7 +461,7 @@ export const CINEMATIC = [
     "title": "Push T",
     "detail": "Coarse alignment",
     "speed": 2,
-    "src": "media/push-1.mp4?v=15",
+    "src": "media/tiles/push-1.mp4?v=15",
     "poster": "media/push-1.jpg?v=15"
   },
   {
@@ -470,7 +470,7 @@ export const CINEMATIC = [
     "title": "Ethernet insertion",
     "detail": "Insertion and release",
     "speed": 2,
-    "src": "media/ethernet-2.mp4?v=15",
+    "src": "media/tiles/ethernet-2.mp4?v=15",
     "poster": "media/ethernet-2.jpg?v=15",
     "view": "Left wrist"
   },
@@ -480,7 +480,7 @@ export const CINEMATIC = [
     "title": "Tower of Hanoi",
     "detail": "Pick & stack \u00b7 DJI close-up",
     "speed": 3,
-    "src": "media/hanoi-1.mp4?v=15",
+    "src": "media/tiles/hanoi-1.mp4?v=15",
     "poster": "media/hanoi-1.jpg?v=15"
   },
   {
@@ -489,7 +489,7 @@ export const CINEMATIC = [
     "title": "Five-block stacking",
     "detail": "Right wrist \u00b7 Stack a block",
     "speed": 1.5,
-    "src": "media/stack-2.mp4?v=15",
+    "src": "media/tiles/stack-2.mp4?v=15",
     "poster": "media/stack-2.jpg?v=15"
   },
   {
@@ -498,7 +498,7 @@ export const CINEMATIC = [
     "title": "Towel folding",
     "detail": "Unfold",
     "speed": 1.5,
-    "src": "media/towel-2.mp4?v=15",
+    "src": "media/tiles/towel-2.mp4?v=15",
     "poster": "media/towel-2.jpg?v=15"
   },
   {
@@ -507,7 +507,7 @@ export const CINEMATIC = [
     "title": "Block sorting",
     "detail": "Right wrist \u00b7 Sort to blue",
     "speed": 1.5,
-    "src": "media/sorting-2.mp4?v=15",
+    "src": "media/tiles/sorting-2.mp4?v=15",
     "poster": "media/sorting-2.jpg?v=15"
   },
   {
@@ -516,7 +516,7 @@ export const CINEMATIC = [
     "title": "Block storage",
     "detail": "Right wrist \u00b7 Place in bowl",
     "speed": 1.5,
-    "src": "media/storage-2.mp4?v=15",
+    "src": "media/tiles/storage-2.mp4?v=15",
     "poster": "media/storage-2.jpg?v=15"
   },
   {
@@ -525,7 +525,7 @@ export const CINEMATIC = [
     "title": "Tic-tac-toe",
     "detail": "Pick & place \u00b7 DJI close-up",
     "speed": 2,
-    "src": "media/tic-1.mp4?v=15",
+    "src": "media/tiles/tic-1.mp4?v=15",
     "poster": "media/tic-1.jpg?v=15"
   }
 ];
@@ -533,22 +533,22 @@ export const CINEMATIC = [
 export const HERO_CLIPS = [
   {
     "id": "tic-1",
-    "src": "media/tic-1.mp4?v=15",
+    "src": "media/preview/tic-1.mp4?v=15",
     "poster": "media/tic-1.jpg?v=15"
   },
   {
     "id": "hanoi-1",
-    "src": "media/hanoi-1.mp4?v=15",
+    "src": "media/preview/hanoi-1.mp4?v=15",
     "poster": "media/hanoi-1.jpg?v=15"
   },
   {
     "id": "hero-stack",
-    "src": "media/hero-stack.mp4?v=15",
+    "src": "media/preview/hero-stack.mp4?v=15",
     "poster": "media/hero-stack.jpg?v=15"
   },
   {
     "id": "hero-sorting",
-    "src": "media/hero-sorting.mp4?v=15",
+    "src": "media/preview/hero-sorting.mp4?v=15",
     "poster": "media/hero-sorting.jpg?v=15"
   }
 ];

@@ -29,12 +29,12 @@ export function mountCinematic(root, items = [], reel = []) {
     if(nextWarmed||destroyed||paused||!visible||doc.hidden)return;
     nextWarmed=true;heroes[1].video.preload='auto';heroes[1].video.load();
   }
-  on(heroes[0].video,'progress',()=>{const v=heroes[0].video;if(v.buffered.length&&v.buffered.end(v.buffered.length-1)>=v.duration-.1)warmNext();});
+  on(heroes[0].video,'playing',warmNext);
   if(!heroes[0].video.paused&&heroes[0].video.readyState>=3)warmNext();
   function play(entry,allowed){
     if(!allowed){entry.video.pause();entry.video.preload='none';return;}
     if(!entry.video.paused||entry.pending)return;
-    entry.pending=true;Promise.resolve(entry.video.play()).catch(()=>{}).finally(()=>{entry.pending=false;if(destroyed||paused||!visible||doc.hidden)entry.video.pause();});
+    entry.pending=true;Promise.resolve(entry.video.play()).catch(error=>{if(heroes.includes(entry)&&error.name==='NotAllowedError')playback.hidden=false;}).finally(()=>{entry.pending=false;if(destroyed||paused||!visible||doc.hidden)entry.video.pause();});
   }
   function sync(){
     const enabled=!destroyed&&!paused&&visible&&!doc.hidden;
@@ -45,7 +45,7 @@ export function mountCinematic(root, items = [], reel = []) {
   function updatePoster(){hero.style.setProperty('--hero-poster',`url("${playlist[shot].poster}")`);root.dataset.shot=playlist[shot].id;}
   function crossfade(){
     if(fading||paused||!visible||doc.hidden)return;
-    const next=1-active;if(heroes[next].video.readyState<2)return;
+    const next=1-active;if(heroes[next].video.readyState<3){const current=heroes[active].video;if(current.ended){current.currentTime=0;sync();}return;}
     const old=active;active=next;shot=(shot+1)%playlist.length;fading=true;
     heroes[active].video.currentTime=0;heroes[active].video.style.opacity='1';heroes[old].video.style.opacity='0';updatePoster();sync();
     fadeTimer=win.setTimeout(()=>{fading=false;const v=heroes[old].video,item=playlist[(shot+1)%playlist.length];v.pause();v.preload='auto';v.poster=item.poster;v.src=item.src;v.load();sync();},650);
@@ -53,7 +53,7 @@ export function mountCinematic(root, items = [], reel = []) {
   heroes.forEach((entry,i)=>{
     on(entry.video,'timeupdate',()=>{if(i===active&&entry.video.duration-entry.video.currentTime<.55)crossfade();});
     on(entry.video,'ended',()=>{if(i===active)crossfade();});
-    on(entry.video,'canplay',()=>{if(heroes[active].video.ended)crossfade();sync();});
+    on(entry.video,'canplay',()=>{if(i!==active&&heroes[active].video.ended)crossfade();sync();});
   });
   function render(){
     const w=sticky.clientWidth,h=sticky.clientHeight,cw=w/4,ch=h/4,eased=progress*progress*(3-2*progress);
@@ -92,7 +92,7 @@ export function mountCinematic(root, items = [], reel = []) {
   on(win,'keydown',e=>{if(e.repeat||!atOpening()||!['ArrowDown','PageDown','ArrowUp','PageUp',' '].includes(e.key)||e.target.closest('button,a,input,select,textarea'))return;e.preventDefault();if(['ArrowUp','PageUp'].includes(e.key)||(e.key===' '&&e.shiftKey)){if(phase==='mosaic')transition(0);}else advance();});
   on(win,'scroll',()=>{if(exiting&&win.scrollY<3)exiting=false;},{passive:true});
   function replayOpening(){
-    if(animation)win.cancelAnimationFrame(animation);win.clearTimeout(fadeTimer);animation=0;fading=false;phase='reel';progress=0;shot=0;active=0;paused=false;exiting=false;lastWheel=performance.now();
+    if(animation)win.cancelAnimationFrame(animation);win.clearTimeout(fadeTimer);animation=0;fading=false;phase='reel';progress=0;shot=0;active=0;paused=false;exiting=false;nextWarmed=false;lastWheel=performance.now();
     heroes.forEach((e,i)=>{e.video.pause();e.video.style.transition='none';e.video.style.opacity=i?'0':'1';e.video.src=playlist[i%playlist.length].src;e.video.poster=playlist[i%playlist.length].poster;e.video.load();});
     win.requestAnimationFrame(()=>heroes.forEach(e=>e.video.style.transition=''));entries.forEach(e=>{e.video.currentTime=0;});root.scrollIntoView({behavior:'instant'});updatePoster();render();sync();
   }
