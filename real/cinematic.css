@@ -1,0 +1,26 @@
+/* Borderless opening with unobscured, gently brightened footage. */
+.cin-stage{position:relative;height:100svh;background:#d6d6d2;color:#fff;isolation:isolate}
+.cin-sticky{position:sticky;top:0;height:100svh;min-height:400px;overflow:hidden}
+.cin-field,.cin-overlay{position:absolute;inset:0}.cin-field{overflow:hidden}
+.cin-tile,.cin-hero{position:absolute;overflow:hidden;background:#d6d6d2;contain:layout paint;will-change:width,height,left,top}
+.cin-hero{z-index:5}.cin-video{display:block;width:100%;height:100%;max-width:none;object-fit:cover;object-position:center}
+.cin-overlay{z-index:20;pointer-events:none}
+.cin-identity{position:absolute;top:50%;left:50%;width:94%;text-align:center;opacity:0;will-change:transform,opacity}
+.cin-wordmark{font-family:Manrope,'DM Sans',Arial,sans-serif;font-size:clamp(48px,8.7vw,140px);line-height:1.08;letter-spacing:-.065em;font-weight:700;color:white;text-shadow:0 2px 22px #0008,0 1px 3px #0005}
+.cin-subtitle{font-family:'DM Sans',Arial,sans-serif;font-size:clamp(16px,2.2vw,34px);line-height:1.35;margin:20px auto 0;max-width:1050px;text-wrap:balance;text-shadow:0 2px 12px #000b,0 1px 3px #0008}
+
+
+.cin-down:focus-visible{outline:2px solid white;outline-offset:4px}
+.cin-down{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);border:0;background:transparent;color:white;font-size:11px;font-weight:600;letter-spacing:.17em;text-transform:uppercase;text-shadow:0 1px 6px #000;cursor:pointer;pointer-events:auto}.cin-down span{display:block;font-size:28px;margin-top:12px;font-weight:300}
+@media(max-width:640px){.cin-stage{height:100svh}.cin-identity{width:94%}.cin-wordmark{font-size:12vw}.cin-subtitle{font-size:clamp(16px,4.7vw,22px);margin-top:16px;max-width:360px}.cin-down{bottom:28px}.cin-hero .cin-video{object-position:42% center}}
+@media(prefers-reduced-motion:reduce){.cin-stage{height:100svh}.cin-tile,.cin-hero,.cin-identity{will-change:auto}}
+
+@media(max-width:640px){.cin-hero[data-expanded='true']::before{content:"";position:absolute;inset:-35px;background-image:var(--hero-poster);background-position:center;background-size:cover;filter:blur(28px);opacity:.55}.cin-hero[data-expanded='true'] .cin-video{object-fit:contain;object-position:center!important}}
+
+.cin-reel-layer{position:absolute;inset:0;transition:opacity .65s ease;will-change:opacity}.cin-sticky{overscroll-behavior:contain}
+@media(prefers-reduced-motion:reduce){.cin-reel-layer{transition:none}}
+
+.cin-sticky{touch-action:pan-x pinch-zoom}
+
+
+.cin-video{filter:brightness(1.08) saturate(1.03)}

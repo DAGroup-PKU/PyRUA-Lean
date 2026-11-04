@@ -1,0 +1,208 @@
+{
+  "source": "PDF page 9, Figure 6d",
+  "method": "Original filled vector polygon (pdfplumber curves[55]) grouped by x coordinate. Inverse linear y-axis using 300s and 150s gridlines; median curve is curves[56]. All 33 plotted medians lie within recovered Q25/Q75 bounds. Values are digitized, not original execution logs.",
+  "y300": 252.81778118015995,
+  "y150": 306.50375863296,
+  "metric": "Median stack-unstack cycle time, including reset; IQR in each reported batch",
+  "rows": [
+    {
+      "version": 1,
+      "q25_approx_s": 285.34,
+      "median_approx_s": 285.34,
+      "q75_approx_s": 285.34
+    },
+    {
+      "version": 2,
+      "q25_approx_s": 239.08,
+      "median_approx_s": 240.41,
+      "q75_approx_s": 272.73
+    },
+    {
+      "version": 3,
+      "q25_approx_s": 252.58,
+      "median_approx_s": 252.98,
+      "q75_approx_s": 254.24
+    },
+    {
+      "version": 4,
+      "q25_approx_s": 320.03,
+      "median_approx_s": 320.03,
+      "q75_approx_s": 320.03
+    },
+    {
+      "version": 5,
+      "q25_approx_s": 235.46,
+      "median_approx_s": 237.58,
+      "q75_approx_s": 250.53
+    },
+    {
+      "version": 6,
+      "q25_approx_s": 214.16,
+      "median_approx_s": 214.38,
+      "q75_approx_s": 233.72
+    },
+    {
+      "version": 7,
+      "q25_approx_s": 205.99,
+      "median_approx_s": 206.26,
+      "q75_approx_s": 221.58
+    },
+    {
+      "version": 8,
+      "q25_approx_s": 176.53,
+      "median_approx_s": 176.82,
+      "q75_approx_s": 193.06
+    },
+    {
+      "version": 9,
+      "q25_approx_s": 175.08,
+      "median_approx_s": 176.55,
+      "q75_approx_s": 188.01
+    },
+    {
+      "version": 10,
+      "q25_approx_s": 182.22,
+      "median_approx_s": 184.16,
+      "q75_approx_s": 186.29
+    },
+    {
+      "version": 11,
+      "q25_approx_s": 283.91,
+      "median_approx_s": 283.91,
+      "q75_approx_s": 283.91
+    },
+    {
+      "version": 12,
+      "q25_approx_s": 191.37,
+      "median_approx_s": 195.82,
+      "q75_approx_s": 208.64
+    },
+    {
+      "version": 13,
+      "q25_approx_s": 288.6,
+      "median_approx_s": 288.6,
+      "q75_approx_s": 288.6
+    },
+    {
+      "version": 14,
+      "q25_approx_s": 177.99,
+      "median_approx_s": 179.78,
+      "q75_approx_s": 194.61
+    },
+    {
+      "version": 15,
+      "q25_approx_s": 178.26,
+      "median_approx_s": 178.81,
+      "q75_approx_s": 179.42
+    },
+    {
+      "version": 16,
+      "q25_approx_s": 191.4,
+      "median_approx_s": 192.61,
+      "q75_approx_s": 229.95
+    },
+    {
+      "version": 17,
+      "q25_approx_s": 318.49,
+      "median_approx_s": 318.49,
+      "q75_approx_s": 318.49
+    },
+    {
+      "version": 18,
+      "q25_approx_s": 182.6,
+      "median_approx_s": 183.22,
+      "q75_approx_s": 198.55
+    },
+    {
+      "version": 19,
+      "q25_approx_s": 174.37,
+      "median_approx_s": 174.97,
+      "q75_approx_s": 177.89
+    },
+    {
+      "version": 20,
+      "q25_approx_s": 177.72,
+      "median_approx_s": 178.3,
+      "q75_approx_s": 183.67
+    },
+    {
+      "version": 21,
+      "q25_approx_s": 178.76,
+      "median_approx_s": 179.51,
+      "q75_approx_s": 180.52
+    },
+    {
+      "version": 22,
+      "q25_approx_s": 177.04,
+      "median_approx_s": 179.4,
+      "q75_approx_s": 180.55
+    },
+    {
+      "version": 23,
+      "q25_approx_s": 181.98,
+      "median_approx_s": 182.24,
+      "q75_approx_s": 183.92
+    },
+    {
+      "version": 24,
+      "q25_approx_s": 177.78,
+      "median_approx_s": 178.35,
+      "q75_approx_s": 179.13
+    },
+    {
+      "version": 25,
+      "q25_approx_s": 171.94,
+      "median_approx_s": 172.7,
+      "q75_approx_s": 173.52
+    },
+    {
+      "version": 26,
+      "q25_approx_s": 166.84,
+      "median_approx_s": 167.38,
+      "q75_approx_s": 168.6
+    },
+    {
+      "version": 27,
+      "q25_approx_s": 159.28,
+      "median_approx_s": 159.93,
+      "q75_approx_s": 162.71
+    },
+    {
+      "version": 28,
+      "q25_approx_s": 160.88,
+      "median_approx_s": 162.29,
+      "q75_approx_s": 174.45
+    },
+    {
+      "version": 29,
+      "q25_approx_s": 167.0,
+      "median_approx_s": 167.45,
+      "q75_approx_s": 168.23
+    },
+    {
+      "version": 30,
+      "q25_approx_s": 151.57,
+      "median_approx_s": 151.9,
+      "q75_approx_s": 152.39
+    },
+    {
+      "version": 31,
+      "q25_approx_s": 156.8,
+      "median_approx_s": 156.96,
+      "q75_approx_s": 157.52
+    },
+    {
+      "version": 32,
+      "q25_approx_s": 156.46,
+      "median_approx_s": 157.28,
+      "q75_approx_s": 157.61
+    },
+    {
+      "version": 33,
+      "q25_approx_s": 155.91,
+      "median_approx_s": 156.0,
+      "q75_approx_s": 156.37
+    }
+  ],
+  "caveat": "Some plotted Q25 and Q75 endpoints coincide. This reproduces the figure and does not establish zero population variance; per-batch sample sizes are not supplied here."
+}
