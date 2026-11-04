@@ -7,7 +7,7 @@ export const MEDIA = {
       "property": "Reasoning \u00b7 long-horizon",
       "poster": "assets/tasks/tic-tac-toe.png",
       "sources": [
-        "native8x/tic/index.m3u8",
+        "native8x/tic/adaptive.m3u8",
         null,
         null
       ],
@@ -33,7 +33,7 @@ export const MEDIA = {
       "property": "Precision \u00b7 multi-object",
       "poster": "assets/tasks/five-block-stacking.png",
       "sources": [
-        "native8x/stack/index.m3u8",
+        "native8x/stack/adaptive.m3u8",
         null,
         null
       ],
@@ -59,7 +59,7 @@ export const MEDIA = {
       "property": "Precision \u00b7 long-horizon",
       "poster": "assets/tasks/tower-of-hanoi.png",
       "sources": [
-        "native8x/hanoi/index.m3u8",
+        "native8x/hanoi/adaptive.m3u8",
         null,
         null
       ],
@@ -85,7 +85,7 @@ export const MEDIA = {
       "property": "Deformable \u00b7 bimanual",
       "poster": "assets/tasks/towel-folding.png",
       "sources": [
-        "native8x/towel/index.m3u8",
+        "native8x/towel/adaptive.m3u8",
         null,
         null
       ],
@@ -111,7 +111,7 @@ export const MEDIA = {
       "property": "Contact-rich \u00b7 precision",
       "poster": "assets/tasks/push-t.png",
       "sources": [
-        "native8x/push/index.m3u8",
+        "native8x/push/adaptive.m3u8",
         null,
         null
       ],
@@ -137,7 +137,7 @@ export const MEDIA = {
       "property": "Multi-object \u00b7 reasoning",
       "poster": "assets/tasks/block-sorting.png",
       "sources": [
-        "native8x/sorting/index.m3u8",
+        "native8x/sorting/adaptive.m3u8",
         null,
         null
       ],
@@ -163,7 +163,7 @@ export const MEDIA = {
       "property": "Multi-object manipulation",
       "poster": "assets/tasks/block-storage.png",
       "sources": [
-        "native8x/storage/index.m3u8",
+        "native8x/storage/adaptive.m3u8",
         null,
         null
       ],
@@ -189,7 +189,7 @@ export const MEDIA = {
       "property": "Precision \u00b7 online-assisted",
       "poster": "assets/tasks/ethernet-insertion.png",
       "sources": [
-        "native8x/ethernet/index.m3u8",
+        "native8x/ethernet/adaptive.m3u8",
         null,
         null
       ],
