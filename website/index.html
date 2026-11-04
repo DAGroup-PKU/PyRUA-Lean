@@ -12,7 +12,7 @@
   <link rel="stylesheet" href="structure.css?v=20">
   <link rel="stylesheet" href="results.css?v=19">
   <link rel="stylesheet" href="leaderboard.css?v=18">
-  <link rel="stylesheet" href="editorial.css?v=20">
+  <link rel="stylesheet" href="editorial.css?v=authors-20">
   <link rel="stylesheet" href="gallery.css?v=21">
   <style>
     /* Reserve the opening before modules load; deep links never paint the title first. */
@@ -71,23 +71,28 @@
       <div class="paper-brand"><span>PyRUA</span>-REAL</div>
       <h1><span class="real-initial">R</span>obot <span class="real-initial">E</span>xploration and <span class="real-initial">A</span>daptive <span class="real-initial">L</span>earning<br class="desktop-break"> through RSI in the Real World</h1>
       <div class="authors">
-        <span><a href="https://qistee.github.io/" target="_blank" rel="noopener">Qiang Wang</a><sup>*1</sup></span><span><a href="https://jxbi1010.github.io/" target="_blank" rel="noopener">Jianxin Bi</a><sup>*1,2</sup></span><span><a href="https://github.com/shu1ong" target="_blank" rel="noopener">Shulong Jiang</a><sup>*1</sup></span><span aria-label="Additional authors to be confirmed">…</span><span><a href="https://zhoudaquan.github.io/homepage.io/index.html" target="_blank" rel="noopener">Daquan Zhou</a><sup>1†</sup></span>
+        <span><a href="https://qistee.github.io/" target="_blank" rel="noopener">Qiang Wang</a><sup>*1</sup></span>
+        <span><a href="https://jxbi1010.github.io/" target="_blank" rel="noopener">Jianxin Bi</a><sup>*1,3‡</sup></span>
+        <span><a href="https://github.com/shu1ong" target="_blank" rel="noopener">Shulong Jiang</a><sup>*1</sup></span>
+        <span>Ruiyang Si<sup>1</sup></span><span>Wenbo Huang<sup>1</sup></span>
+        <span>Kaiqi Chen<sup>1</sup></span><span>Jiaxin Li<sup>1</sup></span><span>Liyun Li<sup>3</sup></span>
+        <span>Xuanyi Li<sup>2†</sup></span><span><a href="https://zhoudaquan.github.io/homepage.io/index.html" target="_blank" rel="noopener">Daquan Zhou</a><sup>1†</sup></span>
       </div>
-      <div class="affiliations"><span><sup>1</sup>Peking University</span><span><sup>2</sup>National University of Singapore</span></div>
-      <p class="author-notes">* Equal contribution &nbsp; † Corresponding author</p>
+      <div class="affiliations"><span><sup>1</sup>Peking University</span><span><sup>2</sup>EngineAI</span><span><sup>3</sup>National University of Singapore</span></div>
+      <p class="author-notes">* Equal contribution &nbsp; ‡ Project lead &nbsp; † Corresponding author</p>
       <div class="paper-links">
         <a href="assets/paper.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h8l4 4v14H6zM14 3v5h4M9 12h6M9 16h6"/></svg>Paper</a>
         <a href="#performance"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="m10 9 5 3-5 3z"/></svg>Videos</a>
         <a href="https://dagroup-pku.github.io/PyRUA-Lean/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14 4h6v6M20 4l-9 9M11 4H4v16h16v-7"/></svg>PyRUA-Lean</a>
       </div>
-      <div class="university-logos" aria-label="Participating universities"><img class="university-pku" src="assets/universities/pku.png" alt="Peking University"><img class="university-nus" src="assets/universities/nus.png" alt="National University of Singapore"></div>
+      <div class="university-logos" aria-label="Participating institutions"><span class="institution-engineai"><img src="assets/universities/engineai.png" alt="EngineAI 众擎机器人"></span><img class="university-pku" src="assets/universities/pku.png" alt="Peking University"><img class="university-nus" src="assets/universities/nus.png" alt="National University of Singapore"></div>
     </header>
 
 
 
     <section class="abstract-section section wrap" id="abstract">
       <h2>Abstract</h2>
-      <p>Coding agents such as GPT-6-Astra empowers spatial reasoning with executable robot behavior, raising the question of how coding agent can produce lasting improvements in robot capabilities from physical interaction. In this work, we study <strong>embodied recursive self-improvement (RSI)</strong> through real world exploration, code improvement, and deployment using PyRUA-REAL. Within this framework, coding agents retain interaction experience as <strong>persistent memory and reusable executable skills</strong> to inform subsequent exploration and improvements. Our empirical study places physical manipulation at the center of the improvement process, examining how agents collaborate, what kind of execution feedback supports effective code improvement, and how task specifications and previously acquired skills influence robustness and task transfer. We further investigate the efficiency and capability of deploying the resulting programs without online agent decisions. Across eight real world tasks, recorded development success averages <strong>91.1%</strong> across tasks. Complementary RoboDojo evaluation with PyRUA-RSI frozen programs achieves <strong>84.42% capability-averaged success</strong> on the development seed and <strong>80.73% on held-out seed 2</strong>, without language-model calls at evaluation time. This study provides empirical guidance for turning physical exploration into reusable robot skills that support continued improvement and robust, efficient deployment.</p>
+      <p>Coding agents powered by models such as GPT-6-Astra connect spatial reasoning with executable robot behavior, raising the question of how coding agents can produce lasting improvements in robot capabilities from physical interaction. In this work, we study embodied recursive self-improvement (RSI) through <em>real-world</em> exploration, code improvement, and deployment using PyRUA-REAL. Within this framework, coding agents retain interaction experience as persistent memory and reusable executable skills to inform subsequent exploration and improvements. Our empirical study places physical manipulation at the center of the improvement process, examining how agents collaborate, what kind of execution feedback supports effective code improvement, and how task specifications and previously acquired skills influence robustness and task transfer. We further investigate the efficiency and capability of deploying the resulting programs without online agent decisions. Across eight real-world tasks, recorded development success averages <strong>91.1%</strong> across tasks. Complementary evaluation across 42 RoboDojo tasks yields <strong>84.42%</strong> capability-averaged success, compared with 50.35% for PyRUA-Lean and 22.48% for GPT-6-Astra in reported evaluations. This study provides empirical guidance for turning physical exploration into reusable robot skills that support continued improvement and robust, efficient deployment.</p>
     </section>
 
 
@@ -107,6 +112,6 @@
     </div>
 
   </main>
-  <footer class="wrap"><a href="#top" class="footer-brand">PyRUA<span>-REAL</span></a><span>Peking University · National University of Singapore</span><a href="assets/paper.pdf" target="_blank" rel="noopener">Paper ↗</a></footer>
+  <footer class="wrap"><a href="#top" class="footer-brand">PyRUA<span>-REAL</span></a><span>Peking University · EngineAI · National University of Singapore</span><a href="assets/paper.pdf" target="_blank" rel="noopener">Paper ↗</a></footer>
 </body>
 </html>
