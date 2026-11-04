@@ -64,7 +64,7 @@ Code: `src/datafarm/simulation/usdcraft.py`, `tools/build_usd_asset.py`.
 
 ## Using the asset
 
-Load the URDF in the target simulator and map names, frames, units, the fixed-base choice and relevant joint ranges into the generated task scene. Do not assume USD physics settings transfer between simulators. Validate actual joint motion, collision cavities, grasp and contact surfaces, support and settling. Compare new simulator images with real views and retain evidence and import settings.
+A rigid object exports one link and no joints, so SAPIEN's `load()` refuses it with "URDF contains multiple objects"; use `load_multiple()`, which returns it as an actor. Load the URDF in the target simulator and map names, frames, units, the fixed-base choice and relevant joint ranges into the generated task scene. Do not assume USD physics settings transfer between simulators. Validate actual joint motion, collision cavities, grasp and contact surfaces, support and settling. Compare new simulator images with real views and retain evidence and import settings.
 
 `exported-unqualified` only means the asset is ready for inspection. The task author collects simulator qualification probes, then queues an independent review through `state.review_requests` with source hashes. Independent grounding review remains required. Nothing is adopted or physically certified automatically.
 
@@ -74,7 +74,8 @@ Changed inputs require a new versioned plan. A non-zero exit is kept as `failed`
 
 ## Limitations
 
-- At the tested commit, Generation has run end to end through the adapter with Codex, and SAPIEN loaded the exported URDF with its joints. Reconstruction has been checked only against the command-line options, not run, and Isaac Sim import has not been tested.
+- At the tested commit, Generation and Reconstruction have each run once end to end through the adapter with Codex, and SAPIEN loaded both exported URDFs. Isaac Sim import and USDCraft's API-key workflow have not been tested.
+- Friction set in `model.py` did not reach SAPIEN through the URDF: a rigid drum authored with static friction 0.40 loaded with SAPIEN's default of 0.3. Set contact materials in the task scene.
 - Exported assets are never simulator-qualified by the adapter, and generation infers geometry.
 - Only `image` reaches the single-image CLI; `context_files` are hashed for provenance only.
 - Costs stay `unknown` until upstream call records are reconciled with the task's budget policy, and enforced budgets cannot be met. The adapter neither enforces a dollar cap nor treats native login as zero-cost usage.
