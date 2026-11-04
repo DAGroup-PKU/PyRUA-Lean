@@ -5,11 +5,11 @@
   </picture>
 </p>
 
+<!-- PyRUA projects: each project adds ` | <a href="<its project page>"><b>🌐 PyRUA-Name</b></a>` here,
+     in the order of the list in Introduction -->
 <h3 align="center">
-<a href="https://dagroup-pku.github.io/PyRUA-Lean/"><b>🌐 Project Page</b></a> |
-<a href="https://arxiv.org/abs/2610.01939"><b>📄 Paper</b></a> |
 <a href="https://dagroup-pku.github.io/PyRUA-Lean/docs/"><b>📚 Docs</b></a> |
-<a href="https://huggingface.co/DAGroup-PKU/PyRUA-Lean-Coder-v0.1-4B"><b>🤗 Model</b></a>
+<a href="https://dagroup-pku.github.io/PyRUA-Lean/"><b>🌐 PyRUA-Lean</b></a>
 </h3>
 
 <p align="center">
@@ -20,11 +20,6 @@
   <a href="pyproject.toml"><img src="https://img.shields.io/badge/Python-3.10%2B-3776ab?logo=python&logoColor=white"></a>
 </p>
 
-**PyRUA-Lean** (*Py*thon for lean *R*obot-*U*se *A*gents, the robot counterpart of computer-use agents)
-turns a robot into a Python object. A tool-calling agent spends a full LLM call on every small step of a task
-and re-sends everything before it each time. A PyRUA-Lean agent writes code against `robo` instead, so one call
-can find an object, move above it, grasp, check the gripper and try again.
-
 <p align="center">
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="docs/assets/overview-dark.png">
@@ -34,6 +29,8 @@ can find an object, move above it, grasp, check the gripper and try again.
 </p>
 
 ## 🔥 News
+
+<!-- Newest first. An entry of another PyRUA project names the project in bold and links its page and paper. -->
 
 - [Incoming] 🔜 **PyRUA-Coder v1.0** (the next release of the trained coder) and **PyRUA-RSI**, each with its own
   technical report.
@@ -73,19 +70,26 @@ can find an object, move above it, grasp, check the gripper and try again.
 
 ## 💡 Introduction
 
-PyRUA-Lean has three parts so far:
+**PyRUA** (*Py*thon for *R*obot-*U*se *A*gents, the robot counterpart of computer-use agents) is a series of
+projects on robot agents that act through Python code:
 
-- **The framework.** The agent composes robot primitives, VLA policies among them, into Python cells that check
-  and retry locally and return only the images and state it asks for. On 700 task instances from LIBERO-PRO,
-  RoboTwin 2.0 and RoboCasa365, with the same GPT-6 Astra planner and the same primitives as tool calling, success
-  goes from **63.1% to 71.7%**, with **49% fewer LLM calls** and **65% fewer input tokens** on the instances both
-  agents solve.
-- **RoboDojo.** With this library's own motion, gripper and perception primitives and the colour images of the
-  benchmark's default observation, PyRUA-Lean reaches **51.62% average success rate (Score 58.20)**, first on all
-  five dimensions of the public leaderboard (snapshot of October 9, 2026).
-- **[PyRUA-Lean Coder v0.1-4B](https://huggingface.co/DAGroup-PKU/PyRUA-Lean-Coder-v0.1-4B).** Qwen3.5-4B trained with GRPO in the PyRUA-Lean framework, on 45 LIBERO-PRO
-  instances, goes from **18.8% to 44.1%** on 655 task instances it never saw in training, above the Qwen3.5-27B base
-  model (29.2%).
+<!-- PyRUA projects: one bullet per project, in order of release: `- **[PyRUA-Name](<its project page>)**: <one line
+     on what it is>`, details as indented sub-bullets. Add the project to the links at the top as well. -->
+
+- **[PyRUA-Lean](https://dagroup-pku.github.io/PyRUA-Lean/)**: a token-efficient harness for robot-use agents, with
+  a higher success rate than tool calling, that generalizes across robots and benchmarks; PyRUA-Lean Coder v0.1-4B
+  is trained in it.
+  - **The framework.** The agent composes robot primitives, VLA policies among them, into Python cells that check
+    and retry locally and return only the images and state it asks for. On 700 task instances from LIBERO-PRO,
+    RoboTwin 2.0 and RoboCasa365, with the same GPT-6 Astra planner and the same primitives as tool calling, success
+    goes from **63.1% to 71.7%**, with **49% fewer LLM calls** and **65% fewer input tokens** on the instances both
+    agents solve.
+  - **RoboDojo.** With this library's own motion, gripper and perception primitives and the colour images of the
+    benchmark's default observation, PyRUA-Lean reaches **51.62% average success rate (Score 58.20)**, first on all
+    five dimensions of the public leaderboard (snapshot of October 9, 2026).
+  - **[PyRUA-Lean Coder v0.1-4B](https://huggingface.co/DAGroup-PKU/PyRUA-Lean-Coder-v0.1-4B).** Qwen3.5-4B trained
+    with GRPO in the PyRUA-Lean framework, on 45 LIBERO-PRO instances, goes from **18.8% to 44.1%** on 655 task
+    instances it never saw in training, above the Qwen3.5-27B base model (29.2%).
 
 ## 🚀 Quick start
 
@@ -157,9 +161,25 @@ of the public leaderboard taken on October 9, 2026; the official evaluation was 
 | Qwen3.5-27B | 64.4 | **38.1** | 20.8 | 65.6 | 13.1 | 29.2 |
 | **PyRUA-Lean Coder v0.1-4B** | **71.1** | 37.4 | **52.4** | **76.7** | **19.4** | **44.1** |
 
-## 📖 Citation
+## 🤗 Acknowledgements
 
-If you use PyRUA-Lean, please cite our paper:
+Thanks to the following open-source projects:
+
+- [RPent](https://github.com/RLinf/RPent)
+- [XPolicyLab](https://github.com/XPolicyLab/XPolicyLab)
+- [RoboDojo](https://github.com/RoboDojo-Benchmark/RoboDojo)
+- [GenieSim](https://github.com/AgibotTech/genie_sim)
+- [SAM 3](https://github.com/facebookresearch/sam3)
+- [Codex CLI](https://github.com/openai/codex)
+- [miles](https://github.com/radixark/miles)
+- [SGLang](https://github.com/sgl-project/sglang)
+- [Qwen3.5](https://huggingface.co/Qwen/Qwen3.5-4B)
+
+## 🌟 Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=DAGroup-PKU/PyRUA-Lean&type=Date)](https://star-history.com/#DAGroup-PKU/PyRUA-Lean&Date)
+
+## 📖 BibTeX
 
 ```bibtex
 @article{si2026fewer,
@@ -170,15 +190,13 @@ If you use PyRUA-Lean, please cite our paper:
 }
 ```
 
-## 🤗 License and acknowledgements
+<!-- PyRUA projects: the BibTeX of the other projects goes here, in one collapsed block:
+<details>
+<summary>BibTeX of the other PyRUA projects</summary>
 
-Apache License 2.0 ([LICENSE](LICENSE)). PyRUA-Lean builds on [RPent](https://github.com/RLinf/RPent)
-(Apache-2.0): on LIBERO-PRO, RoboTwin 2.0 and RoboCasa365 its robot stacks, services and primitive implementations
-do the work behind `robo`, the tool-calling baseline is RPent itself, and parts of this repository are adapted from
-it; see `NOTICE`. If you use
-RPent, please cite its paper, [Harness VLA: Steering Frozen VLAs into Reliable Manipulation Primitives via
-Memory-Guided Agents](https://arxiv.org/abs/2607.08448).
+```bibtex
+@misc{...}
+```
 
-## 🌟 Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=DAGroup-PKU/PyRUA-Lean&type=Date)](https://star-history.com/#DAGroup-PKU/PyRUA-Lean&Date)
+</details>
+-->
