@@ -119,7 +119,8 @@ def test_all_roles_explicitly_load_without_historical_task_rules(tmp_path):
         c = write_context(tmp_path / role, role)
         assert c['messages'][0]['role'] == 'system'
         assert any(x['path'] == f'prompts/roles/{role}.md' for x in c['receipt']['files'])
-        assert not re.search(r'/home/|/mnt/', c['messages'][0]['content'])
+        # The checkout's own path may be anywhere, including under /home in CI.
+        assert not re.search(r'/home/|/mnt/', c['messages'][0]['content'].replace(str(ROOT), ''))
         assert not c['receipt']['task_products_auto_loaded']
 
 
