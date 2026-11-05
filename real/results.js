@@ -15,7 +15,7 @@ function acquisition() {
     ${heading('Real world performance')}
     <div data-performance-slot></div>
     <div class="rs-metrics" id="real-world-charts">${metrics.map(metric=>`<figure class="rs-bar-chart" style="--bar-color:${metric.color}" aria-label="${metric.title}">
-      <figcaption><h4>${metric.title}</h4>${metric.key==='seconds'?'<p class="rs-agent-time-note">Methods involving online agents can take over 10× as long. <a href="assets/paper.pdf#page=16" target="_blank" rel="noopener">See paper, §4.8.</a></p>':''}</figcaption>
+      <figcaption><h4>${metric.title}</h4>${metric.key==='seconds'?'<p class="rs-agent-time-note">Methods involving online agents can take over 10× as long. <a href="https://arxiv.org/pdf/2611.06768#page=16" target="_blank" rel="noopener">See paper, §4.8.</a></p>':''}</figcaption>
       <div class="rs-vertical-chart">${metric.key==='success'?'<span class="rs-axis-unit">%</span>':''}
         <div class="rs-gridlines" aria-hidden="true">${metric.ticks.map(value=>`<div style="bottom:${value/metric.max*100}%"><span>${value.toLocaleString('en-US')}</span></div>`).join('')}</div>
         <div class="rs-columns">${DATA.tasks.map((task,i)=>`<div class="rs-column" data-task="${task.id}" style="--bar-size:${task[metric.key]/metric.max*100}%;--delay:${i*75}ms" aria-label="${task.name}: ${task[metric.key]} ${metric.unit}"><div class="rs-column-plot"><strong>${metric.key==='hours'?'~':''}${metric.key==='hours'?task.hours:format(task[metric.key])}</strong><i></i></div><span class="rs-column-name">${shortNames[task.id]}</span></div>`).join('')}</div>
@@ -53,7 +53,7 @@ function findings(){
   ['Explicit numerical requirements deliver the greatest generalization gains.', '4.6', 13],
   ['Cross-task experience positively transfer to new tasks.', '4.7', 14]
  ];
- return `<article class="rs-story rs-findings" id="other-findings">${heading('Further findings')}<div class="rs-finding-grid">${findings.map(([copy,section,page])=>`<article class="rs-finding-card"><p>${copy} <a href="assets/paper.pdf#page=${page}" target="_blank" rel="noopener">See paper, §${section}.</a></p></article>`).join('')}</div></article>`;
+ return `<article class="rs-story rs-findings" id="other-findings">${heading('Further findings')}<div class="rs-finding-grid">${findings.map(([copy,section,page])=>`<article class="rs-finding-card"><p>${copy} <a href="https://arxiv.org/pdf/2611.06768#page=${page}" target="_blank" rel="noopener">See paper, §${section}.</a></p></article>`).join('')}</div></article>`;
 }
 
 export function mountResults(root) {
