@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>RSIJudge: Learning the Task or Learning the Verifier? Rethinking Criteria Exposure in Embodied Self-Improvement</title>
+  <meta name="description" content="RSIJudge: when a self-improving embodied agent reads the benchmark's success criteria (Criteria Exposure), does it learn the instructed task or the verifier? On RoboDojo, its advantage comes only from tasks whose criteria ask for more than the instruction, disappears when the same episodes are judged by instruction-faithful criteria, and does not carry over to new tasks.">
+  <meta name="keywords" content="Embodied agent, Self-improvement, Robot policy evaluation, Criteria Exposure, Benchmark validity, RoboDojo, Code as policy">
+  <meta name="author" content="Wenbo Huang, Jianxin Bi, Shunyu Yang, Ruiyang Si, Rui Ni, Qiang Wang, Shulong Jiang, Yintianrun Zhang, Feixiang Ruan, Kewei Zhang, Ye Huang, Shukai Gong, Daquan Zhou">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Peking University, National University of Singapore">
+  <meta property="og:title" content="RSIJudge: Learning the Task or Learning the Verifier? Rethinking Criteria Exposure in Embodied Self-Improvement">
+  <meta property="og:description" content="A learner that reads RoboDojo's criteria scores 51.6% against 27.8%; judged by instruction-faithful criteria, the same episodes give 45.0% to 47.2%.">
+  <meta property="og:image" content="static/images/teaser_ce.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="theme-color" content="#FBFBFC">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Inter+Tight:wght@600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@500&display=swap">
+  <link rel="stylesheet" href="static/css/site.css">
+  <script>document.documentElement.classList.add('js');</script>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script defer src="static/js/page.js"></script>
+</head>
+<body>
+
+<header class="bar">
+  <a class="brand" href="#top" aria-label="RSIJudge, back to top"><span class="grad">RSI</span>Judge</a>
+  <nav class="bar-nav" aria-label="Sections">
+    <a href="#overview">Overview</a>
+    <a href="#design">Setup</a>
+    <a href="#original">Where it pays</a>
+    <a href="#rejudge">Task or verifier?</a>
+    <a href="#reuse">Reuse</a>
+    <a href="#criteria">Criteria</a>
+    <a href="#bibtex">BibTeX</a>
+  </nav>
+  <div class="bar-links">
+    <a class="pill light"><i class="fas fa-file-pdf"></i><span>Paper</span></a>
+    <a class="pill light"><i class="fab fa-github"></i><span>Code</span></a>
+  </div>
+</header>
+
+<main id="top">
+
+<!-- ============ Title, authors, links; the three findings; the teaser ============ -->
+<section class="hero" id="overview">
+  <div class="hero-title">
+    <h1>Learning the Task or Learning the <span class="grad">Verifier</span>?</h1>
+    <p class="subtitle">Rethinking Criteria Exposure in Embodied Self-Improvement</p>
+    <p class="tagline">When a self-improving robot agent reads the benchmark's success criteria, <b>does it learn the instructed
+      task, or the verifier?</b></p>
+    <div class="authors">
+      <!-- a name without a page of its own links to this page -->
+      <span><a href="./">Wenbo Huang</a><sup>1</sup></span>
+      <span><a href="https://jxbi1010.github.io/" target="_blank" rel="noopener">Jianxin Bi</a><sup>1,2</sup></span>
+      <span><a href="./">Shunyu Yang</a><sup>1</sup></span>
+      <span><a href="https://ruiyangsi.github.io/" target="_blank" rel="noopener">Ruiyang Si</a><sup>1</sup></span>
+      <span><a href="./">Rui Ni</a><sup>1</sup></span>
+      <span><a href="./">Qiang Wang</a><sup>1</sup></span>
+      <span><a href="./">Shulong Jiang</a><sup>1</sup></span>
+      <span><a href="./">Yintianrun Zhang</a><sup>1</sup></span>
+      <span><a href="https://vme0522.github.io/" target="_blank" rel="noopener">Feixiang Ruan</a><sup>1</sup></span>
+      <span><a href="https://xiwen1.github.io/" target="_blank" rel="noopener">Kewei Zhang</a><sup>1</sup></span>
+      <span><a href="./">Ye Huang</a><sup>1</sup></span>
+      <span><a href="./">Shukai Gong</a><sup>1</sup></span>
+      <span><a href="https://zhoudaquan.github.io/homepage.io/index.html" target="_blank" rel="noopener">Daquan Zhou</a><sup>1,*</sup></span>
+    </div>
+    <div class="affils">
+      <span><sup>1</sup>Peking University</span>
+      <span><sup>2</sup>National University of Singapore</span>
+      <span><sup>*</sup>Corresponding author</span>
+    </div>
+    <div class="hero-row">
+      <div class="logos">
+        <span><img src="static/images/logos/pku.png" alt="Peking University" width="398" height="112"></span>
+        <span><img src="static/images/logos/nus.png" alt="National University of Singapore" width="245" height="112"></span>
+      </div>
+      <div class="hero-links">
+        <!-- TODO(links): Paper, Code and PDF have no link yet; add the arXiv page, the RSIJudge branch and the PDF once posted -->
+        <a class="pill"><i class="fas fa-file-pdf"></i><span>Paper</span></a>
+        <a class="pill"><i class="fab fa-github"></i><span>Code</span></a>
+        <a class="pill"><i class="fas fa-file-download"></i><span>PDF</span></a>
+        <a class="pill light" href="#bibtex"><i class="fas fa-quote-right"></i><span>BibTeX</span></a>
+      </div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <a class="stat" href="#original"><span class="stat-k">H1 &middot; Where exposure pays</span>
+      <span class="stat-h">Exposure helps only where the criteria ask for more than the instruction</span>
+      <span class="stat-t">When criteria and instruction agree, learning from success alone does just as well.</span>
+      <span class="stat-more">Original criteria &rarr;</span></a>
+    <a class="stat" href="#rejudge"><span class="stat-k">H2 &middot; Task or verifier?</span>
+      <span class="stat-h">Exposure's advantage disappears under instruction-faithful criteria</span>
+      <span class="stat-t">Judged that way, the exposed libraries lose successes while the success-only libraries gain them.</span>
+      <span class="stat-more">Changing the criteria &rarr;</span></a>
+    <a class="stat" href="#reuse"><span class="stat-k">H3 &middot; What carries over</span>
+      <span class="stat-h">What exposure adds does not carry over to new tasks</span>
+      <span class="stat-t">Across benchmarks neither library gives a clear gain; only experience from the target benchmark helps.</span>
+      <span class="stat-more">Reusing the library &rarr;</span></a>
+  </div>
+
+  <div class="wrap wide" style="margin-top:44px">
+    <figure class="paper-fig rv">
+      <a href="static/images/teaser_ce.png" target="_blank" rel="noopener" title="Open full size"><img src="static/images/teaser_ce.png" alt="What the learner reads with and without Criteria Exposure on press_by_number, and the same episodes of 16 criteria-limited tasks judged by the original and the instruction-faithful criteria" width="2572" height="990"></a>
+      <figcaption><b>Learning the task or the verifier?</b> <em>(a)</em> The criteria of <code>press_by_number</code> verify a button
+        protocol the instruction does not state. <em>(b)</em> On 16 criteria-limited tasks, the advantage of exposure under the
+        original criteria disappears when the same episodes are judged by instruction-faithful criteria.</figcaption>
+    </figure>
+  </div>
+
+  <div class="abstract">
+    <h2>Abstract</h2>
+    <p>Self-improving embodied agents are increasingly being developed and compared on robot simulation benchmarks. Several
+      recent works expose the benchmark's success criteria to the learning agent, a practice we call Criteria Exposure (CE).
+      These criteria, originally written to verify policies trained by imitation learning, often demand more than the
+      corresponding language instructions, so a score from such a verifier may not faithfully reflect whether the instructed
+      task was completed, especially for robot-control programs written by an agent. As embodied coding agents report ever
+      higher benchmark scores, a natural question arises: when a coding agent is exposed to the benchmark's criteria, does it
+      generate code that better performs the instructed task, or code that simply overfits to the verification criteria? We
+      conduct controlled experiments with a self-improving agent with and without CE, and find that with CE the agent quickly
+      produces code with a higher success rate under the given criteria, but this advantage disappears when the criteria are
+      changed slightly without departing from the original instructions. More importantly, the skills the agent develops
+      under CE transfer poorly across tasks. We further propose instruction-faithful criteria and show that they better
+      reflect the performance of agent-generated programs.</p>
+  </div>
+</section>
+
+<!-- ============ Setup ============ -->
+<section class="sec alt" id="design">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="kicker">Study design</span>
+      <h2>One loop, one switch</h2>
+      <p>A frozen actor acts; a learner turns its episodes into a library of skills and memory. The two settings differ only in
+        what the learner reads.</p>
+    </div>
+    <figure class="paper-fig rv">
+      <a href="static/images/method_loop.png" target="_blank" rel="noopener" title="Open full size"><img src="static/images/method_loop.png" alt="Overview of the self-improvement loop: learning on development layouts and evaluation on unseen layouts" loading="lazy" width="3208" height="1300"></a>
+    </figure>
+    <div class="settings rv">
+      <div class="setting">
+        <h3>w/o CE</h3>
+        <div class="chips"><span class="chip">trajectories</span><span class="chip">success</span><span class="chip off">criteria code</span><span class="chip off">score</span><span class="chip off">stages</span></div>
+        <p>What a real robot gets: success from a human or a VLM.</p>
+      </div>
+      <div class="setting exposed">
+        <h3>w/ CE</h3>
+        <div class="chips"><span class="chip">trajectories</span><span class="chip">success</span><span class="chip">criteria code</span><span class="chip">score</span><span class="chip">stages</span></div>
+        <p>The learner reads the verifier's source; the actor never does.</p>
+      </div>
+    </div>
+    <div class="prose rv" style="margin-top:26px">
+      <p>The <b>actor</b>, GPT-6 Astra, controls a dual-arm robot by writing Python cells that call PyRUA-Lean's perception and
+        motion primitives; it stays frozen throughout. After each batch of five development episodes, the <b>learner</b>, Claude
+        Code with Opus&nbsp;5.5, reads the evidence and makes one revision of the task's library: <em>skills</em> are callable
+        code that reports what it did, <em>memory entries</em> say when to apply what, with the evidence for it. A revision is
+        usually tried first in verification rollouts, and the loop rolls back when a batch falls clearly below the best one.
+        After five rounds the library is frozen, and the same actor runs alone on layouts the loop never saw.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ H1 ============ -->
+<section class="sec" id="original">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="kicker">H1 &middot; Original criteria</span>
+      <h2>Exposure pays only where the criteria ask for more</h2>
+      <p>Judged by the benchmark's own criteria, the ones the exposed learner read.</p>
+    </div>
+    <div class="two">
+      <div class="rv">
+        <div class="card tcard">
+          <table class="tbl">
+            <thead><tr><th>Tasks</th><th>Empty</th><th>w/o CE</th><th>w/ CE</th></tr></thead>
+            <tbody>
+              <tr><td>All (25)</td><td>24.6</td><td>47.8<small>+23.2</small></td><td class="best">62.0<small>+37.4</small></td></tr>
+              <tr><td>Criteria-limited (16)</td><td>8.4</td><td>27.8<small>+19.4</small></td><td class="best">51.6<small>+43.2</small></td></tr>
+              <tr><td>Faithful (9)</td><td>53.3</td><td class="best">83.3<small>+30.0</small></td><td>80.6<small>+27.3</small></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="fine">Test success (%) under the original criteria, 20 layouts per task; green: gain over the empty library; bold: the best of each row.</p>
+        <div class="prose" style="margin-top:22px">
+          <p>Learning from success alone already <b>doubles</b> test success over the empty library, and reading the criteria
+            adds 14 points more. That extra gain comes entirely from the 16 criteria-limited tasks: on the 9 faithful ones, the
+            two settings end level.</p>
+          <p>Among criteria-limited tasks, what matters is whether the unstated rule shows in a failed episode. In
+            <code>build_tower</code> the leftover blocks reveal it, and both settings reach 20/20; the button protocol of
+            <code>press_by_number</code> never shows, and the success-only learner never finds it.</p>
+        </div>
+      </div>
+      <figure class="paper-fig rv">
+        <a href="static/images/dev_curves.png" target="_blank" rel="noopener" title="Open full size"><img src="static/images/dev_curves.png" alt="Development success by round on criteria-limited and faithful tasks, with and without Criteria Exposure" loading="lazy" width="1360" height="748"></a>
+        <figcaption><b>Development success by round.</b> The two settings part in round 1 on criteria-limited tasks and stay level on faithful ones.</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<!-- ============ H2 ============ -->
+<section class="sec alt" id="rejudge">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="kicker">H2 &middot; Task or verifier?</span>
+      <h2>Exposure's score follows the criteria it read</h2>
+      <p>If exposure taught the task, its advantage would survive a change of criteria. It does not.</p>
+    </div>
+    <div class="charts">
+      <div class="card bars rv" aria-label="w/o CE library: 27.8% under the original criteria, 47.2% under the instruction-faithful criteria. w/ CE library: 51.6% and 45.0%."
+           data-bars='{"groups":[{"text":"w/o CE library","a":27.8,"b":47.2,"c":"#8C0000"},{"text":"w/ CE library","a":51.6,"b":45.0,"c":"#596675"}]}'>
+        <div class="bars-head">
+          <div><h3>The same episodes, re-judged</h3><p class="sub">16 criteria-limited tasks, 320 episodes per library</p></div>
+          <button class="replay" type="button" aria-label="Replay the animation"><i class="fas fa-redo"></i>Replay</button>
+        </div>
+        <div class="legend"><span><span class="sw" style="background:#E8B3B3"></span><span class="sw" style="background:#CDD1D6"></span>judged by <i class="m">C</i><sup>orig</sup></span><span><span class="sw" style="background:#8C0000"></span><span class="sw" style="background:#596675"></span>the same episodes by <i class="m">C</i><sup>faith</sup></span></div>
+        <div class="bars-plot"></div>
+        <p class="note">Under the original criteria the exposed library scores higher. Judged by instruction-faithful criteria, the
+          <b>success-only library rises</b> and the <b>exposed one falls</b>, and the two end within noise: the success-only
+          library gains where the original criteria demand an unstated protocol, the exposed one loses where it learned it.</p>
+      </div>
+      <div class="card bars rv" aria-label="Library that read the original criteria: 57.0% under them, 45.0% under the instruction-faithful criteria. Library that read the instruction-faithful criteria: 65.0% under them, 13.5% under the original criteria."
+           data-bars='{"groups":[{"text":"read ","crit":"orig","a":57.0,"b":45.0,"c":"#596675"},{"text":"read ","crit":"faith","a":65.0,"b":13.5,"c":"#0072B2"}]}'>
+        <div class="bars-head">
+          <div><h3>Each exposed library, by the criteria it read and by the other</h3><p class="sub">Ten tasks, 200 episodes per library</p></div>
+          <button class="replay" type="button" aria-label="Replay the animation"><i class="fas fa-redo"></i>Replay</button>
+        </div>
+        <div class="legend"><span><span class="sw" style="background:#CDD1D6"></span><span class="sw" style="background:#A6CDE3"></span>judged by the criteria it read</span><span><span class="sw" style="background:#596675"></span><span class="sw" style="background:#0072B2"></span>by the other criteria</span></div>
+        <div class="bars-plot"></div>
+        <p class="note">We also let the learner read <i class="m">C</i><sup>faith</sup> instead. <b>Each exposed library does well
+          only under the criteria it read</b>; the fall is steepest when moving to the original criteria, which add back every
+          rule the library never saw.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap wide">
+    <div class="demo rv">
+      <div class="tabs center" role="tablist" aria-label="Episode">
+        <button class="mono active" type="button" role="tab" aria-selected="true" data-video="static/videos/swap_blocks_l5" data-cap="cap-swap" data-title="swap_blocks, test layout 5: w/ CE vs w/o CE">swap_blocks</button>
+        <button class="mono" type="button" role="tab" aria-selected="false" data-video="static/videos/make_kong_l4" data-cap="cap-kong" data-title="make_kong, test layout 4: w/ CE vs w/o CE">make_kong</button>
+        <button class="mono" type="button" role="tab" aria-selected="false" data-video="static/videos/sweep_blocks_random_l18" data-cap="cap-sweep" data-title="sweep_blocks_random, test layout 18: w/ CE vs w/o CE">sweep_blocks_random</button>
+      </div>
+      <div class="stage" role="button" tabindex="0" aria-label="Watch the selected episode with controls"
+           data-title="swap_blocks, test layout 5: w/ CE vs w/o CE" data-cap="cap-swap">
+        <video muted loop playsinline preload="metadata" poster="static/videos/swap_blocks_l5.jpg">
+          <source src="static/videos/swap_blocks_l5.mp4" type="video/mp4">
+        </video>
+        <span class="watch"><i class="fas fa-expand"></i>Watch</span>
+      </div>
+      <p class="cap center" id="cap-swap"><b>w/ CE vs w/o CE.</b> The success-only library swaps the blocks as asked and passes
+        the faithful criteria; under the original criteria neither library succeeds on any of the 20 test layouts.</p>
+      <p class="cap center" id="cap-kong" hidden><b>w/ CE vs w/o CE.</b> Both libraries complete what the instruction asks; only
+        the exposed one also draws the tile that the original criteria require and the instruction does not mention.</p>
+      <p class="cap center" id="cap-sweep" hidden><b>w/ CE vs w/o CE.</b> The exposed library notes that the original criteria
+        never check &ldquo;pick up the broom, hand it over&rdquo;, so the robot carries each block into the dustpan by hand: the
+        original criteria pass it, the faithful ones, which require the broom to be picked up, never do. The success-only
+        library hands the broom over and sweeps, and passes both.</p>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="callout rv"><b>Exposure changes what the learner writes down.</b> A learner that reads the criteria can explain
+      a failure by the condition it violated, so its experience is phrased in the terms of one verifier; a learner that sees
+      only success has to find a physical cause. About a third of the exposed memory entries cite the criteria code, and none
+      of the success-only ones do. An exposed entry, verbatim:
+      <div class="entry"><span class="k">press_by_number-manipulate-001</span>
+<span class="k">do:</span> Press in exactly this order: LEFT red xN_left (left arm) -&gt; BLUE once (right arm) -&gt; MIDDLE red xN_middle (right arm) -&gt; BLUE once more -&gt; ... <mark>Blue is pressed exactly TWICE, never more.</mark> ...
+<span class="k">evidence:</span> <mark>task checks in order:</mark> repeat(button0 below 0.5 / above 0.9) x num0; button2 below 0.5; ...</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ H3 ============ -->
+<section class="sec" id="reuse">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="kicker">H3 &middot; Reuse</span>
+      <h2>What exposure adds stays with its task</h2>
+      <p>Libraries distilled from ten source tasks, applied to new tasks and two further benchmarks.</p>
+    </div>
+    <div class="card tcard rv">
+      <table class="tbl">
+        <thead><tr><th>Target</th><th class="l">Library from</th><th>Empty</th><th>w/o CE</th><th>w/ CE</th></tr></thead>
+        <tbody>
+          <tr><td>RoboDojo, 10 new tasks</td><td class="l">RoboDojo</td><td>65/200</td><td class="best">80/200<small>+15</small></td><td>71/200<small>+6</small></td></tr>
+          <tr><td>LIBERO-PRO, 6 tasks</td><td class="l">RoboDojo</td><td>45/60</td><td class="best">48/60<small>+3</small></td><td>46/60<small>+1</small></td></tr>
+          <tr><td>RoboCasa365, 10 tasks</td><td class="l">RoboDojo</td><td>22/100</td><td class="best">24/100<small>+2</small></td><td class="best">24/100<small>+2</small></td></tr>
+          <tr><td>RoboCasa365, 10 tasks</td><td class="l">RoboCasa365</td><td>22/100</td><td class="best">33/100<small>+11</small></td><td>29/100<small>+7</small></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="fine">Successes under each benchmark's own criteria, paired with the empty library on the same layouts; green: gain over the empty library; bold: the best of each row.</p>
+    <div class="prose cols rv">
+      <p><b>Across tasks.</b> We distill the libraries of ten learned tasks into one library per setting and apply it to ten
+        RoboDojo tasks none of them covers. Both help, but the advantage that exposure had on its own tasks does not reappear: the
+        success-only library helps more. Exposed experience carries the conditions and precision needed to pass one task's
+        criteria, which become overhead elsewhere, whereas rules about the gripper hold across tasks.</p>
+      <p><b>Across benchmarks.</b> Translated to LIBERO-PRO and RoboCasa365, neither library gives a clear gain: the translated
+        skills are almost never called, and what the targets lack, such as moving the base or operating articulated parts, has
+        no counterpart in RoboDojo. Libraries distilled from other RoboCasa365 tasks do help there; experience transfers where
+        the bottleneck is shared.</p>
+    </div>
+  </div>
+  <div class="wrap wide">
+    <div class="demo rv">
+      <div class="tabs center" role="tablist" aria-label="Episode">
+        <button class="mono active" type="button" role="tab" aria-selected="true" data-video="static/videos/solve_equation_l4" data-cap="cap-solve" data-title="solve_equation, layout 4: empty library, off-10, on-10">solve_equation</button>
+        <button class="mono" type="button" role="tab" aria-selected="false" data-video="static/videos/insert_tubes_l19" data-cap="cap-tubes" data-title="insert_tubes, layout 19: empty library, off-10, on-10">insert_tubes</button>
+      </div>
+      <div class="stage" role="button" tabindex="0" aria-label="Watch the selected episode with controls"
+           data-title="solve_equation, layout 4: empty library, off-10, on-10" data-cap="cap-solve">
+        <video muted loop playsinline preload="metadata" poster="static/videos/solve_equation_l4.jpg">
+          <source src="static/videos/solve_equation_l4.mp4" type="video/mp4">
+        </video>
+        <span class="watch"><i class="fas fa-expand"></i>Watch</span>
+      </div>
+      <p class="cap center" id="cap-solve"><b>A general rule carries over.</b> off-10 (distilled w/o CE) tells the actor to open the
+        gripper fully on every empty move and solves this layout in 125 actions; on-10 (w/ CE) keeps a single-task formula
+        that opens it only part way, and its closes grasp nothing.</p>
+      <p class="cap center" id="cap-tubes" hidden><b>Single-task precision does not.</b> on-10 spends 116 actions per episode
+        re-measuring with the wrist camera, against 57 for off-10; here it seats all three tubes but runs out of its
+        500-action budget before the arms are home.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============ Criteria vs instruction ============ -->
+<section class="sec alt" id="criteria">
+  <div class="wrap">
+    <div class="sec-head rv">
+      <span class="kicker">Criteria vs instruction</span>
+      <h2>When the criteria verify more than the instruction says</h2>
+      <p>The benchmarks were built for policies trained on demonstrations, which already carry every detail the criteria check.
+        An agent that receives only the instruction does not.</p>
+    </div>
+    <div class="prose rv">
+      <p>We call a task <b>criteria-limited</b> if its criteria disagree with the success its instruction asks for: they reject
+        a trajectory the instruction accepts, through an unstated order, count or end state, or a tolerance stricter than
+        needed, or they accept one it rejects. Such tasks appear in every benchmark we examined, RoboDojo, LIBERO, RoboCasa365
+        and RoboTwin&nbsp;2.0. A manual review of all 42 RoboDojo tasks finds 20 criteria-limited ones, and 33 of the 42
+        require both arms to return home, which only 5 instructions mention.</p>
+    </div>
+    <div class="example rv">
+      <div class="ex-col instr">
+        <h3>The instruction of <code>press_by_number</code></h3>
+        <blockquote>&ldquo;Press the two red buttons the required number of times according to the number cards, then press the
+          blue button to confirm.&rdquo;</blockquote>
+      </div>
+      <div class="ex-col orig">
+        <h3>Original criteria <i class="m">C</i><sup>orig</sup></h3>
+        <ul>
+          <li>left red &times; its number, then blue<span class="tag">unstated</span></li>
+          <li>middle red &times; its number, then blue again</li>
+          <li>blue pressed exactly twice<span class="tag">unstated</span></li>
+          <li>both arms back home<span class="tag">unstated</span></li>
+        </ul>
+      </div>
+      <div class="ex-col faith">
+        <h3>Instruction-faithful <i class="m">C</i><sup>faith</sup></h3>
+        <ul>
+          <li>each red exactly its number, in any order</li>
+          <li>then blue once, to confirm</li>
+          <li>blue before the reds are done fails</li>
+          <li>both arms back home (kept)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="demo rv">
+      <div class="stage" role="button" tabindex="0" aria-label="Watch press_by_number with controls"
+           data-title="press_by_number, test layout 1: w/ CE vs w/o CE" data-cap="cap-pbn">
+        <video muted loop playsinline preload="metadata" poster="static/videos/press_by_number_l1.jpg">
+          <source src="static/videos/press_by_number_l1.mp4" type="video/mp4">
+        </video>
+        <span class="watch"><i class="fas fa-expand"></i>Watch</span>
+      </div>
+      <p class="cap center" id="cap-pbn"><b>Left, w/ CE:</b> the learner read the criteria, so the robot presses blue between the two red
+        groups, a rule the instruction never states; the original criteria pass it, the instruction-faithful ones fail it.
+        <b>Right, w/o CE:</b> learned from success alone, it presses the reds and then confirms with blue, as instructed.</p>
+    </div>
+    <div class="callout rv">
+      <b>How we change the criteria.</b> For each criteria-limited task we rewrite only the criteria code, never the instruction:
+      hidden rules are removed or relaxed, defects fixed, hard thresholds relaxed to what still clearly satisfies the
+      instruction, and loose criteria tightened. Every evaluation episode is then judged by both, so any difference between
+      the two success rates comes from what the criteria verify, not from behavior. Every flipped verdict was checked by hand.
+    </div>
+  </div>
+</section>
+
+<!-- ============ BibTeX ============ -->
+<section class="sec" id="bibtex">
+  <div class="wrap">
+    <div class="bib-head">
+      <h2>BibTeX</h2>
+      <button class="pill copy-bibtex" type="button" title="Copy BibTeX to clipboard"><i class="fas fa-copy"></i><span>Copy</span></button>
+    </div>
+    <!-- TODO(bibtex): arXiv id once posted -->
+    <pre class="bib" id="bibtex-code">@misc{huang2026criteria,
+  title={Learning the Task or Learning the Verifier? Rethinking Criteria Exposure in Embodied Self-Improvement},
+  author={Huang, Wenbo and Bi, Jianxin and Yang, Shunyu and Si, Ruiyang and Ni, Rui and Wang, Qiang and Jiang, Shulong and Zhang, Yintianrun and Ruan, Feixiang and Zhang, Kewei and Huang, Ye and Gong, Shukai and Zhou, Daquan},
+  year={2026}
+}</pre>
+  </div>
+</section>
+
+</main>
+
+<footer class="foot">
+  <div class="wrap">
+    Peking University &middot; National University of Singapore<br>
+    The page layout follows the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank" rel="noopener">Academic Project Page Template</a>,
+    adopted from <a href="https://nerfies.github.io" target="_blank" rel="noopener">Nerfies</a>, under
+    <a rel="license noopener" href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC BY-SA 4.0</a>.
+  </div>
+</footer>
+
+<button class="to-top" type="button" title="Back to top" aria-label="Back to top"><i class="fas fa-chevron-up"></i></button>
+
+<dialog class="player" id="player" aria-label="Video player">
+  <div class="player-top"><b></b><button class="player-close" type="button" aria-label="Close"><i class="fas fa-times"></i></button></div>
+  <video controls playsinline preload="auto"></video>
+  <p class="player-cap"></p>
+</dialog>
+
+</body>
+</html>
