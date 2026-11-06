@@ -14,7 +14,13 @@ Yuxuan Chen<sup>1</sup>, Hao Chen<sup>1</sup>, Yichen Liu<sup>1</sup>, Yintianru
 
 </div>
 
-<p align="center"><img src="assets/paper/overview.png" alt="Overview of DataFarm: survey the field from one calibration episode, build the task in simulation, render real appearance, then inspect and harvest the dataset" width="100%"></p>
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/paper/teaser-dark.png">
+    <img src="assets/paper/teaser.png" width="100%"
+         alt="PyRUA-DataFarm at a glance. Top: on five real-robot tasks, policies trained only on farm data reach 93 successes in 100 trials against 84 for teleoperated data, and 87 against 46 under an unseen tablecloth and coloured light. Bottom left: real, simulated and rendered head views of the five tasks. Bottom right: the average cost per episode falls to $1.06 at 100 episodes and towards the marginal $0.80, below teleoperation in North America and China">
+  </picture>
+</p>
 
 **DataFarm** lets a coding agent do the teleoperator's job. From a data request and **one
 calibration episode** of the robot in its scene, the agent rebuilds the task in simulation, and a
@@ -42,6 +48,8 @@ https://github.com/user-attachments/assets/e8ea2b91-7e17-48fe-b9a8-e1ebeccad789
 - [License and acknowledgements](#license-and-acknowledgements)
 
 ## How it works
+
+<p align="center"><img src="assets/paper/overview.png" alt="Overview of DataFarm: survey the field from one calibration episode, build the task in simulation, render real appearance, then inspect and harvest the dataset" width="100%"></p>
 
 <p align="center"><img src="assets/paper/pipeline.png" alt="The DataFarm pipeline on one episode: grounding G, task contract T and expert C, episode E, render O, admission q, on top of the shared capability layer K" width="100%"></p>
 
