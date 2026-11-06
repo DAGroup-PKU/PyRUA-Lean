@@ -79,6 +79,7 @@ nav:
   - Papers:
       # PyRUA projects: one page per paper, docs/papers/<project>.md laid out like pyrua-lean.md, in order of release
       - PyRUA-Lean: papers/pyrua-lean.md
+      - PyRUA-DataFarm: papers/datafarm.md
   - Get Started:
       - Quick Start: getting-started/quickstart.md
       - How It Works: getting-started/how-it-works.md

@@ -9,7 +9,8 @@
      in the order of the list in Introduction -->
 <h3 align="center">
 <a href="https://dagroup-pku.github.io/PyRUA-Lean/docs/"><b>📚 Docs</b></a> |
-<a href="https://dagroup-pku.github.io/PyRUA-Lean/"><b>🌐 PyRUA-Lean</b></a>
+<a href="https://dagroup-pku.github.io/PyRUA-Lean/"><b>🌐 PyRUA-Lean</b></a> |
+<a href="https://dagroup-pku.github.io/PyRUA-Lean/DataFarm/"><b>🌐 PyRUA-DataFarm</b></a>
 </h3>
 
 <p align="center">
@@ -34,6 +35,12 @@
 
 - [Incoming] 🔜 **PyRUA-Coder v1.0** (the next release of the trained coder) and **PyRUA-RSI**, each with its own
   technical report.
+- [2026/11/04] 🚜 **PyRUA-DataFarm: paper and code are out.** A coding agent takes over the teleoperator's job:
+  from a data request and one calibration episode, it rebuilds the task in simulation and renders photographic,
+  action-labelled multi-view data. On five real-robot tasks, policies trained only on farm data reach 93 successes
+  in 100 trials against 84 for teleoperated data, and 87 against 46 under an unseen tablecloth and coloured light.
+  [[Page]](https://dagroup-pku.github.io/PyRUA-Lean/DataFarm/) [[Paper]](https://arxiv.org/abs/2611.05320)
+  [[Code]](https://github.com/DAGroup-PKU/PyRUA-Lean/tree/DataFarm)
 - [2026/11/03] 🏟️ **Rank 1 on the RoboColiseum leaderboard**: on [RoboColiseum](https://robocoliseum.ai/leaderboard),
   an embodied-AI benchmark jointly initiated by nearly 20 universities, companies and research institutes worldwide,
   including Hugging Face, NVIDIA and Tsinghua University, PyRUA-Lean with GPT-6.1 Sol and no VLA policy is **rank 1**
@@ -90,6 +97,18 @@ projects on robot agents that act through Python code:
   - **[PyRUA-Lean Coder v0.1-4B](https://huggingface.co/DAGroup-PKU/PyRUA-Lean-Coder-v0.1-4B).** Qwen3.5-4B trained
     with GRPO in the PyRUA-Lean framework, on 45 LIBERO-PRO instances, goes from **18.8% to 44.1%** on 655 task
     instances it never saw in training, above the Qwen3.5-27B base model (29.2%).
+- **[PyRUA-DataFarm](https://dagroup-pku.github.io/PyRUA-Lean/DataFarm/)**: a data farm in which a coding agent
+  takes over the teleoperator's job, turning a data request and one calibration episode into real-ready robot data:
+  synchronized photographic camera views labelled with the robot's exact actions. Code on the
+  [`DataFarm` branch](https://github.com/DAGroup-PKU/PyRUA-Lean/tree/DataFarm).
+  - **The farm.** The agent rebuilds the task in simulation, writing the scene, an expert controller and a success
+    judge; a video model conditioned on real images renders each rollout, and independent judges certify the expert
+    and every rendered episode before admission.
+  - **Real robot.** On five real-robot tasks, π<sub>0.5</sub> policies trained only on farm data match policies
+    trained on as many teleoperated episodes (**93 vs. 84** successes in 100 trials), and under an unseen tablecloth
+    and coloured light keep **87** successes where the teleoperation-trained policies fall to 46.
+  - **Cost.** Adapting a task is fully automatic and costs **$21** of API usage on average, plus $5 for a render
+    contract; every further episode costs **$0.80** on average, with no robot or operator.
 
 ## 🚀 Quick start
 
@@ -190,13 +209,21 @@ Thanks to the following open-source projects:
 }
 ```
 
-<!-- PyRUA projects: the BibTeX of the other projects goes here, in one collapsed block:
+<!-- PyRUA projects: the BibTeX of the other projects goes here, in this one collapsed block -->
 <details>
 <summary>BibTeX of the other PyRUA projects</summary>
 
 ```bibtex
-@misc{...}
+@misc{datafarm2026,
+  title  = {PyRUA-DataFarm: LLM Agent as a Cost-Efficient Teleoperator for Real-Ready Robot Data},
+  author = {Zhang, Kewei and Ma, Juncheng and Lv, Guodong and Wang, Duomin and Ruan, Feixiang and Si, Ruiyang and
+            Zhang, Chuanrui and Chen, Yuxuan and Chen, Hao and Liu, Yichen and Zhang, Yintianrun and Deng, Yufan and
+            Xie, Enze and Zhou, Daquan},
+  year   = {2026},
+  eprint = {2611.05320},
+  archivePrefix = {arXiv},
+  url    = {https://arxiv.org/abs/2611.05320}
+}
 ```
 
 </details>
--->
