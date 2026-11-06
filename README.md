@@ -72,39 +72,6 @@ long-horizon execution, memory, and open-ended tasks. The paper abstract and pro
 **84.4% average success**. The website provides an
 [interactive comparison by capability group](https://dagroup-pku.github.io/PyRUA-Lean/real/#result-benchmark).
 
-## 🚀 Preview the website
-
-The site uses static HTML, CSS, and JavaScript, with bundled images, videos, and HLS playlists.
-No package installation or build step is required. With Python 3.9 or newer:
-
-```bash
-git clone --branch REAL --single-branch https://github.com/DAGroup-PKU/PyRUA-Lean.git
-cd PyRUA-Lean
-python3 website/preview.py
-```
-
-Open [http://127.0.0.1:8792/](http://127.0.0.1:8792/). The preview server supports HTTP Range
-requests for video playback and seeking.
-
-## 📂 Repository layout
-
-```text
-README.md       Project introduction, results, and citation
-LICENSE         Apache License 2.0
-website/        Self-contained static project website
-  index.html    Page content and entry point
-  *.css, *.js   Layout, interactions, charts, and video playback
-  assets/       Figures, task images, paper, and chart provenance
-  media/        Videos, posters, and HLS streams
-  native8x/     Additional video streams
-  vendor/       Bundled HLS player and its license
-  preview.py    Local preview server with video Range support
-```
-
-The public website is served from `real/` on the repository's `page` branch. The source lives
-in `website/` on `REAL`; publishing copies that directory to `page:real/` while preserving the
-other project pages and documentation. See [website/README.md](website/README.md).
-
 ## 📖 Citation
 
 ```bibtex
