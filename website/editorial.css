@@ -29,3 +29,5 @@ body.article-in-view .section-nav{opacity:1;visibility:visible;transform:transla
 @media(max-width:620px){.university-logos{gap:20px}.institution-engineai{width:min(42%,180px)}.university-pku{width:min(42%,190px)}.university-nus{width:min(32%,132px)}}
 
 .citation-section pre{margin:24px 0 18px;padding:26px 30px;background:#f5f5f4;border:1px solid #e5e5e3;border-radius:12px;white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.7 ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--ink);text-align:left}.citation-download{color:var(--red);font-size:14px;font-weight:600}.citation-download:hover{text-decoration:underline}@media(max-width:520px){.citation-section pre{padding:18px;font-size:12px}}
+
+.citation-box{position:relative}.citation-box pre{padding-top:62px}.citation-copy{position:absolute;top:14px;right:14px;padding:7px 13px;border:1px solid #d8d8d5;border-radius:7px;background:#fff;color:var(--ink);font-family:inherit;font-size:12px;font-weight:600;line-height:1.2;cursor:pointer}.citation-copy:hover{border-color:var(--red);color:var(--red)}.citation-copy:focus-visible{outline:2px solid var(--red);outline-offset:3px}
