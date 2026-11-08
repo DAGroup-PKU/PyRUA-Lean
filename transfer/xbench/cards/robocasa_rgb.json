@@ -1,0 +1,25 @@
+{
+  "suite": "target",
+  "task": "CloseBlenderLid",
+  "seed": 2,
+  "task_language": "Close the lid blender by securely placing the lid on top.",
+  "object_names": [],
+  "eef_pos": null,
+  "eef_quat": null,
+  "gripper_opening": null,
+  "images": {
+    "agentview_left": "agentview_left.png",
+    "agentview_right": "agentview_right.png",
+    "eye_in_hand": "eye_in_hand.png"
+  },
+  "max_env_steps": 900,
+  "transfer": false,
+  "robot": "robocasa_rgb",
+  "facts": {
+    "arm initial grasp point [x, y, z]": "[-0.008, 0.450, 1.283] m",
+    "gripper initial pitch / yaw / roll": "76 / 15 / -169 deg",
+    "gripper opening": "0.51 (about 0.97 = open, 0 = closed)",
+    "torso lift": "0.00 m (0 .. 0.34)",
+    "native action budget": "900 (RoboCasa's horizon for this task; a motion call spends one or more)"
+  }
+}

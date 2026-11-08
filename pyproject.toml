@@ -1,0 +1,78 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyrualean"
+version = "0.2.0"
+description = "Criteria Exposure in embodied self-improvement: PyRUA-Lean robots, the self-improvement loop and its evaluation"
+readme = {file = "README.md", content-type = "text/markdown"}
+requires-python = ">=3.10"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+authors = [{name = "The Criteria Exposure Authors"}, {name = "PyRUA-Lean Contributors"}]
+keywords = ["robotics", "code-as-policy", "self-improvement", "agents", "robodojo", "libero", "robocasa"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "build>=1.2",
+    "pytest>=8.0",
+    "ruff>=0.8",
+    "numpy",
+    "pillow",
+    # the in-process MCP server of `play` (RPent's environments already ship these);
+    # it uses the lowlevel Server API of mcp 1.x, which mcp 2 removed
+    "mcp>=1.8,<2",
+    "uvicorn",
+    "httpx",
+    # RoboDojo's XPolicyLab bridge and the deploy configs
+    "pyyaml>=6",
+    "msgpack-numpy",
+    "websockets>=13",
+    "h5py>=3.8",
+    # the RoboCasa365 robot's multi-view measurement
+    "opencv-python-headless<4.12",
+]
+
+[project.scripts]
+pyrualean = "pyrualean.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+pyrualean = ["knowledge/*.md", "codex-catalog-gpt-6-astra-fallback.json"]
+
+[tool.pytest.ini_options]
+addopts = ["--import-mode=importlib"]
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+extend-exclude = ["runs", "criteria_v2", "eval_robocasa/smoke"]
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+# long lines and zip() without strict= kept as the RoboCasa365 robot was written (no reformatting
+# of the policy code: its hash is part of every run's identity)
+"src/pyrualean/hosts/robocasa_*.py" = ["E501", "B905"]
+"src/pyrualean/robocasa.py" = ["F401"]
+"tests/test_robocasa_rgb.py" = ["E501"]
+"tests/test_evolve.py" = ["E501"]
+# the briefs and checks keep the paper's sentences on one line
+"transfer/**" = ["E501"]

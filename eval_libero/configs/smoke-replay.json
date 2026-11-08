@@ -1,0 +1,61 @@
+{
+ "label": "replay smoke (no model): the full settings on libero_10_swap task 5 seed 0, empty library, saved cells instead of the model",
+ "suite": "libero_10_swap",
+ "task_indices": [
+  5
+ ],
+ "seeds": [
+  0
+ ],
+ "arms": {
+  "v0": {
+   "library": "${CE_ROOT}/eval_libero/libraries/empty"
+  }
+ },
+ "concurrency": 1,
+ "gpus": [
+  0
+ ],
+ "per_gpu": 1,
+ "need_gib": 32,
+ "stagger_seconds": 20,
+ "pause_after_provider_failures": 3,
+ "environment": {},
+ "paths": {
+  "python": "${LIBERO_PYTHON}",
+  "lean": "${CE_ROOT}",
+  "rpent_code": "${RPENT_ROOT}",
+  "liberopro": "${LIBERO_PRO_ROOT}",
+  "assets": "${LIBERO_PRO_ASSET_PATH}",
+  "libero_config": "${LIBERO_CONFIG_PATH}",
+  "sam3_checkpoint": "${SAM3_CHECKPOINT_PATH}"
+ },
+ "sam3_sha256": "${SAM3_SHA256:-9999e2341ceef5e136daa386eecb55cb414446a00ac2b55eb2dfd2f7c3cf8c9e}",
+ "execution": {
+  "robot": "libero_rgb",
+  "primitives": "no-vla",
+  "runtime": "openai",
+  "model": "${ACTOR_MODEL:-gpt-6-astra}",
+  "base_url": "${ACTOR_BASE_URL}",
+  "api_key_env": "ACTOR_API_KEY",
+  "extra_body": {
+   "reasoning_effort": "high"
+  },
+  "images": "on-demand",
+  "feedback": "pure",
+  "max_cells": 40,
+  "max_model_requests": 80,
+  "max_tokens": 8192,
+  "nudges": 20,
+  "provider_retries": 2,
+  "policy_seconds": 7200,
+  "max_episode_steps": 10000
+ },
+ "replay_dir": "${LIBERO_REPLAY_DIR}",
+ "budgets": {
+  "max_launches": 3,
+  "max_hours": 2,
+  "max_infra_retries": 1,
+  "episode_watchdog_seconds": 8400
+ }
+}

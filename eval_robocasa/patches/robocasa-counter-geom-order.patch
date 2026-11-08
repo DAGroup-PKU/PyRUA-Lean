@@ -1,0 +1,14 @@
+--- a/robocasa/models/fixtures/counter.py	2026-11-08 16:53:06.298405028 +0800
++++ b/robocasa/models/fixtures/counter.py	2026-11-08 16:53:06.330848000 +0800
+@@ -810,7 +810,10 @@
+ 
+             if len(valid_geoms) > 0:
+                 # remove duplicates as needed
+-                valid_geoms = list(set(valid_geoms))
++                # keep the first-seen order: list(set(...)) orders these elements by memory
++                # address, so the region rng.choice picks (and the scene) changed from run to
++                # run under the same seed
++                valid_geoms = list(dict.fromkeys(valid_geoms))
+ 
+             for g in valid_geoms:
+                 top_pos = s2a(g.get("pos"))

@@ -1,0 +1,1 @@
+{"env": {"CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"}, "enabledPlugins": {"cc-plugin-agents-md@builtin": false, "cc-plugin-plugin-authoring@builtin": false}, "disableAllHooks": true, "autoMemoryEnabled": false, "includeGitInstructions": false}

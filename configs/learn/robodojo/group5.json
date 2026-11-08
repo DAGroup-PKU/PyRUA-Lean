@@ -1,0 +1,105 @@
+{
+ "label": "RoboDojo group5: 5 tasks, 6 rounds on dev seed 1 layouts 0-4; run with --worker-scoring off (w/o CE) or on (w/ CE); test with eval/ on seed 0 layouts 0-19",
+ "tasks": [
+  "insert_key",
+  "store_laptop_and_headphones",
+  "store_tools_in_toolbox",
+  "hang_mugs_random",
+  "insert_tubes"
+ ],
+ "dev": {
+  "eval_seed": 1,
+  "layouts": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ]
+ },
+ "test": {
+  "eval_seed": 0,
+  "layouts": [
+   0,
+   1,
+   2,
+   3,
+   4,
+   5,
+   6,
+   7,
+   8,
+   9,
+   10,
+   11,
+   12,
+   13,
+   14,
+   15,
+   16,
+   17,
+   18,
+   19
+  ]
+ },
+ "rounds": 6,
+ "run_test": false,
+ "learning": {
+  "rollback_if_worse_by": 2,
+  "pause_after_provider_failures": 3
+ },
+ "source_root": "${ROBODOJO_SOURCE_ROOT}",
+ "sim_python": "${ROBODOJO_SIM_PYTHON}",
+ "sam3_checkpoint": "${SAM3_CHECKPOINT_PATH}",
+ "sam3_sha256": "9999e2341ceef5e136daa386eecb55cb414446a00ac2b55eb2dfd2f7c3cf8c9e",
+ "slots": {
+  "gpus": [
+   0
+  ],
+  "per_gpu": 1,
+  "stagger_seconds": 20,
+  "min_free_gib": 30
+ },
+ "execution": {
+  "model": "${ACTOR_MODEL:-gpt-6-astra}",
+  "base_url": "${ACTOR_BASE_URL:-https://api.openai.com/v1}",
+  "api_key_env": "ACTOR_API_KEY",
+  "suite": "arx_x5",
+  "images": "on-demand",
+  "feedback": "pure",
+  "max_cells": 100,
+  "max_model_requests": 200,
+  "max_tokens": 8192,
+  "nudges": 20,
+  "policy_seconds": 5400,
+  "provider_retries": 2,
+  "extra_body": {
+   "reasoning_effort": "high"
+  }
+ },
+ "worker": {
+  "command": "${CE_ROOT}/tools/claude-clean",
+  "model": null,
+  "effort": "high",
+  "seconds": 7200,
+  "concurrency": 5,
+  "max_replays": 8,
+  "max_replays_per_layout": 3,
+  "max_library_chars": 40000,
+  "settings": {
+   "model": "${LEARNER_MODEL:-claude-opus-5-5}",
+   "env": {
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+   },
+   "disableAllHooks": true,
+   "autoMemoryEnabled": false,
+   "includeGitInstructions": false
+  }
+ },
+ "budgets": {
+  "max_launches": 600,
+  "max_hours": 72,
+  "max_infra_retries": 1,
+  "episode_watchdog_seconds": 6600
+ }
+}

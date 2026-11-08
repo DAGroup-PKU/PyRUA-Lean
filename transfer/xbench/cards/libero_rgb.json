@@ -1,0 +1,31 @@
+{
+  "suite": "libero_10_swap",
+  "task": 0,
+  "seed": 0,
+  "task_language": "put both the alphabet soup and the tomato sauce in the basket",
+  "object_names": [
+    "alphabet_soup_1",
+    "basket_1",
+    "butter_1",
+    "cream_cheese_1",
+    "ketchup_1",
+    "milk_1",
+    "orange_juice_1",
+    "tomato_sauce_1"
+  ],
+  "eef_pos": null,
+  "eef_quat": null,
+  "gripper_opening": 0.07807918432307784,
+  "images": {
+    "agentview": "agentview_high.png",
+    "wrist": "wrist_high.png"
+  },
+  "max_env_steps": 10000,
+  "transfer": false,
+  "robot": "libero_rgb",
+  "facts": {
+    "initial grasp point [x, y, z]": "[-0.058, 0.000, 0.681] m",
+    "initial gripper": "pitch 87, yaw 180, roll -90 deg; opening 0.98 (open)",
+    "table top height (z)": "0.427 m"
+  }
+}

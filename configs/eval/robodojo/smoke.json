@@ -1,0 +1,26 @@
+{
+ "label": "smoke: the active library of the README smoke campaign (runs/learn/smoke) on one seed-0 layout",
+ "eval_seed": 0,
+ "concurrency": 4,
+ "gpus": [
+  0
+ ],
+ "per_gpu": 1,
+ "need_gib": 50,
+ "stagger_seconds": 20,
+ "pause_after_provider_failures": 3,
+ "budgets": {
+  "max_launches": 600,
+  "max_hours": 72,
+  "max_infra_retries": 1,
+  "episode_watchdog_seconds": 6600
+ },
+ "source": "active",
+ "tasks": {
+  "press_by_number": {
+   "campaign": "${CE_ROOT}/runs/learn/smoke",
+   "layouts": 1,
+   "pool": 3
+  }
+ }
+}

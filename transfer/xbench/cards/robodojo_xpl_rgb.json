@@ -1,0 +1,27 @@
+{
+  "suite": "arx_x5",
+  "task": "pour_liquid_into_cup",
+  "seed": 0,
+  "task_language": "Pour the liquid from the bottle into the cup.",
+  "object_names": [],
+  "eef_pos": null,
+  "eef_quat": null,
+  "gripper_opening": null,
+  "images": {
+    "cam_head": "cam_head.png",
+    "cam_left_wrist": "cam_left_wrist.png",
+    "cam_right_wrist": "cam_right_wrist.png"
+  },
+  "max_env_steps": 400,
+  "transfer": false,
+  "robot": "robodojo_xpl_rgb",
+  "facts": {
+    "left arm initial grasp point [x, y, z]": "[-0.300, -0.207, 0.922] m",
+    "left gripper initial pitch / yaw / roll": "0 / 0 / 0 deg",
+    "left gripper opening": "1.00 (1 = open, 0 = closed)",
+    "right arm initial grasp point [x, y, z]": "[0.300, -0.207, 0.922] m",
+    "right gripper initial pitch / yaw / roll": "0 / 0 / 0 deg",
+    "right gripper opening": "1.00 (1 = open, 0 = closed)",
+    "native action budget": "400 (a motion call spends one or more)"
+  }
+}

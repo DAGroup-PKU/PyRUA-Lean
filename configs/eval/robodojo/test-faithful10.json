@@ -1,0 +1,71 @@
+{
+ "label": "the active library of $FAITHFUL_CAMPAIGN (learned reading the instruction-faithful criteria) on seed 0, 20 judged layouts, judged by both criteria",
+ "eval_seed": 0,
+ "concurrency": 4,
+ "gpus": [
+  0
+ ],
+ "per_gpu": 1,
+ "need_gib": 50,
+ "stagger_seconds": 20,
+ "pause_after_provider_failures": 3,
+ "budgets": {
+  "max_launches": 600,
+  "max_hours": 72,
+  "max_infra_retries": 1,
+  "episode_watchdog_seconds": 6600
+ },
+ "source": "active",
+ "tasks": {
+  "sweep_blocks_random": {
+   "campaign": "${FAITHFUL_CAMPAIGN}",
+   "layouts": 20,
+   "pool": 30
+  },
+  "hang_mugs_random": {
+   "campaign": "${FAITHFUL_CAMPAIGN}",
+   "layouts": 20,
+   "pool": 30
+  },
+  "insert_key": {
+   "campaign": "${FAITHFUL_CAMPAIGN}",
+   "layouts": 20,
+   "pool": 30
+  },
+  "build_tower": {
+   "campaign": "${FAITHFUL_CAMPAIGN}",
+   "layouts": 20,
+   "pool": 30
+  },
+  "make_kong": {
+   "campaign": "${FAITHFUL_CAMPAIGN}",
+   "layouts": 20,
+   "pool": 30
+  },
+  "fill_pen_holder": {
+   "campaign": "${FAITHFUL_CAMPAIGN}",
+   "layouts": 20,
+   "pool": 30
+  },
+  "swap_blocks": {
+   "campaign": "${FAITHFUL_CAMPAIGN}",
+   "layouts": 20,
+   "pool": 30
+  },
+  "press_by_number": {
+   "campaign": "${FAITHFUL_CAMPAIGN}",
+   "layouts": 20,
+   "pool": 30
+  },
+  "store_tools_in_toolbox": {
+   "campaign": "${FAITHFUL_CAMPAIGN}",
+   "layouts": 20,
+   "pool": 30
+  },
+  "pour_by_language": {
+   "campaign": "${FAITHFUL_CAMPAIGN}",
+   "layouts": 20,
+   "pool": 30
+  }
+ }
+}

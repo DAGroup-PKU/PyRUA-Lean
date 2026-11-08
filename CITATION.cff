@@ -1,0 +1,39 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper."
+title: "Learning the Task or Learning the Verifier? Rethinking Criteria Exposure in Embodied Self-Improvement"
+type: software
+license: Apache-2.0
+authors:
+  - {given-names: Wenbo, family-names: Huang}
+  - {given-names: Jianxin, family-names: Bi}
+  - {given-names: Shunyu, family-names: Yang}
+  - {given-names: Ruiyang, family-names: Si}
+  - {given-names: Rui, family-names: Ni}
+  - {given-names: Qiang, family-names: Wang}
+  - {given-names: Shulong, family-names: Jiang}
+  - {given-names: Yintianrun, family-names: Zhang}
+  - {given-names: Feixiang, family-names: Ruan}
+  - {given-names: Kewei, family-names: Zhang}
+  - {given-names: Ye, family-names: Huang}
+  - {given-names: Shukai, family-names: Gong}
+  - {given-names: Daquan, family-names: Zhou}
+preferred-citation:
+  type: article
+  title: "Learning the Task or Learning the Verifier? Rethinking Criteria Exposure in Embodied Self-Improvement"
+  journal: "arXiv preprint arXiv:2611.08318"
+  url: "https://arxiv.org/abs/2611.08318"
+  year: 2026
+  authors:
+    - {given-names: Wenbo, family-names: Huang}
+    - {given-names: Jianxin, family-names: Bi}
+    - {given-names: Shunyu, family-names: Yang}
+    - {given-names: Ruiyang, family-names: Si}
+    - {given-names: Rui, family-names: Ni}
+    - {given-names: Qiang, family-names: Wang}
+    - {given-names: Shulong, family-names: Jiang}
+    - {given-names: Yintianrun, family-names: Zhang}
+    - {given-names: Feixiang, family-names: Ruan}
+    - {given-names: Kewei, family-names: Zhang}
+    - {given-names: Ye, family-names: Huang}
+    - {given-names: Shukai, family-names: Gong}
+    - {given-names: Daquan, family-names: Zhou}

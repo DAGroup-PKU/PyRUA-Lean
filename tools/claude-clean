@@ -1,0 +1,26 @@
+#!/bin/sh
+# Claude Code for the learner (worker.command) with a clean config dir: no CLAUDE.md/AGENTS.md,
+# no auto-memory, no git status, no bundled skills, no plugins or cron, so that the learner reads
+# only the session's brief and evidence.  CLAUDE_REAL_BIN (default: the `claude` on PATH) runs
+# with CLAUDE_CONFIG_DIR=CE_CLAUDE_HOME (default: .cache/claude-home of the repository); log in
+# there once (`tools/claude-clean auth login`) or export ANTHROPIC_API_KEY.  No MCP server and no
+# slash commands either; the caller's own --tools and --settings are kept.  The paper's learner
+# ran Claude Code 2.1.303.
+set -eu
+here=$(cd "$(dirname "$0")/.." && pwd)
+real=${CLAUDE_REAL_BIN:-$(command -v claude || true)}
+[ -n "$real" ] || { echo "claude-clean: no claude on PATH (set CLAUDE_REAL_BIN)" >&2; exit 2; }
+home=${CE_CLAUDE_HOME:-$here/.cache/claude-home}
+mkdir -p "$home"
+case "${1:-}" in
+    auth|--version|-v|--help|-h) ;;
+    *) set -- "$@" --strict-mcp-config --disable-slash-commands ;;
+esac
+exec env CLAUDE_CONFIG_DIR="$home" \
+    DISABLE_AUTOUPDATER=1 CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1 \
+    CLAUDE_CODE_DISABLE_CLAUDE_MDS=1 CLAUDE_CODE_DISABLE_AUTO_MEMORY=1 CLAUDE_CODE_DISABLE_ORG_MEMORY=1 \
+    CLAUDE_CODE_DISABLE_GIT_INSTRUCTIONS=1 CLAUDE_CODE_DISABLE_BUNDLED_SKILLS=1 \
+    CLAUDE_CODE_DISABLE_POLICY_SKILLS=1 CLAUDE_CODE_DISABLE_CLAUDE_API_SKILL=1 \
+    CLAUDE_CODE_DISABLE_CRON=1 CLAUDE_CODE_DISABLE_WORKFLOWS=1 \
+    CLAUDE_CODE_DISABLE_OFFICIAL_MARKETPLACE_AUTOINSTALL=1 \
+    "$real" "$@"

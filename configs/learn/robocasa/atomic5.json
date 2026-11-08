@@ -1,0 +1,131 @@
+{
+ "benchmark": "robocasa",
+ "label": "RoboCasa365 atomic5: 5 tasks, 6 rounds on scene seeds of dev; run with --worker-scoring off (w/o CE) or on (w/ CE)",
+ "tasks": [
+  "TurnOnSinkFaucet",
+  "CloseToasterOvenDoor",
+  "CloseBlenderLid",
+  "CoffeeSetupMug",
+  "OpenStandMixerHead"
+ ],
+ "dev": {
+  "eval_seed": 1,
+  "layouts": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ]
+ },
+ "test": {
+  "eval_seed": 2,
+  "layouts": [
+   0,
+   1,
+   2,
+   3,
+   4
+  ]
+ },
+ "rounds": 6,
+ "run_test": false,
+ "learning": {
+  "rollback_if_worse_by": 2,
+  "pause_after_provider_failures": 3
+ },
+ "scene_seeds": {
+  "dev": [
+   1,
+   2,
+   3,
+   4,
+   5
+  ],
+  "test": [
+   6,
+   7,
+   8,
+   9,
+   10
+  ]
+ },
+ "seed_overrides": {
+  "dev": {
+   "CoffeeSetupMug": [
+    1,
+    2,
+    3,
+    5,
+    6
+   ]
+  },
+  "test": {
+   "CoffeeSetupMug": [
+    7,
+    8,
+    9,
+    10,
+    11
+   ]
+  }
+ },
+ "sim_python": "${ROBOCASA_SIM_PYTHON}",
+ "sim_packages": "${ROBOCASA_SIM_PACKAGES}",
+ "robocasa_assets": "${ROBOCASA_ASSETS_PATH}",
+ "sam3_checkpoint": "${SAM3_CHECKPOINT_PATH}",
+ "sam3_sha256": "9999e2341ceef5e136daa386eecb55cb414446a00ac2b55eb2dfd2f7c3cf8c9e",
+ "slots": {
+  "gpus": [
+   0
+  ],
+  "per_gpu": 1,
+  "stagger_seconds": 20,
+  "min_free_gib": 20
+ },
+ "execution": {
+  "robot": "robocasa_rgb",
+  "primitives": "no-vla",
+  "split": "target",
+  "model": "${ACTOR_MODEL:-gpt-6-astra}",
+  "base_url": "${ACTOR_BASE_URL:-https://api.openai.com/v1}",
+  "api_key_env": "ACTOR_API_KEY",
+  "extra_body": {
+   "reasoning_effort": "high"
+  },
+  "images": "on-demand",
+  "feedback": "pure",
+  "max_cells": 40,
+  "max_model_requests": 80,
+  "max_tokens": 8192,
+  "nudges": 20,
+  "provider_retries": 2,
+  "policy_seconds": 7200,
+  "max_episode_steps": 10000
+ },
+ "worker": {
+  "command": "${CE_ROOT}/tools/claude-clean",
+  "model": null,
+  "effort": "high",
+  "seconds": 7200,
+  "concurrency": 5,
+  "max_replays": 8,
+  "max_replays_per_layout": 3,
+  "max_library_chars": 40000,
+  "settings": {
+   "model": "${LEARNER_MODEL:-claude-opus-5-5}",
+   "env": {
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+   },
+   "disableAllHooks": true,
+   "autoMemoryEnabled": false,
+   "includeGitInstructions": false
+  }
+ },
+ "budgets": {
+  "max_launches": 450,
+  "max_hours": 72,
+  "max_infra_retries": 2,
+  "episode_watchdog_seconds": 8400
+ }
+}

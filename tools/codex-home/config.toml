@@ -1,0 +1,49 @@
+# A clean CODEX_HOME for the codex runtime (execution.runtime = "codex"), as used in the paper.
+# Copy this directory somewhere writable (e.g. .cache/codex-home) and log in there yourself:
+#     CODEX_HOME=$PWD/.cache/codex-home tools/codex-mcp-only login
+# then set execution.codex_home to it and execution.codex_bin to tools/codex-mcp-only.
+# Clean CODEX_HOME for PyRUA-Lean's codex runtime (eval/episode.py, execution.runtime = "codex").
+# The model may only use the episode's MCP tools (pyrualean: python / finish, injected per
+# episode with -c mcp_servers.pyrualean.url=...): every built-in Codex tool is off, there is
+# no MCP server, skill, plugin, memory, hook or project doc here.  Credentials: auth.json,
+# written by `codex login` run by the user (never copied from another home).
+approval_policy = "never"
+sandbox_mode = "read-only"
+web_search = "disabled"
+project_doc_max_bytes = 0
+cli_auth_credentials_store = "file"
+
+[history]
+persistence = "none"
+
+# no skill list in the prompt and no bundled system skills (the model has no tool to read them)
+[skills]
+include_instructions = false
+
+[skills.bundled]
+enabled = false
+
+[features]
+shell_tool = false
+unified_exec = false
+shell_snapshot = false
+view_image = false
+image_generation = false
+apps = false
+plugins = false
+remote_plugin = false
+skill_search = false
+skill_mcp_dependency_install = false
+browser_use = false
+browser_use_external = false
+browser_use_full_cdp_access = false
+in_app_browser = false
+computer_use = false
+code_mode_host = false
+multi_agent = false
+tool_suggest = false
+sleep_tool = false
+goals = false
+hooks = false
+memories = false
+fast_mode = false

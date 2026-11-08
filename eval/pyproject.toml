@@ -1,0 +1,12 @@
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.lint.per-file-ignores]
+# long docstring and report lines kept as written
+"run.py" = ["E501"]
+"export.py" = ["E501"]
+"tests/test_eval.py" = ["E501"]

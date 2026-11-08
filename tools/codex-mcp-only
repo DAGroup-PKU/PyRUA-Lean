@@ -1,0 +1,33 @@
+#!/bin/sh
+# The codex binary for execution.runtime = "codex" with a clean home (tools/codex-home/).
+# pyrualean.play passes `exec ... -s workspace-write`; this runs the real codex (CODEX_REAL_BIN,
+# default: the `codex` on PATH; the paper used Codex CLI 0.155.1) with `-s read-only` instead.
+# Every built-in tool is off in codex-home/config.toml, so the model only has the episode's MCP
+# tools; the sandbox only sets the permissions text it is shown.
+# Any other command (login, login status, features list) goes through unchanged.
+set -eu
+real=${CODEX_REAL_BIN:-$(command -v codex || true)}
+[ -n "$real" ] || { echo "codex-mcp-only: no codex on PATH (set CODEX_REAL_BIN)" >&2; exit 2; }
+if [ "${1:-}" != exec ]; then
+    exec "$real" "$@"
+fi
+found=0
+prev=
+for arg do
+    shift
+    if [ "$prev" = -s ]; then
+        if [ "$arg" != workspace-write ]; then
+            echo "codex-mcp-only: expected -s workspace-write, got -s $arg" >&2
+            exit 2
+        fi
+        arg=read-only
+        found=1
+    fi
+    set -- "$@" "$arg"
+    prev=$arg
+done
+if [ "$found" != 1 ]; then
+    echo "codex-mcp-only: no -s workspace-write to replace" >&2
+    exit 2
+fi
+exec "$real" "$@"

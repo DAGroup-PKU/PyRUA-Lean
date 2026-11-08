@@ -1,0 +1,120 @@
+{
+ "label": "the active library of the 16 criteria-limited tasks of $CAMPAIGNS/group1..5 on seed 0, 20 judged layouts, judged by the instruction-faithful criteria with the original ones alongside",
+ "eval_seed": 0,
+ "concurrency": 4,
+ "gpus": [
+  0
+ ],
+ "per_gpu": 1,
+ "need_gib": 50,
+ "stagger_seconds": 20,
+ "pause_after_provider_failures": 3,
+ "budgets": {
+  "max_launches": 600,
+  "max_hours": 72,
+  "max_infra_retries": 1,
+  "episode_watchdog_seconds": 6600
+ },
+ "source": "active",
+ "source_root": "${ROBODOJO_FAITHFUL_ROOT}",
+ "allow_identity_mismatch": [
+  "build_tower",
+  "fill_egg_holder",
+  "fill_pen_holder",
+  "hang_mugs_random",
+  "insert_key",
+  "make_kong",
+  "make_toast_random",
+  "organize_table",
+  "pack_objects_into_box",
+  "pour_by_language",
+  "pour_liquid_into_cup",
+  "press_by_number",
+  "store_laptop_and_headphones",
+  "store_tools_in_toolbox",
+  "swap_blocks",
+  "sweep_blocks_random"
+ ],
+ "tasks": {
+  "make_kong": {
+   "campaign": "${CAMPAIGNS}/group1",
+   "layouts": 20,
+   "pool": 30
+  },
+  "press_by_number": {
+   "campaign": "${CAMPAIGNS}/group1",
+   "layouts": 20,
+   "pool": 30
+  },
+  "sweep_blocks_random": {
+   "campaign": "${CAMPAIGNS}/group1",
+   "layouts": 20,
+   "pool": 30
+  },
+  "pour_by_language": {
+   "campaign": "${CAMPAIGNS}/group2",
+   "layouts": 20,
+   "pool": 30
+  },
+  "swap_blocks": {
+   "campaign": "${CAMPAIGNS}/group2",
+   "layouts": 20,
+   "pool": 30
+  },
+  "pour_liquid_into_cup": {
+   "campaign": "${CAMPAIGNS}/group3",
+   "layouts": 20,
+   "pool": 30
+  },
+  "organize_table": {
+   "campaign": "${CAMPAIGNS}/group4",
+   "layouts": 20,
+   "pool": 30
+  },
+  "hang_mugs_random": {
+   "campaign": "${CAMPAIGNS}/group5",
+   "layouts": 20,
+   "pool": 30
+  },
+  "store_laptop_and_headphones": {
+   "campaign": "${CAMPAIGNS}/group5",
+   "layouts": 20,
+   "pool": 30
+  },
+  "insert_key": {
+   "campaign": "${CAMPAIGNS}/group5",
+   "layouts": 20,
+   "pool": 30
+  },
+  "make_toast_random": {
+   "campaign": "${CAMPAIGNS}/group2",
+   "layouts": 20,
+   "pool": 30
+  },
+  "store_tools_in_toolbox": {
+   "campaign": "${CAMPAIGNS}/group5",
+   "layouts": 20,
+   "pool": 30
+  },
+  "pack_objects_into_box": {
+   "campaign": "${CAMPAIGNS}/group4",
+   "layouts": 20,
+   "pool": 30
+  },
+  "fill_pen_holder": {
+   "campaign": "${CAMPAIGNS}/group3",
+   "layouts": 20,
+   "pool": 30
+  },
+  "fill_egg_holder": {
+   "campaign": "${CAMPAIGNS}/group4",
+   "layouts": 20,
+   "pool": 30
+  },
+  "build_tower": {
+   "campaign": "${CAMPAIGNS}/group2",
+   "layouts": 20,
+   "pool": 30
+  }
+ }
+}

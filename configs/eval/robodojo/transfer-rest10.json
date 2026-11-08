@@ -1,0 +1,103 @@
+{
+ "label": "the distilled library $TRANSFER_LIBRARY on the 10 target tasks, seed 0, 20 judged layouts, judged by both criteria; settings of $CAMPAIGNS/group3's pour_liquid_into_cup (round-0 dev episodes)",
+ "eval_seed": 0,
+ "concurrency": 4,
+ "gpus": [
+  0
+ ],
+ "per_gpu": 1,
+ "need_gib": 50,
+ "stagger_seconds": 20,
+ "pause_after_provider_failures": 3,
+ "budgets": {
+  "max_launches": 600,
+  "max_hours": 72,
+  "max_infra_retries": 1,
+  "episode_watchdog_seconds": 6600
+ },
+ "source_root": "${ROBODOJO_FAITHFUL_ROOT}",
+ "allow_identity_mismatch": [
+  "fasten_screws",
+  "fold_clothes_random",
+  "hang_mugs_random",
+  "insert_key",
+  "insert_tubes",
+  "play_tic_tac_toe",
+  "pour_balls_into_vase",
+  "solve_equation",
+  "store_laptop_and_headphones",
+  "store_tools_in_toolbox"
+ ],
+ "tasks": {
+  "hang_mugs_random": {
+   "campaign": "${CAMPAIGNS}/group3",
+   "layouts": 20,
+   "pool": 30,
+   "library": "${TRANSFER_LIBRARY}",
+   "settings_task": "pour_liquid_into_cup"
+  },
+  "store_laptop_and_headphones": {
+   "campaign": "${CAMPAIGNS}/group3",
+   "layouts": 20,
+   "pool": 30,
+   "library": "${TRANSFER_LIBRARY}",
+   "settings_task": "pour_liquid_into_cup"
+  },
+  "fasten_screws": {
+   "campaign": "${CAMPAIGNS}/group3",
+   "layouts": 20,
+   "pool": 30,
+   "library": "${TRANSFER_LIBRARY}",
+   "settings_task": "pour_liquid_into_cup"
+  },
+  "store_tools_in_toolbox": {
+   "campaign": "${CAMPAIGNS}/group3",
+   "layouts": 20,
+   "pool": 30,
+   "library": "${TRANSFER_LIBRARY}",
+   "settings_task": "pour_liquid_into_cup"
+  },
+  "insert_key": {
+   "campaign": "${CAMPAIGNS}/group3",
+   "layouts": 20,
+   "pool": 30,
+   "library": "${TRANSFER_LIBRARY}",
+   "settings_task": "pour_liquid_into_cup"
+  },
+  "insert_tubes": {
+   "campaign": "${CAMPAIGNS}/group3",
+   "layouts": 20,
+   "pool": 30,
+   "library": "${TRANSFER_LIBRARY}",
+   "settings_task": "pour_liquid_into_cup"
+  },
+  "pour_balls_into_vase": {
+   "campaign": "${CAMPAIGNS}/group3",
+   "layouts": 20,
+   "pool": 30,
+   "library": "${TRANSFER_LIBRARY}",
+   "settings_task": "pour_liquid_into_cup"
+  },
+  "fold_clothes_random": {
+   "campaign": "${CAMPAIGNS}/group3",
+   "layouts": 20,
+   "pool": 30,
+   "library": "${TRANSFER_LIBRARY}",
+   "settings_task": "pour_liquid_into_cup"
+  },
+  "play_tic_tac_toe": {
+   "campaign": "${CAMPAIGNS}/group3",
+   "layouts": 20,
+   "pool": 30,
+   "library": "${TRANSFER_LIBRARY}",
+   "settings_task": "pour_liquid_into_cup"
+  },
+  "solve_equation": {
+   "campaign": "${CAMPAIGNS}/group3",
+   "layouts": 20,
+   "pool": 30,
+   "library": "${TRANSFER_LIBRARY}",
+   "settings_task": "pour_liquid_into_cup"
+  }
+ }
+}

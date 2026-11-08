@@ -1,0 +1,20 @@
+# machine paths and caches
+paths.env
+.cache/
+runs/*
+!runs/_empty-memory*/
+criteria_v2/build/
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.venv/
+# editors
+.vscode/
+.idea/
+*.swp
+.DS_Store
