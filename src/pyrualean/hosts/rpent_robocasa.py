@@ -60,7 +60,7 @@ CAMERAS = ("agentview", "navview", "wrist")
 CARD_IMAGES = {camera: f"{camera}.png" for camera in CAMERAS}
 #: The tracked empty memory corpus (the one the tool-calling arm's zero-shot
 #: runs pass to RPent); used when the package runs from this repository.
-EMPTY_MEMORY = Path(__file__).resolve().parents[3] / "runs" / "_empty-memory-robocasa"
+EMPTY_MEMORY = Path(__file__).resolve().parents[3] / "configs" / "empty_memory"
 
 
 @dataclass(frozen=True)
@@ -125,7 +125,7 @@ def add_boot_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument(
         "--memory-dir",
         default=None,
-        help="empty memory corpus for RPent's toolkit (default: runs/_empty-memory-robocasa)",
+        help="empty memory corpus for RPent's toolkit (default: configs/empty_memory)",
     )
 
 
@@ -152,7 +152,7 @@ def boot_options(args: argparse.Namespace) -> dict[str, Any]:
 def memory_root(out_dir: Path, memory_dir: str | None = None) -> Path:
     """An empty, read-only memory corpus for the toolkit (zero-shot: nothing is read).
 
-    ``memory_dir`` when given, else the tracked ``runs/_empty-memory-robocasa``
+    ``memory_dir`` when given, else the tracked ``configs/empty_memory``
     when this package runs from its repository, else a private empty corpus
     under the run directory.  RPent's toolkit only binds its file tools to
     it; PyRUA-Lean never exposes those, so nothing is read or written.

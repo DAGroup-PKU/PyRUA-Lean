@@ -40,7 +40,7 @@ TASKS = (
 )
 
 #: Execution fixed for every episode of a campaign, v0 and learned revisions alike.  The
-#: defaults are the submission's (``integrations/xpolicylab/PyRUA_Lean/deploy.yml``).
+#: defaults are the submission's (``src/xpolicylab_adapter/deploy.yml``).
 EXECUTION_DEFAULTS: dict[str, Any] = {
     "suite": "arx_x5",
     "images": "on-demand",
@@ -98,7 +98,7 @@ def robocasa(config: dict[str, Any]) -> bool:
 
 def scene_seeds(config: dict[str, Any], split: str, task: str) -> list[int]:
     """The scene seeds of a robocasa split, by layout: ``seed_overrides[split][task]`` or
-    ``scene_seeds[split]`` (as eval_robocasa's ``seed_overrides``: the paper's CoffeeSetupMug)."""
+    ``scene_seeds[split]`` (as eval/robocasa's ``seed_overrides``: the paper's CoffeeSetupMug)."""
 
     name = "test" if split == "test" else "dev"
     override = ((config.get("seed_overrides") or {}).get(name) or {}).get(task)

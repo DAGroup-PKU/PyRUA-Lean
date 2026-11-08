@@ -13,10 +13,10 @@ OUT_DIR/MANIFEST.json:
   render.py with the RoboDojo evaluation's settings (robodojo_xpl_rgb, no-vla, on-demand images,
   pure feedback, 5400 s) and an empty library
 - source/api/       robodojo_xpl_rgb.py, robodojo.py (its base), _robot.py
-- target/system_prompt.md   the same for LIBERO-PRO with eval_libero's settings (libero_rgb,
+- target/system_prompt.md   the same for LIBERO-PRO with eval/libero's settings (libero_rgb,
   no-vla, on-demand, pure, 7200 s)
 - target/api/       libero_rgb.py, _robot.py
-  (robocasa: target/system_prompt.md with eval_robocasa's settings: robocasa_rgb, no-vla,
+  (robocasa: target/system_prompt.md with eval/robocasa's settings: robocasa_rgb, no-vla,
   on-demand, pure, 7200 s, and an atomic task's card, so its native-action budget is that task's
   horizon; target/api/ robocasa_rgb.py, _robot.py)
 
@@ -36,7 +36,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 SRC = HERE.parents[1] / "src"
 EMPTY = (
-    HERE.parents[1] / "eval_libero/libraries/empty"
+    HERE.parents[1] / "eval/empty_library"
 )  # lessons/none.md, empty: the prompt gets LIBRARY_NOTE, no lessons
 BENCH = {
     "source": {

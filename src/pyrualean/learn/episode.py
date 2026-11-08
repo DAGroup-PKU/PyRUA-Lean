@@ -12,7 +12,8 @@ the worker reads (a run cut short by the harness is not a policy lesson).
 
 A task with expansions (``config["expansions"][task]["s<seed>l<layout>"]``: source, sha256,
 text, frozen in the config) gets its layout's after the task card under
-:data:`EXPANSION_HEADING`, as ``eval/episode.py`` does; ``result.json`` gains ``expansion``.
+:data:`EXPANSION_HEADING`, as ``eval/robodojo/episode.py`` does; ``result.json`` gains
+``expansion``.
 """
 
 from __future__ import annotations
@@ -33,7 +34,7 @@ def execution_identity(config: dict[str, Any]) -> str:
 
     repo = Path(__file__).resolve().parents[3]
     if robocasa(config):
-        # as eval_robocasa: the kitchen's Python sources stand for the benchmark
+        # as eval/robocasa: the kitchen's Python sources stand for the benchmark
         packages = Path(config["sim_packages"])
         return json_hash(
             {
@@ -55,7 +56,7 @@ def execution_identity(config: dict[str, Any]) -> str:
     )
 
 
-#: Heading of a layout's expansion, put after the prompt's task card (eval/episode.py's).
+#: Heading of a layout's expansion, put after the prompt's task card (eval/robodojo/episode.py's).
 EXPANSION_HEADING = "# Notes on this scene (written from the step-0 head image)"
 
 
@@ -186,7 +187,7 @@ def _openai_options(settings: dict[str, Any]) -> dict[str, Any]:
 
 
 def _robocasa_episode(request: dict[str, Any], output: Path, replay: Any) -> dict[str, Any]:
-    """One RoboCasa365 cell: the layout's scene seed (as eval_robocasa/robocasa_episode.py, with
+    """One RoboCasa365 cell: the layout's scene seed (as eval/robocasa/robocasa_episode.py, with
     the library view)."""
 
     from ..hosts.robocasa_rgb import Cell

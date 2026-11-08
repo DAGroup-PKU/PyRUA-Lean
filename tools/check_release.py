@@ -2,7 +2,7 @@
 
 Every text file outside git-ignored places (``.git``, ``.cache``, ``runs``, built criteria) is
 searched for absolute machine paths, IP addresses and the shapes of API keys and private keys.
-Exits 1 and prints file:line for each hit.  Run it before every push; CI runs it as well.
+Exits 1 and prints file:line for each hit.  Run it before every push.
 """
 
 from __future__ import annotations

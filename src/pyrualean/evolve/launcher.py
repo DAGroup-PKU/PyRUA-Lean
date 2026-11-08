@@ -21,7 +21,7 @@ def execution_identity(config: dict[str, Any]) -> str:
         {
             "execution": config["execution"],
             "policy": tree_hash(repo / "src"),
-            "integration": tree_hash(repo / "integrations" / "xpolicylab" / "PyRUA_Lean"),
+            "integration": tree_hash(repo / "src" / "xpolicylab_adapter"),
             "environment": tree_hash(Path(config["source_root"]) / "env_cfg"),
             "benchmark_task": tree_hash(Path(config["source_root"]) / "task"),
             "benchmark_client": tree_hash(Path(config["source_root"]) / "src"),

@@ -1,14 +1,16 @@
 <div align="center">
 
-# Learning the Task or Learning the Verifier?
+# Learning the Task or Learning the Verifier? 重新审视具身自我改进中的判定暴露（Criteria Exposure）
 
-**重新审视具身自我改进中的判定暴露（Criteria Exposure）**
+Wenbo Huang<sup>1</sup>, Jianxin Bi<sup>1,2</sup>, Shunyu Yang<sup>1</sup>, Ruiyang Si<sup>1</sup>, Rui Ni<sup>1</sup>, Qiang Wang<sup>1</sup>, Shulong Jiang<sup>1</sup>, Yintianrun Zhang<sup>1</sup>, Feixiang Ruan<sup>1</sup>, Kewei Zhang<sup>1</sup>, Ye Huang<sup>1</sup>, Shukai Gong<sup>1</sup>, Daquan Zhou<sup>1,†</sup>
 
+<sup>1</sup>Peking University &nbsp; <sup>2</sup>National University of Singapore
+
+<sup>†</sup>Corresponding author
+
+[![Project Page](https://img.shields.io/badge/Project-Page-8C0000.svg)](https://dagroup-pku.github.io/PyRUA-Lean/RSIJudge/)
 [![arXiv](https://img.shields.io/badge/arXiv-2611.08318-b31b1b.svg)](https://arxiv.org/abs/2611.08318)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Benchmarks](https://img.shields.io/badge/benchmarks-RoboDojo%20%7C%20LIBERO--PRO%20%7C%20RoboCasa365-8C0000.svg)](docs/REPRODUCE.md)
-[![English](https://img.shields.io/badge/lang-English-blue.svg)](README.md)
-[![简体中文](https://img.shields.io/badge/语言-简体中文-red.svg)](README.zh-CN.md)
 
 </div>
 
@@ -47,7 +49,7 @@ RoboCasa365 的库迁移，以及每个实验的配置。
 | **w/ CE** | 另加该任务的判定代码、每局的 score 和 stages | `--worker-scoring on` |
 
 25 个学习任务中，16 个是**判定受限**任务（判定在某些轨迹上与指令不一致），9 个是**忠实**任务，分组在看到任何结果之前就已确定。
-我们只改写判定受限任务的判定代码，得到 $C^{faith}$（[`criteria_v2/`](criteria_v2/README.md)）：去掉隐藏规则、修掉缺陷、
+我们只改写判定受限任务的判定代码，得到 $C^{faith}$（[`faithful_criteria/`](faithful_criteria/README.md)）：去掉隐藏规则、修掉缺陷、
 把硬阈值放宽到仍然明确满足指令的程度，并保留双臂回原位的要求。
 
 ## 结论
@@ -116,11 +118,11 @@ LIBERO-PRO 和 RoboCasa365（成功局数；括号内为相对空库的变化）
 | 路径 | 内容 |
 |---|---|
 | `src/pyrualean/` | PyRUA-Lean 包：机器人（`robodojo_xpl_rgb`、`libero_rgb`、`robocasa_rgb`）、prompt、agent runtime（OpenAI 兼容、Codex CLI、replay），以及自我改进循环 `pyrualean.learn` |
-| `criteria_v2/` | RoboDojo 的忠实判定 $C^{faith}$：判定代码的 overlay，构建成每局同时用两套判定判的 source root |
-| `eval/` | RoboDojo：在留出布局上评测 learn campaign 的最终库；`eval/compare.py` 逐布局配对两种设置 |
-| `eval_libero/`、`eval_robocasa/` | LIBERO-PRO、RoboCasa365 上的同类评测，多组库并排 |
+| `faithful_criteria/` | RoboDojo 的忠实判定 $C^{faith}$：判定代码的 overlay，构建成每局同时用两套判定判的 source root |
+| `eval/robodojo/` | RoboDojo：在留出布局上评测 learn campaign 的最终库；`eval/robodojo/compare.py` 逐布局配对两种设置 |
+| `eval/libero/`、`eval/robocasa/` | LIBERO-PRO、RoboCasa365 上的同类评测，多组库并排 |
 | `transfer/` | 把 10 个源任务的库蒸馏成一个；把 RoboDojo 的库翻译到 LIBERO-PRO 和 RoboCasa365 |
-| `configs/` | 论文的 learn campaign 和 RoboDojo 评测计划（模板） |
+| `configs/` | 论文的 learn campaign 和评测计划（模板） |
 | `tools/` | 环境、配置渲染、启动脚本、干净的 CLI 包装、离线测试、发布前检查 |
 | `docs/` | [环境搭建](docs/SETUP.md) · [模型与凭据](docs/MODELS.md) · [复现论文](docs/REPRODUCE.md)（英文） |
 
@@ -139,9 +141,9 @@ bash tools/run_learn.sh runs/learn/smoke --worker-scoring off
 
 # 跑完后导出它的库，在 seed 0 的一个布局上测一局
 python tools/render_config.py configs/eval/robodojo/smoke.json runs/eval-smoke.json
-python eval/export.py runs/eval/smoke --config runs/eval-smoke.json
-bash eval/run_eval_env.sh runs/eval/smoke
-python eval/run.py runs/eval/smoke report
+python eval/robodojo/export.py runs/eval/smoke --config runs/eval-smoke.json
+bash eval/robodojo/run_eval_env.sh runs/eval/smoke
+python eval/robodojo/run.py runs/eval/smoke report
 ```
 
 learner 用 `claude` CLI 自己的登录（`tools/claude-clean auth login`）或 `ANTHROPIC_API_KEY`；网关和 Codex runtime
@@ -151,12 +153,12 @@ learner 用 `claude` CLI 自己的登录（`tools/claude-clean auth login`）或
 
 - 调模型要花钱：learn 一轮是 5 局 actor 加 1 次 learner 会话；测试是每个任务、每个库 20 局。先跑 smoke 配置。
 - 开发用评测 seed 1 的布局 0–4，测试用 seed 0 的布局 0–19；基准标为不稳定的布局，按官方顺序用下一个布局顶替。
-- 开发批的噪声很大，结论以测试布局上的逐布局配对比较为准（`eval/compare.py`）。
+- 开发批的噪声很大，结论以测试布局上的逐布局配对比较为准（`eval/robodojo/compare.py`）。
 - 代码、基准或执行设置与学库时不一致时，评测会拒绝运行（execution identity 会被记录并核对）；actor 的 prompt 一旦改变，
   `tests/test_paper_prompts.py` 就会失败。
 
 ## 引用与许可
 
 论文：[arXiv:2611.08318](https://arxiv.org/abs/2611.08318)。引用格式见 [README.md](README.md#citation) 或 [CITATION.cff](CITATION.cff)。代码采用 Apache License 2.0
-（见 [LICENSE](LICENSE)、[NOTICE](NOTICE)）；`criteria_v2/overlay/` 是 RoboDojo 文件的修改版（MIT License）；
+（见 [LICENSE](LICENSE)、[NOTICE](NOTICE)）；`faithful_criteria/reward_manager/` 和 `faithful_criteria/tasks/` 是 RoboDojo 文件的修改版（MIT License）；
 `docs/assets/` 中的图来自论文。

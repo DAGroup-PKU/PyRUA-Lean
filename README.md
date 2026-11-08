@@ -1,15 +1,16 @@
 <div align="center">
 
-# Learning the Task or Learning the Verifier?
+# Learning the Task or Learning the Verifier? Rethinking Criteria Exposure in Embodied Self-Improvement
 
-**Rethinking Criteria Exposure in Embodied Self-Improvement**
+Wenbo Huang<sup>1</sup>, Jianxin Bi<sup>1,2</sup>, Shunyu Yang<sup>1</sup>, Ruiyang Si<sup>1</sup>, Rui Ni<sup>1</sup>, Qiang Wang<sup>1</sup>, Shulong Jiang<sup>1</sup>, Yintianrun Zhang<sup>1</sup>, Feixiang Ruan<sup>1</sup>, Kewei Zhang<sup>1</sup>, Ye Huang<sup>1</sup>, Shukai Gong<sup>1</sup>, Daquan Zhou<sup>1,†</sup>
 
+<sup>1</sup>Peking University &nbsp; <sup>2</sup>National University of Singapore
+
+<sup>†</sup>Corresponding author
+
+[![Project Page](https://img.shields.io/badge/Project-Page-8C0000.svg)](https://dagroup-pku.github.io/PyRUA-Lean/RSIJudge/)
 [![arXiv](https://img.shields.io/badge/arXiv-2611.08318-b31b1b.svg)](https://arxiv.org/abs/2611.08318)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
-[![Python](https://img.shields.io/badge/Python-3.10%2B-3776ab?logo=python&logoColor=white)](pyproject.toml)
-[![Benchmarks](https://img.shields.io/badge/benchmarks-RoboDojo%20%7C%20LIBERO--PRO%20%7C%20RoboCasa365-8C0000.svg)](docs/REPRODUCE.md)
-[![English](https://img.shields.io/badge/lang-English-blue.svg)](README.md)
-[![简体中文](https://img.shields.io/badge/语言-简体中文-red.svg)](README.zh-CN.md)
 
 </div>
 
@@ -62,7 +63,7 @@ RoboCasa365, and the configurations of every experiment.
 Of the 25 RoboDojo tasks we learn, 16 are **criteria-limited** (their criteria disagree with the
 instruction on some trajectories) and 9 are **faithful**; the groups were fixed before any result
 was seen. For the criteria-limited tasks we rewrote only the judging code into $C^{faith}$
-([`criteria_v2/`](criteria_v2/README.md)): hidden rules removed, defects fixed, hard thresholds
+([`faithful_criteria/`](faithful_criteria/README.md)): hidden rules removed, defects fixed, hard thresholds
 relaxed to what still clearly satisfies the instruction, the return of both arms kept.
 
 ## Findings
@@ -142,12 +143,12 @@ reflects what the agent learned about the task.
 | Path | What |
 |---|---|
 | [`src/pyrualean/`](src/pyrualean) | the PyRUA-Lean package: the robots (`robodojo_xpl_rgb`, `libero_rgb`, `robocasa_rgb`), prompts, agent runtimes (OpenAI-compatible, Codex CLI, replay) and the self-improvement loop [`pyrualean.learn`](src/pyrualean/learn) |
-| [`criteria_v2/`](criteria_v2/README.md) | $C^{faith}$ for RoboDojo: an overlay of the judging code, built into a source root that judges every episode by both criteria |
-| [`eval/`](eval/README.md) | RoboDojo: evaluate the final libraries of learn campaigns on held-out layouts; [`eval/compare.py`](eval/compare.py) pairs two settings layout by layout |
-| [`eval_libero/`](eval_libero/README.md), [`eval_robocasa/`](eval_robocasa/README.md) | the same for LIBERO-PRO and RoboCasa365, several libraries side by side |
+| [`src/xpolicylab_adapter/`](src/xpolicylab_adapter) | the XPolicyLab adapter RoboDojo's evaluation client talks to |
+| [`faithful_criteria/`](faithful_criteria/README.md) | $C^{faith}$ for RoboDojo: an overlay of the judging code, built into a source root that judges every episode by both criteria |
+| [`eval/robodojo/`](eval/robodojo/README.md) | RoboDojo: evaluate the final libraries of learn campaigns on held-out layouts; [`eval/robodojo/compare.py`](eval/robodojo/compare.py) pairs two settings layout by layout |
+| [`eval/libero/`](eval/libero/README.md), [`eval/robocasa/`](eval/robocasa/README.md) | the same for LIBERO-PRO and RoboCasa365, several libraries side by side |
 | [`transfer/`](transfer/README.md) | distill the libraries of ten source tasks into one; translate RoboDojo libraries to LIBERO-PRO and RoboCasa365 |
-| [`configs/`](configs) | the paper's learn campaigns and RoboDojo evaluation plans, as templates |
-| [`integrations/xpolicylab/PyRUA_Lean/`](integrations/xpolicylab/PyRUA_Lean) | the XPolicyLab adapter RoboDojo's evaluation client talks to |
+| [`configs/`](configs) | the paper's learn campaigns and evaluation plans, as templates |
 | [`tools/`](tools) | environment, config rendering, launchers, clean CLI wrappers, offline tests, release check |
 | [`docs/`](docs) | [setup](docs/SETUP.md) · [models and credentials](docs/MODELS.md) · [reproducing the paper](docs/REPRODUCE.md) |
 
@@ -171,9 +172,9 @@ tail -f runs/learn/smoke/run.log
 
 # 4. once it is done: export its library and test it on one seed-0 layout
 python tools/render_config.py configs/eval/robodojo/smoke.json runs/eval-smoke.json
-python eval/export.py runs/eval/smoke --config runs/eval-smoke.json
-bash eval/run_eval_env.sh runs/eval/smoke
-python eval/run.py runs/eval/smoke report
+python eval/robodojo/export.py runs/eval/smoke --config runs/eval-smoke.json
+bash eval/robodojo/run_eval_env.sh runs/eval/smoke
+python eval/robodojo/run.py runs/eval/smoke report
 ```
 
 The learner uses the `claude` CLI's own login (`tools/claude-clean auth login`) or
@@ -185,7 +186,7 @@ Every experiment of the paper, section by section, is in [docs/REPRODUCE.md](doc
 | §4.1, Table 1, Fig. 3 | 25 tasks, w/o CE and w/ CE, against the empty library | `configs/learn/robodojo/group{1..5}.json`, `configs/eval/robodojo/test-{orig,empty}.json` |
 | §4.2.1, Fig. 1b, 4 | re-judging the 16 criteria-limited tasks | `configs/eval/robodojo/test-dual16.json` |
 | §4.2.2, Fig. 5 | the learner reads $C^{faith}$ | `configs/learn/robodojo/faithful10.json`, `configs/eval/robodojo/test-faithful10.json` |
-| §4.3, Table 2 | transfer to new tasks, LIBERO-PRO and RoboCasa365 | `transfer/`, `configs/eval/robodojo/transfer-rest10*.json`, `eval_libero/configs/`, `eval_robocasa/configs/`, `configs/learn/robocasa/` |
+| §4.3, Table 2 | transfer to new tasks, LIBERO-PRO and RoboCasa365 | `transfer/`, `configs/eval/robodojo/transfer-rest10*.json`, `configs/eval/libero/`, `configs/eval/robocasa/`, `configs/learn/robocasa/` |
 
 ## Requirements
 
@@ -195,7 +196,7 @@ Every experiment of the paper, section by section, is in [docs/REPRODUCE.md](doc
   one GPU with about 45 GB free per RoboDojo episode.
 - SAM 3 (`facebook/sam3`, `sam3.pt`).
 - Optional: RPent's LIBERO-PRO environment; a RoboCasa365 kitchen environment (robocasa 1.0.1
-  with the patch in `eval_robocasa/patches/`, robosuite 1.5.2, MuJoCo 3.3.1 exactly).
+  with the patch in `eval/robocasa/patches/`, robosuite 1.5.2, MuJoCo 3.3.1 exactly).
 - An actor model behind an OpenAI-compatible endpoint (or the Codex CLI), and Claude Code for the
   learner (Node.js 22 or later).
 
@@ -210,7 +211,7 @@ Every experiment of the paper, section by section, is in [docs/REPRODUCE.md](doc
 - The evaluations refuse to run when the policy code, the benchmark or the execution settings
   differ from those the libraries were learned with (an execution identity is recorded and
   checked), and `tests/test_paper_prompts.py` fails if the actor's prompt changes.
-- `criteria_v2/` changes only the judging code. In the w/o CE setting, nothing should read or tune
+- `faithful_criteria/` changes only the judging code. In the w/o CE setting, nothing should read or tune
   against the criteria: that is the point of the comparison.
 
 ## Citation
@@ -228,6 +229,6 @@ Every experiment of the paper, section by section, is in [docs/REPRODUCE.md](doc
 
 ## License
 
-Apache License 2.0 (see [LICENSE](LICENSE) and [NOTICE](NOTICE)). `criteria_v2/overlay/` holds
+Apache License 2.0 (see [LICENSE](LICENSE) and [NOTICE](NOTICE)). `faithful_criteria/reward_manager/` and `faithful_criteria/tasks/` hold
 modified files of RoboDojo (MIT License, Copyright (c) 2026 RoboDojo Contributors). The figures
 in `docs/assets/` are from the paper.

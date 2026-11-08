@@ -3,7 +3,7 @@ Copyright 2026 The Criteria Exposure Authors and PyRUA-Lean Contributors
 
 Licensed under the Apache License, Version 2.0 (see LICENSE).
 
-This repository includes PyRUA-Lean (src/pyrualean/, integrations/xpolicylab/PyRUA_Lean/),
+This repository includes PyRUA-Lean (src/pyrualean/, src/xpolicylab_adapter/),
 https://github.com/DAGroup-PKU/PyRUA-Lean, Copyright 2026 PyRUA-Lean Contributors, licensed under
 the Apache License, Version 2.0, with the self-improvement loop (src/pyrualean/learn/) and the
 libero_rgb and robocasa_rgb robots added.
@@ -16,7 +16,7 @@ redistribute them.  Parts derived from RPent and modified:
   - src/pyrualean/knowledge/*.md distil the operating knowledge of RPent's prompts and guides;
   - the robot classes in src/pyrualean/ mirror RPent's tool schemas.
 
-criteria_v2/overlay/ holds modified copies of files of RoboDojo
+faithful_criteria/reward_manager/ and faithful_criteria/tasks/ hold modified copies of files of RoboDojo
 (https://github.com/RoboDojo-Benchmark/RoboDojo, commit cb2a37d58dbb),
 Copyright (c) 2026 RoboDojo Contributors, licensed under the MIT License:
 

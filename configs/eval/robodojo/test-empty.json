@@ -20,151 +20,151 @@
    "campaign": "${CAMPAIGNS}/group1",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "make_kong": {
    "campaign": "${CAMPAIGNS}/group1",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "sweep_blocks_random": {
    "campaign": "${CAMPAIGNS}/group1",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "play_Xylophone": {
    "campaign": "${CAMPAIGNS}/group1",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "pick_from_conveyor_by_image": {
    "campaign": "${CAMPAIGNS}/group1",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "build_tower": {
    "campaign": "${CAMPAIGNS}/group2",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "pour_by_language": {
    "campaign": "${CAMPAIGNS}/group2",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "make_toast_random": {
    "campaign": "${CAMPAIGNS}/group2",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "swap_blocks": {
    "campaign": "${CAMPAIGNS}/group2",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "play_stacking_toy": {
    "campaign": "${CAMPAIGNS}/group2",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "pour_liquid_into_cup": {
    "campaign": "${CAMPAIGNS}/group3",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "fill_pen_holder": {
    "campaign": "${CAMPAIGNS}/group3",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "align_blocks": {
    "campaign": "${CAMPAIGNS}/group3",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "plug_in_charger": {
    "campaign": "${CAMPAIGNS}/group3",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "match_and_pick_from_conveyor": {
    "campaign": "${CAMPAIGNS}/group3",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "organize_table": {
    "campaign": "${CAMPAIGNS}/group4",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "pack_objects_into_box": {
    "campaign": "${CAMPAIGNS}/group4",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "fill_egg_holder": {
    "campaign": "${CAMPAIGNS}/group4",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "deposit_coin": {
    "campaign": "${CAMPAIGNS}/group4",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "stack_bowls_random": {
    "campaign": "${CAMPAIGNS}/group4",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "insert_key": {
    "campaign": "${CAMPAIGNS}/group5",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "store_laptop_and_headphones": {
    "campaign": "${CAMPAIGNS}/group5",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "store_tools_in_toolbox": {
    "campaign": "${CAMPAIGNS}/group5",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "hang_mugs_random": {
    "campaign": "${CAMPAIGNS}/group5",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   },
   "insert_tubes": {
    "campaign": "${CAMPAIGNS}/group5",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty"
+   "library": "${CE_ROOT}/eval/empty_library"
   }
  }
 }

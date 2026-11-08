@@ -272,7 +272,7 @@ def test_the_reference_and_the_knowledge_of_the_colour_robot_promise_no_depth():
 
 
 def _deploy():
-    path = Path(__file__).resolve().parents[1] / "integrations/xpolicylab/PyRUA_Lean/deploy.py"
+    path = Path(__file__).resolve().parents[1] / "src/xpolicylab_adapter/deploy.py"
     spec = importlib.util.spec_from_file_location("pyrua_lean_deploy", path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -408,7 +408,7 @@ def test_get_action_does_not_keep_the_client_waiting_while_the_program_thinks():
 
 
 def _adapter_model(monkeypatch):
-    """integrations/xpolicylab/PyRUA_Lean/model.py, over XPolicyLab's template as it is."""
+    """src/xpolicylab_adapter/model.py, over XPolicyLab's template as it is."""
 
     import sys
     import types
@@ -444,7 +444,7 @@ def _adapter_model(monkeypatch):
     monkeypatch.setitem(sys.modules, "XPolicyLab.model_template", template)
     monkeypatch.setitem(sys.modules, "XPolicyLab.utils", utils)
     monkeypatch.setitem(sys.modules, "XPolicyLab.utils.process_data", process_data)
-    path = Path(__file__).resolve().parents[1] / "integrations/xpolicylab/PyRUA_Lean/model.py"
+    path = Path(__file__).resolve().parents[1] / "src/xpolicylab_adapter/model.py"
     spec = importlib.util.spec_from_file_location("pyrua_lean_model", path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -1193,7 +1193,7 @@ def test_a_root_with_depth_can_write_its_results_into_the_checkout(tmp_path):
 def test_the_adapter_starts_the_client_as_robodojo_configures_it():
     """The submitted directory holds nothing that changes what the client sends."""
 
-    adapter = Path(__file__).resolve().parents[1] / "integrations/xpolicylab/PyRUA_Lean"
+    adapter = Path(__file__).resolve().parents[1] / "src/xpolicylab_adapter"
     assert not (adapter / "client_root.py").exists()
     client = (adapter / "setup_eval_env_client.sh").read_text()
     assert "env_cfg" not in client.replace("env_cfg_type", "") and "client_root" not in client

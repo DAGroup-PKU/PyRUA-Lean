@@ -21,7 +21,7 @@ export ACTOR_API_KEY=...
 
 The templates set `"api_key_env": "ACTOR_API_KEY"`, `"extra_body": {"reasoning_effort": "high"}`
 and the per-episode limits of the paper (cells, requests, nudges, wall clock). `check-services`
-(learn) and the start of `eval/run.py` send one short request to confirm the endpoint answers.
+(learn) and the start of `eval/robodojo/run.py` send one short request to confirm the endpoint answers.
 Proxies follow your environment; a config's `environment` block can set or unset (`null`)
 variables such as `HTTPS_PROXY` for its episodes.
 

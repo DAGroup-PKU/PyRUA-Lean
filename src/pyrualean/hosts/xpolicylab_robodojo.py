@@ -17,7 +17,7 @@ answers ``update_obs`` / ``get_action``.  This host is the policy server.  :func
 
 *   builds the directory the client runs from (:mod:`.robodojo_client_root`): RoboDojo's
     code and configuration copied, XPolicyLab's code and the adapter
-    (``integrations/xpolicylab/PyRUA_Lean``) beside them, ``Assets`` linked;
+    (``src/xpolicylab_adapter``) beside them, ``Assets`` linked;
 *   serves a :class:`.xpolicylab_bridge.Bridge` with XPolicyLab's policy server, in a thread;
 *   starts the evaluation client on one task and one layout (``scripts/eval_policy.sh``, the
     script RoboDojo's own CLI ends in), which connects to that server;
@@ -67,7 +67,7 @@ POLICY_NAME = "PyRUA_Lean"
 #: The robot this host serves (the colour-only wrapper names its own).
 ROBOT = "robodojo_xpl"
 #: The adapter's files, relative to the repository root.
-ADAPTER_DIR = Path("integrations") / "xpolicylab" / POLICY_NAME
+ADAPTER_DIR = Path("src") / "xpolicylab_adapter"
 EVAL_SEEDS = (0, 1, 2)
 BOOT_TIMEOUT_S = 1500.0
 
@@ -183,6 +183,7 @@ def lay_out(
         env_cfg_type=suite,
         xpolicylab=xpolicylab,
         policy_dir=adapter_dir(),
+        policy_name=POLICY_NAME,
         private_layout=private_layout,
         task=task,
         eval_seed=eval_seed,

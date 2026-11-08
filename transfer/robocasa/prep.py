@@ -8,7 +8,7 @@ learn campaigns:
   lessons/ without retired cards), the last worker's FINDINGS.md and the dev successes per round
   with each round's revision, as transfer/robodojo/prep.py does for RoboDojo;
 - inputs/robot/system_prompt.md: what a robocasa_rgb policy reads besides library and task card,
-  rendered by transfer/xbench/render.py with eval_robocasa's settings (as xbench's robocasa target;
+  rendered by transfer/xbench/render.py with eval/robocasa's settings (as xbench's robocasa target;
   --card replaces its card); inputs/robot/api/: robocasa_rgb.py, _robot.py.
 Also writes OUT_DIR/SOURCES.json and OUT_DIR/MANIFEST.json.  The source tasks are all tasks of the
 given campaigns, or those named by --tasks; use the campaigns of one setting (all

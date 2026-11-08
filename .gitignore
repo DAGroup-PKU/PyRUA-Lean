@@ -1,9 +1,8 @@
 # machine paths and caches
 paths.env
 .cache/
-runs/*
-!runs/_empty-memory*/
-criteria_v2/build/
+runs/
+faithful_criteria/build/
 # Python
 __pycache__/
 *.py[cod]

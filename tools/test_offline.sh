@@ -13,6 +13,6 @@ run() {
 cd "$here"
 run tests
 # each of these has its own `import run`: one pytest process per directory
-for d in eval eval_libero eval_robocasa; do
+for d in eval/robodojo eval/libero eval/robocasa; do
   run --rootdir="$d" "$d/tests"
 done

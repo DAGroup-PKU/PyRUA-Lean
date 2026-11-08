@@ -50,6 +50,7 @@ pyrualean = "pyrualean.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["pyrualean*"]
 
 [tool.setuptools.package-data]
 pyrualean = ["knowledge/*.md", "codex-catalog-gpt-6-astra-fallback.json"]
@@ -61,7 +62,7 @@ testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 100
-extend-exclude = ["runs", "criteria_v2", "eval_robocasa/smoke"]
+extend-exclude = ["runs", "faithful_criteria", "eval/robocasa/smoke_cells", "src/xpolicylab_adapter"]
 target-version = "py310"
 
 [tool.ruff.lint]

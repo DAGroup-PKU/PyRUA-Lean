@@ -12,7 +12,7 @@ actor's key in `ACTOR_API_KEY` ([MODELS.md](MODELS.md)). Run directories go unde
 | §4.2.1, Fig. 1b, 4 | the 16 criteria-limited tasks, every episode judged by $C^{orig}$ and $C^{faith}$ | `configs/eval/robodojo/test-dual16.json` |
 | §4.2.2, Fig. 5 | the learner reads $C^{faith}$ (ten tasks) | `configs/learn/robodojo/faithful10.json`; `configs/eval/robodojo/test-faithful10.json` |
 | §4.3, App. G–H | ten source libraries distilled into one, applied to ten other RoboDojo tasks | `transfer/robodojo/`; `configs/eval/robodojo/transfer-rest10*.json` |
-| §4.3, App. I–J | RoboDojo libraries translated to LIBERO-PRO and RoboCasa365; RoboCasa365's own loop | `transfer/xbench/`, `transfer/robocasa/`; `configs/learn/robocasa/*.json`; `eval_libero/configs/`, `eval_robocasa/configs/` |
+| §4.3, App. I–J | RoboDojo libraries translated to LIBERO-PRO and RoboCasa365; RoboCasa365's own loop | `transfer/xbench/`, `transfer/robocasa/`; `configs/learn/robocasa/*.json`; `configs/eval/libero/`, `configs/eval/robocasa/` |
 
 ## Protocol
 
@@ -55,36 +55,36 @@ fails repeatedly it writes `PAUSED.json` and stops starting work; fix the servic
 for s in wo_ce w_ce; do
   CAMPAIGNS=$CE_ROOT/runs/learn/$s python tools/render_config.py \
       configs/eval/robodojo/test-orig.json runs/configs/test-orig-$s.json
-  python eval/export.py runs/eval/test-orig-$s --config runs/configs/test-orig-$s.json
-  bash eval/run_eval_env.sh runs/eval/test-orig-$s
+  python eval/robodojo/export.py runs/eval/test-orig-$s --config runs/configs/test-orig-$s.json
+  bash eval/robodojo/run_eval_env.sh runs/eval/test-orig-$s
 done
 CAMPAIGNS=$CE_ROOT/runs/learn/wo_ce python tools/render_config.py \
     configs/eval/robodojo/test-empty.json runs/configs/test-empty.json
-python eval/export.py runs/eval/test-empty --config runs/configs/test-empty.json
-bash eval/run_eval_env.sh runs/eval/test-empty
+python eval/robodojo/export.py runs/eval/test-empty --config runs/configs/test-empty.json
+bash eval/robodojo/run_eval_env.sh runs/eval/test-empty
 
-python eval/run.py runs/eval/test-orig-w_ce report                    # per-task and macro rates
-python eval/compare.py runs/eval/test-orig-w_ce runs/eval/test-orig-wo_ce   # paired by layout
+python eval/robodojo/run.py runs/eval/test-orig-w_ce report                    # per-task and macro rates
+python eval/robodojo/compare.py runs/eval/test-orig-w_ce runs/eval/test-orig-wo_ce   # paired by layout
 ```
 
-`eval/export.py` copies each task's active library (as its episodes read it) and freezes the
-campaign's settings; `eval/run.py` refuses to start if the code, the benchmark or the settings
-changed since. Running `eval/run_eval_env.sh` again resumes. See [`eval/README.md`](../eval/README.md).
+`eval/robodojo/export.py` copies each task's active library (as its episodes read it) and freezes the
+campaign's settings; `eval/robodojo/run.py` refuses to start if the code, the benchmark or the settings
+changed since. Running `eval/robodojo/run_eval_env.sh` again resumes. See [`eval/robodojo/README.md`](../eval/robodojo/README.md).
 
 ## 3. Re-judging with the instruction-faithful criteria (§4.2.1)
 
-Build `criteria_v2/build/v2-b9` first ([SETUP.md](SETUP.md), [`criteria_v2/README.md`](../criteria_v2/README.md)).
+Build `faithful_criteria/build/v2-b9` first ([SETUP.md](SETUP.md), [`faithful_criteria/README.md`](../faithful_criteria/README.md)).
 
 ```bash
 for s in wo_ce w_ce; do
   CAMPAIGNS=$CE_ROOT/runs/learn/$s python tools/render_config.py \
       configs/eval/robodojo/test-dual16.json runs/configs/test-dual16-$s.json
-  python eval/export.py runs/eval/test-dual16-$s --config runs/configs/test-dual16-$s.json
-  bash eval/run_eval_env.sh runs/eval/test-dual16-$s
+  python eval/robodojo/export.py runs/eval/test-dual16-$s --config runs/configs/test-dual16-$s.json
+  bash eval/robodojo/run_eval_env.sh runs/eval/test-dual16-$s
 done
-python criteria_v2/dual_table.py runs/eval/test-dual16-w_ce runs/eval/test-dual16-wo_ce
-python eval/compare.py runs/eval/test-dual16-w_ce runs/eval/test-dual16-wo_ce --criteria orig
-python eval/compare.py runs/eval/test-dual16-w_ce runs/eval/test-dual16-wo_ce --criteria faith
+python faithful_criteria/dual_table.py runs/eval/test-dual16-w_ce runs/eval/test-dual16-wo_ce
+python eval/robodojo/compare.py runs/eval/test-dual16-w_ce runs/eval/test-dual16-wo_ce --criteria orig
+python eval/robodojo/compare.py runs/eval/test-dual16-w_ce runs/eval/test-dual16-wo_ce --criteria faith
 ```
 
 Every episode is judged by $C^{faith}$ (the ledger's `success`) and, alongside, by the original
@@ -100,9 +100,9 @@ python -m pyrualean.learn.campaign runs/learn/faithful10 init --config runs/conf
 bash tools/run_learn.sh runs/learn/faithful10 --worker-scoring on
 FAITHFUL_CAMPAIGN=$CE_ROOT/runs/learn/faithful10 python tools/render_config.py \
     configs/eval/robodojo/test-faithful10.json runs/configs/test-faithful10.json
-python eval/export.py runs/eval/test-faithful10 --config runs/configs/test-faithful10.json
-bash eval/run_eval_env.sh runs/eval/test-faithful10
-python criteria_v2/dual_table.py runs/eval/test-faithful10 runs/eval/test-dual16-w_ce
+python eval/robodojo/export.py runs/eval/test-faithful10 --config runs/configs/test-faithful10.json
+bash eval/robodojo/run_eval_env.sh runs/eval/test-faithful10
+python faithful_criteria/dual_table.py runs/eval/test-faithful10 runs/eval/test-dual16-w_ce
 ```
 
 The campaign's `source_root` is the faithful build, so its learner reads $C^{faith}$ and its
@@ -118,14 +118,14 @@ Distill one library per setting from the finished campaigns as described in
 for s in wo_ce w_ce; do
   CAMPAIGNS=$CE_ROOT/runs/learn/$s TRANSFER_LIBRARY=/path/to/distilled-$s/library-v1 \
       python tools/render_config.py configs/eval/robodojo/transfer-rest10.json runs/configs/transfer-$s.json
-  python eval/export.py runs/eval/transfer-$s --config runs/configs/transfer-$s.json
-  bash eval/run_eval_env.sh runs/eval/transfer-$s
+  python eval/robodojo/export.py runs/eval/transfer-$s --config runs/configs/transfer-$s.json
+  bash eval/robodojo/run_eval_env.sh runs/eval/transfer-$s
 done
 CAMPAIGNS=$CE_ROOT/runs/learn/wo_ce python tools/render_config.py \
     configs/eval/robodojo/transfer-rest10-empty.json runs/configs/transfer-empty.json
-python eval/export.py runs/eval/transfer-empty --config runs/configs/transfer-empty.json
-bash eval/run_eval_env.sh runs/eval/transfer-empty
-python eval/compare.py runs/eval/transfer-wo_ce runs/eval/transfer-empty --criteria orig
+python eval/robodojo/export.py runs/eval/transfer-empty --config runs/configs/transfer-empty.json
+bash eval/robodojo/run_eval_env.sh runs/eval/transfer-empty
+python eval/robodojo/compare.py runs/eval/transfer-wo_ce runs/eval/transfer-empty --criteria orig
 ```
 
 The target tasks take the execution settings of a finished campaign (`settings_task`), so the
@@ -135,22 +135,22 @@ actor runs exactly as it did while learning.
 
 - **Translation**: `transfer/xbench/` turns the two distilled RoboDojo libraries into
   `libero_rgb` and `robocasa_rgb` libraries.
-- **LIBERO-PRO**: `eval_libero/configs/xbench-10swap-t569.json` and `xbench-goalswap-t159.json`
+- **LIBERO-PRO**: `configs/eval/libero/xbench-10swap-t569.json` and `xbench-goalswap-t159.json`
   run the empty library and both translated libraries on `libero_10_swap` tasks 5, 6, 9 and
   `libero_goal_swap` tasks 1, 5, 9, seeds 0–9, paired with the empty library. See
-  [`eval_libero/README.md`](../eval_libero/README.md).
+  [`eval/libero/README.md`](../eval/libero/README.md).
 - **RoboCasa365, in-benchmark loop**: `configs/learn/robocasa/atomic5.json` and `composite5.json`
   (the ten source tasks), each in both settings as in section 1; `transfer/robocasa/` distills each
   setting's ten libraries into one.
-- **RoboCasa365, held-out tasks**: `eval_robocasa/configs/heldout10-{atomic,composite}.json` run
+- **RoboCasa365, held-out tasks**: `configs/eval/robocasa/heldout10-{atomic,composite}.json` run
   the translated and the in-benchmark libraries on ten target tasks, seeds 10–19, and
   `heldout10-*-v0.json` the empty library; `report --with` pairs them. `atomic-zero-shot.json` and
   `composite-zero-shot.json` are the zero-shot runs of the primitive alignment (App. J). See
-  [`eval_robocasa/README.md`](../eval_robocasa/README.md).
+  [`eval/robocasa/README.md`](../eval/robocasa/README.md).
 
 ## What to expect
 
 Rates move by several points between reruns: verdicts on one layout change often between two
 runs of the same library, so compare settings layout by layout on the test layouts
-(`eval/compare.py`) rather than by development curves. The actor and learner are hosted models;
+(`eval/robodojo/compare.py`) rather than by development curves. The actor and learner are hosted models;
 their versions behind an endpoint may change over time.

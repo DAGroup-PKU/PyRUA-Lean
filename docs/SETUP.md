@@ -19,11 +19,11 @@ pip install "sam3 @ git+https://github.com/RLinf/sam3.git@c1f6b1e83967c912f675d8
     msgpack-numpy "websockets>=13" pyyaml "h5py>=3.8"
 ```
 
-`integrations/xpolicylab/PyRUA_Lean/install.sh` does the same inside an existing environment and
+`src/xpolicylab_adapter/install.sh` does the same inside an existing environment and
 keeps its torch. Set `CE_PYTHON` in `paths.env` to this environment's `python`.
 
 **SAM 3.** Download `sam3.pt` of the Hugging Face model `facebook/sam3` (3.4 GB;
-`integrations/xpolicylab/PyRUA_Lean/download_assets.sh` fetches it) and set
+`src/xpolicylab_adapter/download_assets.sh` fetches it) and set
 `SAM3_CHECKPOINT_PATH`. The configs record its sha256; set `SAM3_SHA256` if yours differs.
 
 Check: `bash tools/test_offline.sh "$CE_PYTHON"` (no simulator, GPU or model).
@@ -67,14 +67,14 @@ Check: `bash tools/test_offline.sh "$CE_PYTHON"` (no simulator, GPU or model).
    `curobo.yml` every episode fails at boot. Run it again if the checkout moves.
 4. Set `ROBODOJO_SOURCE_ROOT` (the checkout) and `ROBODOJO_SIM_PYTHON` (the simulator
    environment's `python`). Nothing has to be linked into the checkout: each episode builds its
-   own client directory from RoboDojo, XPolicyLab and `integrations/xpolicylab/PyRUA_Lean`.
-5. Build the instruction-faithful criteria once (see [`criteria_v2/README.md`](../criteria_v2/README.md)):
+   own client directory from RoboDojo, XPolicyLab and `src/xpolicylab_adapter`.
+5. Build the instruction-faithful criteria once (see [`faithful_criteria/README.md`](../faithful_criteria/README.md)):
    ```bash
    source tools/env.sh
-   bash criteria_v2/build_source.sh v2-b9          # -> criteria_v2/build/v2-b9
-   ROOT=criteria_v2/build/v2-b9 "$ROBODOJO_SIM_PYTHON" -m pytest -q criteria_v2/tests/test_offline.py
+   bash faithful_criteria/build_source.sh v2-b9          # -> faithful_criteria/build/v2-b9
+   ROOT=faithful_criteria/build/v2-b9 "$ROBODOJO_SIM_PYTHON" -m pytest -q faithful_criteria/tests/test_offline.py
    ```
-   and set `ROBODOJO_FAITHFUL_ROOT=$CE_ROOT/criteria_v2/build/v2-b9`.
+   and set `ROBODOJO_FAITHFUL_ROOT=$CE_ROOT/faithful_criteria/build/v2-b9`.
 
 A RoboDojo episode takes about 45 GB of GPU memory at its peak (simulator and SAM 3) and 10–60
 minutes.
@@ -114,7 +114,7 @@ pip install "robosuite @ git+https://github.com/RLinf/robosuite.git@97cfbde4b68d
 # deterministic scenes: robocasa orders some counter geoms by memory address, so the same seed
 # gave a different kitchen from run to run; the patch keeps their first-seen order
 SITE=$(python -c 'import sysconfig; print(sysconfig.get_paths()["purelib"])')
-patch -d "$SITE" -p1 < eval_robocasa/patches/robocasa-counter-geom-order.patch
+patch -d "$SITE" -p1 < eval/robocasa/patches/robocasa-counter-geom-order.patch
 yes y | robocasa-download-assets --assets-path <dir> --no-macros     # ~23 GB; it asks to confirm
 ```
 

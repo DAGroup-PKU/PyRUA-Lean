@@ -102,10 +102,10 @@ sh transfer/freeze.sh $W runs/transfer/on-10
 
 `prep.py ... --tasks T1 T2 ...` takes a subset of the campaigns' tasks.
 
-**Evaluate** with `eval/`: in the plan of `eval/export.py`, a task with `"library": DIR` (here
+**Evaluate** with `eval/`: in the plan of `eval/robodojo/export.py`, a task with `"library": DIR` (here
 `runs/transfer/off-10/library-v1`) runs that library instead of a revision of its campaign, and
 `"settings_task"` lets a target task no campaign learned run with a campaign's settings (see the
-docstring of `eval/export.py`); then `python eval/run.py ROOT run` / `report`. Use target tasks
+docstring of `eval/robodojo/export.py`); then `python eval/robodojo/run.py ROOT run` / `report`. Use target tasks
 that no source task covers. The paper's plan is `configs/eval/robodojo/transfer-rest10.json`
 (`TRANSFER_LIBRARY=runs/transfer/off-10/library-v1`), commands in docs/REPRODUCE.md §5.
 
@@ -115,9 +115,9 @@ The source is a frozen library from stage 1 (a `freeze.sh` destination: `library
 `NOTES.md`, `SOURCES.json`). `prep.py` copies it to `DIR/inputs/source/` with the RoboDojo system
 prompt (`render.py`: `robodojo_xpl_rgb`, `no-vla`, on-demand images, pure feedback, 5400 s, empty
 library, task card removed) and API (`robodojo_xpl_rgb.py`, `robodojo.py`, `_robot.py`), and puts
-the target's system prompt and API in `DIR/inputs/target/`: LIBERO-PRO with eval_libero's settings
+the target's system prompt and API in `DIR/inputs/target/`: LIBERO-PRO with eval/libero's settings
 (`libero_rgb`, `no-vla`, on-demand, pure, 7200 s; `libero_rgb.py`, `_robot.py`) or RoboCasa365
-with eval_robocasa's (`robocasa_rgb`, same settings, the horizon of the atomic task in
+with eval/robocasa's (`robocasa_rgb`, same settings, the horizon of the atomic task in
 `cards/robocasa_rgb.json`; `robocasa_rgb.py`, `_robot.py`). `--source-card` / `--target-card`
 replace the cards. The distiller gets no target task list, trajectories or judging code.
 
@@ -133,10 +133,10 @@ done
 # w/ CE: runs/transfer/on-10 with --setting w_ce
 ```
 
-**Evaluate** with `eval_libero/` (`arms`: `{name: {library: DIR}}`; the paper's
-`eval_libero/configs/xbench-*.json` take `LIBERO_LIB_WO_CE` / `LIBERO_LIB_W_CE`, e.g.
-`runs/transfer/off-10-libero/library-v1`, next to the empty library as `v0`) or `eval_robocasa/`
-(`eval_robocasa/configs/heldout10-*.json`: `ROBOCASA_LIB_XBENCH_WO_CE` / `_W_CE`); see their
+**Evaluate** with `eval/libero/` (`arms`: `{name: {library: DIR}}`; the paper's
+`configs/eval/libero/xbench-*.json` take `LIBERO_LIB_WO_CE` / `LIBERO_LIB_W_CE`, e.g.
+`runs/transfer/off-10-libero/library-v1`, next to the empty library as `v0`) or `eval/robocasa/`
+(`configs/eval/robocasa/heldout10-*.json`: `ROBOCASA_LIB_XBENCH_WO_CE` / `_W_CE`); see their
 READMEs and docs/REPRODUCE.md §6.
 
 ## 3. RoboCasa365: N source tasks -> one library
@@ -158,8 +158,8 @@ sh transfer/freeze.sh $W runs/transfer/off-rc10
 # w/ CE: the campaigns run with --worker-scoring on, --setting w_ce, -> runs/transfer/on-rc10
 ```
 
-**Evaluate** with `eval_robocasa/` (`arms`) on RoboCasa365 tasks disjoint from the source tasks:
-`eval_robocasa/configs/heldout10-*.json` take `ROBOCASA_LIB_RC10_WO_CE` / `_W_CE`
+**Evaluate** with `eval/robocasa/` (`arms`) on RoboCasa365 tasks disjoint from the source tasks:
+`configs/eval/robocasa/heldout10-*.json` take `ROBOCASA_LIB_RC10_WO_CE` / `_W_CE`
 (`runs/transfer/off-rc10/library-v1`, `runs/transfer/on-rc10/library-v1`).
 
 ## Limits the briefs set

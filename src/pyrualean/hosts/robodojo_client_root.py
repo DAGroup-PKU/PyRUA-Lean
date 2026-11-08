@@ -8,7 +8,7 @@ camera file).  RoboDojo ships with them off.  The host of robot ``robodojo_xpl``
 of its own: RoboDojo's code and configuration copied (a few megabytes), those switches on in
 the copy, ``Assets`` linked.  Nothing in the RoboDojo checkout is edited.
 
-The XPolicyLab adapter (``integrations/xpolicylab/PyRUA_Lean``) does not use this module: under
+The XPolicyLab adapter (``src/xpolicylab_adapter``) does not use this module: under
 RoboDojo's own entry point the client runs from the checkout, as it is configured.
 """
 
@@ -63,6 +63,7 @@ def lay_out(
     env_cfg_type: str = "arx_x5",
     xpolicylab: Path | None = None,
     policy_dir: Path | None = None,
+    policy_name: str | None = None,
     results: Path | None = None,
     private_layout: Path | None = None,
     task: str | None = None,
@@ -126,8 +127,10 @@ def lay_out(
     for entry in sorted((xpolicylab / "policy").iterdir()):
         if entry.is_file() and not (policies / entry.name).exists():  # __init__.py, lib.sh
             shutil.copy2(entry, policies / entry.name)
-    if policy_dir is not None and not (policies / policy_dir.name).exists():
-        shutil.copytree(policy_dir, policies / policy_dir.name, ignore=_SKIP)
+    if policy_dir is not None:
+        target = policies / (policy_name or policy_dir.name)
+        if not target.exists():
+            shutil.copytree(policy_dir, target, ignore=_SKIP)
     return root
 
 

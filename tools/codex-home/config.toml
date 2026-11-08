@@ -2,7 +2,7 @@
 # Copy this directory somewhere writable (e.g. .cache/codex-home) and log in there yourself:
 #     CODEX_HOME=$PWD/.cache/codex-home tools/codex-mcp-only login
 # then set execution.codex_home to it and execution.codex_bin to tools/codex-mcp-only.
-# Clean CODEX_HOME for PyRUA-Lean's codex runtime (eval/episode.py, execution.runtime = "codex").
+# Clean CODEX_HOME for PyRUA-Lean's codex runtime (eval/robodojo/episode.py, execution.runtime = "codex").
 # The model may only use the episode's MCP tools (pyrualean: python / finish, injected per
 # episode with -c mcp_servers.pyrualean.url=...): every built-in Codex tool is off, there is
 # no MCP server, skill, plugin, memory, hook or project doc here.  Credentials: auth.json,

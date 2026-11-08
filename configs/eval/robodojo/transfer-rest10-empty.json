@@ -33,70 +33,70 @@
    "campaign": "${CAMPAIGNS}/group3",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty",
+   "library": "${CE_ROOT}/eval/empty_library",
    "settings_task": "pour_liquid_into_cup"
   },
   "store_laptop_and_headphones": {
    "campaign": "${CAMPAIGNS}/group3",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty",
+   "library": "${CE_ROOT}/eval/empty_library",
    "settings_task": "pour_liquid_into_cup"
   },
   "fasten_screws": {
    "campaign": "${CAMPAIGNS}/group3",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty",
+   "library": "${CE_ROOT}/eval/empty_library",
    "settings_task": "pour_liquid_into_cup"
   },
   "store_tools_in_toolbox": {
    "campaign": "${CAMPAIGNS}/group3",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty",
+   "library": "${CE_ROOT}/eval/empty_library",
    "settings_task": "pour_liquid_into_cup"
   },
   "insert_key": {
    "campaign": "${CAMPAIGNS}/group3",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty",
+   "library": "${CE_ROOT}/eval/empty_library",
    "settings_task": "pour_liquid_into_cup"
   },
   "insert_tubes": {
    "campaign": "${CAMPAIGNS}/group3",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty",
+   "library": "${CE_ROOT}/eval/empty_library",
    "settings_task": "pour_liquid_into_cup"
   },
   "pour_balls_into_vase": {
    "campaign": "${CAMPAIGNS}/group3",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty",
+   "library": "${CE_ROOT}/eval/empty_library",
    "settings_task": "pour_liquid_into_cup"
   },
   "fold_clothes_random": {
    "campaign": "${CAMPAIGNS}/group3",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty",
+   "library": "${CE_ROOT}/eval/empty_library",
    "settings_task": "pour_liquid_into_cup"
   },
   "play_tic_tac_toe": {
    "campaign": "${CAMPAIGNS}/group3",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty",
+   "library": "${CE_ROOT}/eval/empty_library",
    "settings_task": "pour_liquid_into_cup"
   },
   "solve_equation": {
    "campaign": "${CAMPAIGNS}/group3",
    "layouts": 20,
    "pool": 30,
-   "library": "${CE_ROOT}/eval/libraries/empty",
+   "library": "${CE_ROOT}/eval/empty_library",
    "settings_task": "pour_liquid_into_cup"
   }
  }
