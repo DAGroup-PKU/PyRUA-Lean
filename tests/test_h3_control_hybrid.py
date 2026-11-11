@@ -297,9 +297,9 @@ def test_bundle_mode_comes_only_from_the_bundle_confirmation(tmp_path):
     assert contract['intent']['mode'] == 'sim2real' and (tmp_path / 'contract/prompt.txt').is_file()
 
 
-def make_carrier(path, frames):
+def make_carrier(path, frames, fps=24):
     subprocess.run(['ffmpeg', '-hide_banner', '-loglevel', 'error', '-y', '-f', 'lavfi', '-i',
-                    f'color=c=white:s=320x270:r=24:d={frames / 24}', '-vf',
+                    f'color=c=white:s=320x270:r={fps}:d={frames / fps}', '-vf',
                     'drawbox=x=40:y=60:w=60:h=80:color=0x202020:t=fill,format=yuv420p', '-frames:v', str(frames),
                     '-c:v', 'libx264', '-preset', 'ultrafast', '-pix_fmt', 'yuv420p', str(path)], check=True)
 

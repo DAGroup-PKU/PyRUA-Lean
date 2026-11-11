@@ -544,8 +544,11 @@ def cmd_build(args) -> int:
     # contract + canvas carrier (the last frame held for tail_pad extra frames)
     contract = h3_bundle.compile_contract(bundle, args.mode, ep["id"], args.variant, out / "contract")
     canvas = inputs / "carrier-canvas-24fps.mp4"
-    ffmpeg("-i", str(carrier), "-vf", f"trim=start_frame={fr[0]}:end_frame={fr[1]},setpts=N/(24*TB),"
-           f"{SPATIAL.ffmpeg_to_canvas()}" + (f",tpad=stop_mode=clone:stop={tail_pad}" if tail_pad else ""),
+    # hold the last frame BEFORE retiming: tpad counts frames at the stream's nominal rate, so after setpts a 30 fps
+    # carrier would keep only 48 x 24/30 of the held frames once the output is resampled to 24 fps
+    ffmpeg("-i", str(carrier), "-vf", f"trim=start_frame={fr[0]}:end_frame={fr[1]},"
+           + (f"tpad=stop_mode=clone:stop={tail_pad}," if tail_pad else "")
+           + f"setpts=N/(24*TB),{SPATIAL.ffmpeg_to_canvas()}",
            "-fps_mode", "cfr", "-an", "-r", "24", "-c:v", "libx264",
            "-preset", "fast", "-crf", "10", "-pix_fmt", "yuv420p", str(canvas))
     if probe(canvas).frames != render_total:

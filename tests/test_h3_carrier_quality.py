@@ -433,8 +433,9 @@ def test_tail_padded_package_is_cut_back_to_the_episode_length(tmp_path, monkeyp
     for d in ('run/recipes', 'run/tasks/unseen-task', 'models', 'vx'):
         (tmp_path / d).mkdir(parents=True)
     carrier = tmp_path / 'carrier.mp4'
-    make_carrier(carrier, 200)
+    make_carrier(carrier, 200, fps=30)   # a 30 fps white: the held frames must survive the retiming to 24 fps
     bundle = synthetic_bundle(tmp_path, carrier)
+    bundle['carrier_fps'] = 30
     bundle['episodes'][0]['wide_wrist'] = {'factor': 0.65, 'principal_points': {'left': [640, 360], 'right': [640, 360]}}
     (run / 'tasks/unseen-task/bundle.json').write_text(json.dumps(bundle))
     recipe = run / 'recipes/test-hybrid.json'
@@ -471,11 +472,11 @@ def test_tail_padded_package_is_cut_back_to_the_episode_length(tmp_path, monkeyp
     assert hcp.probe(record['carrier_clip']).frames == 200
     locked = lock.lock_package(out, {'name': 'exposure-lock-test'}, run)
     assert json.loads((locked / 'assembled.json').read_text())['frames'] == 200
-    assert hcp.probe(locked / 'final-t3-24fps.mp4').frames == 200
+    assert hcp.probe(locked / 'final-t3-30fps.mp4').frames == 200
     crop = hybrid('h3_wrist_crop')
     cropped = crop.crop_back(locked, run)
     assert cropped.parts[-3] == 'exposure-lock-test-wristcrop'
-    info = hcp.probe(cropped / 'final-t3-24fps.mp4')
+    info = hcp.probe(cropped / 'final-t3-30fps.mp4')
     assert (info.width, info.height, info.frames) == (1280, 1080, 200)
     assert json.loads((cropped / 'package.json').read_text())['wrist_crop_back']['factor'] == 0.65
     assert (cropped / 'render/chunks').is_dir()
