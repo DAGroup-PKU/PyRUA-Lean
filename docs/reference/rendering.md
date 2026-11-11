@@ -61,7 +61,7 @@ White carrier (one per episode, T layout on a 1024x768 canvas with gutters)
   │   · references: a real scene frame matching the carrier's state, a robot reference keeping the real arm appearance
   │   · check_h3_payload runs when building and again before the worker renders
   ▼
-launch_control_worker.sh [memory_mode]  (one resident worker per GPU) → h3_control_worker.py
+h3_pool.py run (resident + elastic workers) or launch_control_worker.sh [memory_mode] per GPU → h3_control_worker.py
   ▼
 h3_screen_prep.py composites → a VLM scores each chunk (evaluations/render-h3/prompts/seed-screen.txt) → choice.json
   (parts from several agents are merged with h3_screen_prep.py merge)
@@ -120,18 +120,18 @@ The bundle, reference images, episode list, OOD variants, recipe copy and seed-s
 1. Confirm the mode. sim2real or OOD (and its axes) can come only from the current user's in-scope instruction. Write the exact words and source into the bundle's `mode_confirmations`. When missing, `h3_bundle.py` refuses to compile.
 2. Create the run directory (`tasks/ recipes/ queue/ eval/realpool/`) and write `tasks/<task>/bundle.json`: the complete white carrier and the real references prepared as above, the five overlay slots and the real baseline. `h3_clean_references.py` can instead generate an object-free scene plate and cable-free sheets. Run `h3_bundle.py check <bundle> --run-dir <run>`; it fails on a carrier below 20 fps and warns when the head view has no wall or table seam the control can see. Write the text fields once per task from the real references and the carrier itself (object identity, colour, size and count; phases, events and terminal relations); every episode of the task then reuses that bundle text. A generic template text loses object identity: with "the objects follow the source video" the drum was drawn as a plain cylinder.
 3. Copy `configs/render/h3-control-hybrid-v1.json` to `<run>/recipes/<name>.json`, changing only `name`, `bundle_variant` and per-task switches backed by evidence (`prompt_lowering`, `chunk.event_aware`).
-4. Enqueue 8 seeds and start workers on the hosts the user and deployment allow (`<run>/queue/ALLOWED_HOSTS`).
+4. Enqueue 8 seeds in one call and start workers on the hosts the user and deployment allow (`<run>/queue/ALLOWED_HOSTS`). The first seed's packages are built first and fill the HED cache the other seeds reuse; builds run at nice 10 and share `--build-slots` (default 2) run-wide slots, because each build runs 4 HED processes of 16 threads. For more than one episode, keep workers with `h3_pool.py`: `resident` workers stay loaded (a resident worker's model load took about 1000 s in the 2026-11 canary), and elastic workers are added up to `max_workers` while tickets are pending.
 5. Select seeds, assemble, score, lock, pack and review. Production first runs 2 complete-episode prefixes and then a fixed set of 8 canaries, with a fixed denominator and all failures kept. `h3_gate.py init` fixes the three lists before the first render; enqueue with `--gate`, and `record` every final package (or a render failure) as it finishes. The gate reads only the blind-review verdicts. When the seed-screen session fails or leaves a partial `choice.json`, `h3_finalize.py select` falls back to the occupancy screen and records why; the episode still goes to blind review.
 
 ```bash
 export H3_RUN=/data/runs/<run> ; H=<datafarm>/src/datafarm/render/h3
 python $H/h3_gate.py init --gate <name>-g1 --recipe <name> --task <task> --prefix <e1> <e2> \
   --canary <e3> <e4> <e5> <e6> <e7> <e8> <e9> <e10> --rest <e11> ...
-for s in 0 1 2 3 4 5 6 7; do
-  python $H/h3_enqueue.py --recipe $H3_RUN/recipes/<name>.json --tasks <task> --gate <name>-g1 \
-    --episodes <episode> --modes sim2real --seed-offset $s --priority 001 --per-chunk
-done
-bash $H/launch_control_worker.sh full     # submit once per GPU
+python $H/h3_enqueue.py --recipe $H3_RUN/recipes/<name>.json --tasks <task> --gate <name>-g1 \
+  --episodes <episode> --modes sim2real --seed-offset 0 1 2 3 4 5 6 7 --priority 001 --per-chunk
+bash $H/launch_control_worker.sh full     # submit once per GPU, or keep a pool:
+echo '{"schema": "h3.worker-pool/1", "resident": 1, "max_workers": 4}' > $H3_RUN/queue/pool.json
+setsid nohup python $H/h3_pool.py run > $H3_RUN/queue/pool.out 2>&1 &   # touch $H3_RUN/queue/STOP to stop all
 B=pkgs/<name>/<task>/<episode>-sim2real
 cd $H3_RUN && python $H/h3_screen_prep.py composites --cands $B $B-s1 $B-s2 $B-s3 $B-s4 $B-s5 $B-s6 $B-s7 --out screen/<task>/<ep>
 # the VLM writes screen/<task>/<ep>/choice.json per the seed-screen prompt
@@ -155,7 +155,7 @@ python src/datafarm/render/h3/h3_paths.py show
 python evaluations/render-h3/h3eval.py score --generated <final.mp4> --carrier <carrier.mp4> --out <score.json>
 ```
 
-`h3_requeue_orphans.py` returns the tickets of dead workers to the queue.
+`h3_requeue_orphans.py` returns the tickets of dead scheduler workers to the queue; in local mode `h3_pool.py` does it for the workers it started. `h3_pool.py status` prints the pool state (pending, running, alive workers, last error).
 
 ### OOD (tabletop material and light colour)
 
@@ -169,7 +169,7 @@ The alternative renders the sim2real recipe with an OOD contract, using the same
 - **Python** (`H3_PYTHON`): torch, diffusers, transformers, omegaconf, safetensors, opencv-python, numpy; system `ffmpeg` and `ffprobe`. Packaging, seed selection and the exposure lock need only numpy and opencv.
 - **External assets** (`configs/external-assets.json`, doctor profile `h3-control`): the MiniMax-H3 Ref2VA directory, the H3-Fun ControlNet-Union weights, the MiniMax-H3 Turbo 4-step LoRA, the ControlNetHED annotator weights, the VideoX-Fun repository with `videox-fun-datafarm.patch` applied (see `vendor/videox_fun/README.md`), the ControlNet v1.1 annotator source, DINOv2-base (EVAL-v1) and SAM2.1-hiera-large (OOD only).
 - **Bindings** (environment variable, then `DATAFARM_<KEY>`, then the bindings file; no built-in default, and a missing key or path fails): `H3_RUN` (or `--run-dir`), `H3_PYTHON` (default: the current interpreter), `H3_MODELS`, `H3_VIDEOX_FUN`, `H3_TURBO_LORA`, `GPU_SCHEDULER`, `H3_EVAL_DINO`, `H3_SAM2`, `H3_HED_ANNOTATOR_REPO`. `python3 src/datafarm/render/h3/h3_paths.py show` prints what resolves.
-- **Scheduling:** `launch_control_worker.sh` calls `$GPU_SCHEDULER submit`, with hosts from `<run>/queue/ALLOWED_HOSTS`. The interface is in [deployment](../deployment.md#gpu-scheduling).
+- **Scheduling:** `launch_control_worker.sh` calls `$GPU_SCHEDULER submit`, with hosts from `<run>/queue/ALLOWED_HOSTS`. The interface is in [deployment](../deployment.md#gpu-scheduling). Local mode (`H3_LOCAL_GPU=<index>`, or `local_gpus` + `local_host` in `pool.json`) runs the same worker on a GPU of a dedicated node without the scheduler; nothing then stops another user's job from taking that GPU, so use it only on a node the run owns.
 
 ### Guarantees
 
@@ -205,7 +205,9 @@ Code: `src/datafarm/render/h3/`, `src/datafarm/render/policy.py`.
 | bundle episode `wide_wrist` | absent | `{factor, principal_points}` of a wide-FOV wrist white; the final is cropped back |
 | bundle episode `keep_regions` | absent | `h3.keep-regions/1` spec path; real pixels kept where the white shows the state |
 | `h3_episode_references.py` spec `budget_mpix` | 25 | Encoded reference area per ticket |
-| recipe `seeds.count` / `seed_offsets` | 8 / 0–7 | Not read by code; the operator runs `h3_enqueue.py --seed-offset` once per offset. Seed = `seed_base` (1000) + offset |
+| recipe `seeds.count` / `seed_offsets` | 8 / 0–7 | Not read by code; the operator passes the offsets to `h3_enqueue.py --seed-offset 0 1 … 7`. Seed = `seed_base` (1000) + offset |
+| `h3_enqueue.py --build-slots` | env `H3_BUILD_SLOTS` or 2 | Concurrent package builds across the whole run (`<run>/cache/build-slots`) |
+| `<run>/queue/pool.json` | absent | `h3_pool.py`: `resident`, `max_workers`, `resident_idle_min` (720), `elastic_idle_min` (20), `min_free_mb` (172000), `profile`, optional `local_gpus` + `local_host`; re-read every cycle |
 | `h3_enqueue.py --episodes` | all | Bundle episode IDs |
 | `build --hed-device` / `--hed-jobs` / `--hed-threads` | `cpu` / 4 / 16 | Where and how HED runs |
 | `launch_control_worker.sh [memory_mode]` | `full` | Worker memory mode; `H3_IDLE_EXIT` and `H3_MAX_TICKETS` bound its lifetime |

@@ -78,7 +78,7 @@ Budget policies are in `examples/runtime/` and described in
 
 The release ships no GPU scheduler. The deployment supplies an executable with `submit` and `leases` subcommands, and tools receive its path through the `GPU_SCHEDULER` binding (default `<ws>/external/gpu-scheduler`). A thin wrapper around Slurm, Kubernetes or an SSH lease script is enough. A single-node setup can avoid it: the expert harness also has a `local` rollout backend.
 
-Three things call the scheduler: `tools/launch_pi05_training.py` (training jobs), the expert harness `command` rollout backend through the adapter's `rollout.submit.argv` (`src/datafarm/expert/rollout.py`), and the H3 workers (`src/datafarm/render/h3/launch_control_worker.sh`, `h3_requeue_orphans.py`).
+Three things call the scheduler: `tools/launch_pi05_training.py` (training jobs), the expert harness `command` rollout backend through the adapter's `rollout.submit.argv` (`src/datafarm/expert/rollout.py`), and the H3 workers (`src/datafarm/render/h3/launch_control_worker.sh`, `h3_pool.py`, `h3_requeue_orphans.py`). `h3_pool.py` reads the `id` line of `submit` and matches it against column 1 of `leases`, treats exit 2 as "no GPU free", and launches nothing while `leases` fails.
 
 ### `submit`
 
