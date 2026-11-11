@@ -71,6 +71,11 @@ def lock_package(src: Path, recipe: dict, run: Path) -> Path:
         a, b = seam["keep_global"]
         parts.append(locked[a - start:b - start])
     canvas = np.concatenate(parts)
+    pad = int(pkg.get("tail_pad", 0))
+    if pad:   # tail-padded package: the seams cover the padded carrier; keep the episode's own frames only
+        if len(canvas) != int(assembled["frames"]) + pad:
+            raise SystemExit(f"padded canvas has {len(canvas)} frames, expected {assembled['frames']} + {pad}")
+        canvas = canvas[:int(assembled["frames"])]
     fps = int(assembled["fps"])
     final = dst / f"final-t3-{fps}fps.mp4"
     tmp = dst / "final.partial.mp4"

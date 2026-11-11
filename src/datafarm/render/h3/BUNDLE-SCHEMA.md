@@ -56,8 +56,11 @@ A quote from another run or user is not authorization for this one.
 EPISODE:
 ```json
 {"id": "episode-000",
- "carrier": "/abs/white-authority-3view-<fps>fps.mp4",   // canonical 1280x1080 T-layout white video
+ "carrier": "/abs/white-authority-3view-<fps>fps.mp4",   // canonical 1280x1080 T-layout white video, >= 20 fps
  "frame_range": [100, 900] | null,        // half-open window of carrier frames to render (null = all)
+ "wide_wrist": {"factor": 0.65,           // optional: the carrier's wrist views are a wide-FOV white replay;
+                "principal_points": {"left": [cx, cy], "right": [cx, cy]}},  // 1280x720 wrist pixels; cropped back
+ "keep_regions": "/abs/keep.json",        // optional: h3.keep-regions/1 spec (h3_keep_regions.py)
  "notes": "..."}
 ```
 
@@ -84,4 +87,8 @@ Rules
   (must print no problems).
 - Reference policy of the default recipe (configs/render/h3-control-hybrid-v1.json, docs/reference/rendering.md):
   a real scene frame whose task state matches the carrier at the render start + a real robot sheet that keeps the
-  real (dark) arm links; no isolated object sheets. `h3_clean_references.py` derives cable-free sheets from the real episode.
+  real arm links; an object close-up sheet only for objects that stay in view (none for objects that are put away).
+  `h3_episode_references.py` derives the production set (start frame, robot-visible frame, robot / object / wrist
+  sheets) within the 25 MP memory budget; `h3_clean_references.py` derives an object-free plate and cable-free sheets.
+- `h3_bundle.py check` fails on a carrier below 20 fps or a carrier rate that differs from `carrier_fps`, validates
+  `wide_wrist` and `keep_regions`, and warns when the head view has no wall/table seam above the control gate.

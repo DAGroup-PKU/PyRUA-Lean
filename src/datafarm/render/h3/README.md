@@ -10,6 +10,11 @@ The tools run by path with `H3_PYTHON`, which need not have this package install
 
 | Step | Tool |
 |---|---|
+| render-only replay of a white attempt (robot colour, shapes, dressing, dense rate, wide wrists) | `python -m datafarm.simulation.white_replay` |
+| compose and check the T-layout white carrier | `h3_carrier.py` |
+| real references from the task's episode (production set, memory budget, robot colours) | `h3_episode_references.py` |
+| projected robot masks from the task's kinematics (light robots, dark furniture) | `h3_robot_masks.py` |
+| keep real pixels for a task state (validated here, applied by the builder) | `h3_keep_regions.py` |
 | validate a bundle, compile its contract | `h3_bundle.py` |
 | clean real references from an episode (optional) | `h3_clean_references.py` |
 | build one package | `h3_package.py` (usually through `h3_enqueue.py`) |
@@ -17,7 +22,7 @@ The tools run by path with `H3_PYTHON`, which need not have this package install
 | render | `launch_control_worker.sh` -> `h3_control_worker.py` |
 | return tickets of dead workers to the queue | `h3_requeue_orphans.py` |
 | seed screen composites, merge of answers | `h3_screen_prep.py` |
-| seed choice, assembly, exposure lock, scores | `h3_finalize.py` (`h3_select.py`, `h3_assemble.py`, `h3_exposure_lock.py`) |
+| seed choice, assembly, exposure lock, wide-wrist crop back, scores | `h3_finalize.py` (`h3_select.py`, `h3_assemble.py`, `h3_exposure_lock.py`, `h3_wrist_crop.py`) |
 | score and write the review pack | `h3_score_and_pack.py` |
 | blind review jobs | `h3_review_prep.py` |
 | OOD edit of an accepted render | `h3_sam2_table_masks.py`, `h3_ood_restyle.py` |

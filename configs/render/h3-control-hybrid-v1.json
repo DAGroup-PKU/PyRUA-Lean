@@ -13,7 +13,8 @@
   "chunk": {
     "frames": 192,
     "advance": 120,
-    "keep_head": 72
+    "keep_head": 72,
+    "tail_pad": 48
   },
   "seed_base": 1000,
   "references": "contract",
@@ -76,14 +77,25 @@
   "references_policy": {
     "real_scene": "one state-matched real full-view T-layout frame per episode: the task state (e.g. device display on/off, container open/closed, object placement) must match the white carrier at the render start; prefer an object-free real plate derived from the episode (h3_clean_references.py) when objects move",
     "robot": "a real robot sheet that keeps the real arm appearance (dark links, shoulder motor, gripper, wrist camera) and no cables; without real dark links the model copies the white sim arm from the white video reference",
-    "objects": "no isolated object sheets: they make the generator re-insert the object on the table (the scene frame and the carrier carry object appearance and position)",
+    "objects": "objects that stay visible all episode: an enlarged object close-up sheet (local-detail, start state plus a second tile for an object whose appearance changes) gives close wrist views real material; objects that leave the view (put away, closed in): no isolated object sheets, they make the generator re-insert the object on the table",
+    "episode_set": "h3_episode_references.py derives f0 + the frame where the real robot is most visible + robot sheet + object sheet + a stacked wrist sheet from the task's own real episode; the set that passed blind review on the 2026-11 production renders",
+    "memory_budget": "H3 encodes every image reference at a 2048-pixel short edge: budget the encoded area, not the count; <= 25 MP of references peaked at 171 GiB on a 178 GiB B200, 31.9 MP ran out of memory",
     "order": "contract real references first (images-first); the white carrier clip is appended as a 39-frame video reference by the worker",
     "derivation": "references are task artifacts the agent derives from the current real episode; see src/datafarm/render/h3/BUNDLE-SCHEMA.md"
+  },
+  "carrier_policy": {
+    "white_replay": "datafarm.simulation.white_replay re-renders a captured attempt with render-only changes and a state-log identity check: real robot link colours (@robot from the robot sheet, @robot_links from projected masks), parametric object shapes, render-only scene dressing, a dense image rate and wide wrist cameras",
+    "robot_colour": "tint the robot links to the real robot colour; pale simulator links are rendered as white arms",
+    "frame_rate": "a white below 20 fps is re-rendered densely, never motion-interpolated (interpolation warps fast objects and H3 copies the drift)",
+    "contrast": "the head view needs a wall/table seam above the control gate (h3_carrier.py check); on a flat white scene H3 invents wall and table edges",
+    "tail_pad": "chunk.tail_pad holds the last carrier frame 48 frames past the end; the output is cut back to the episode length"
   },
   "per_task_knobs": {
     "prompt_lowering": "h3-caption-chunkvis-notask (default) | h3-caption-chunkvis-noevents; keep notask when whole-task text draws future states",
     "chunk.event_aware": "{\"before\": 24, \"min_advance\": 48} moves a chunk start ahead of an arm entering/leaving the head view",
-    "bundle_variant": "the task's reference bundle variant"
+    "bundle_variant": "the task's reference bundle variant",
+    "episode.wide_wrist": "{factor, principal_points} of a wide-FOV wrist white (white_replay wrist_fov_factor 0.65); h3_finalize.py crops the wrist views back",
+    "episode.keep_regions": "h3_keep_regions.py spec: real pixels kept where the white shows a task state the generator does not follow (a lit display)"
   },
   "evaluation": {
     "automatic": "evaluations/render-h3/h3eval.py score --white-cos --dino ${H3_EVAL_DINO} --realpool <run>/eval/realpool/<task>.npz",

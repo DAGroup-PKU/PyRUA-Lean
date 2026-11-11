@@ -19,6 +19,8 @@ import json
 import sys
 from pathlib import Path
 
+import h3_carrier
+import h3_keep_regions
 import h3_paths
 from h3_media import probe, sha256
 
@@ -133,15 +135,44 @@ def cmd_check(args) -> int:
         problems.append("episodes must be a non-empty list")
         episodes = []
     report = {"task": b.get("task"), "episodes": {}}
+    warnings = []
     for ep in episodes:
         row = {}
         if not Path(ep["carrier"]).is_file():
             problems.append(f"{ep['id']}: carrier missing {ep['carrier']}")
         else:
             row["carrier"] = probe(ep["carrier"])
+            fps = h3_carrier.fps_of(ep["carrier"])
+            if fps < h3_carrier.MIN_WHITE_FPS:
+                problems.append(f"{ep['id']}: carrier at {fps:g} fps; re-render the white densely (white_replay "
+                                "image_stride), never interpolate it")
+            elif abs(fps - float(b.get("carrier_fps") or 0)) > 0.5:
+                problems.append(f"{ep['id']}: carrier is {fps:g} fps but carrier_fps is {b.get('carrier_fps')}")
+            try:
+                measured = h3_carrier.check(Path(ep["carrier"]))
+                row["room_seam_frames"] = [measured["frames_with_room_seam"], measured["sampled_frames"]]
+                warnings += [f"{ep['id']}: {w}" for w in measured["warnings"] if "fps" not in w]
+            except Exception as e:  # noqa: BLE001 - a measurement, not a gate
+                warnings.append(f"{ep['id']}: carrier check failed: {e}")
         fr = ep.get("frame_range")
         if fr and row.get("carrier") and not (0 <= fr[0] < fr[1] <= row["carrier"].frames):
             problems.append(f"{ep['id']}: frame_range {fr} outside carrier {row['carrier'].frames}")
+        if ep.get("keep_regions"):
+            kp = Path(ep["keep_regions"])
+            if not kp.is_file():
+                problems.append(f"{ep['id']}: keep_regions spec missing {kp}")
+            else:
+                problems += [f"{ep['id']}: keep_regions {p}" for p in
+                             h3_keep_regions.validate(json.loads(kp.read_text()))]
+        ww = ep.get("wide_wrist")
+        if ww is not None:
+            pps = (ww or {}).get("principal_points") or {}
+            if not (isinstance(ww, dict) and isinstance(ww.get("factor"), (int, float))
+                    and 0.3 <= float(ww["factor"]) < 1.0):
+                problems.append(f"{ep['id']}: wide_wrist.factor must be in [0.3, 1)")
+            if not all(isinstance(pps.get(s), list) and len(pps[s]) == 2 for s in ("left", "right")):
+                problems.append(f"{ep['id']}: wide_wrist.principal_points needs left and right [cx, cy] "
+                                "(pixels of the 1280x720 wrist camera)")
         report["episodes"][ep["id"]] = row
     for src in b.get("realpool", {}).get("sources", []):
         p = src.get("video") or src.get("image")
@@ -162,6 +193,7 @@ def cmd_check(args) -> int:
             except (ValueError, KeyError, TypeError, OSError, SystemExit) as e:
                 problems.append(f"{mode} compile failed: {e}")
     report["problems"] = problems
+    report["warnings"] = warnings
     print(json.dumps(report, indent=1, ensure_ascii=False))
     return 1 if problems else 0
 

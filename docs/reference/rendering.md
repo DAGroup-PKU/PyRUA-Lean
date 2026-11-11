@@ -45,11 +45,18 @@ The following is procedure, carried out by the agent and its reviewers:
 ### Flow
 
 ```text
+Captured white attempt + the task's real episode
+  │ datafarm.simulation.white_replay  (render-only: real robot colour, object shapes, scene dressing, dense image
+  │   rate, wide wrist cameras; the state log must stay identical)  →  h3_carrier.py compose / check
+  │ h3_episode_references.py build  (f0, robot-visible frame, robot / object / wrist sheets within the memory budget)
+  ▼
 White carrier (one per episode, T layout on a 1024x768 canvas with gutters)
   │ h3_enqueue.py --seed-offset 0..7 --per-chunk  →  h3_package.py build
   │   · compile the contract: h3_bundle.py → tools/render_policy.py compile (mode and axes only from bundle.mode_confirmations)
+  │   · the last carrier frame held 48 frames past the end (chunk.tail_pad), cut back after assembly
   │   · independent chunks: 192 frames, advance 120, the first 72 frames are guidance
   │   · soft-HED control with a luma-step shadow gate; active repaint of the whole region
+  │   · keep regions (optional): real pixels kept where the white shows a task state
   │   · chunk prompt = lower_h3_prompt(contract, h3-caption-chunkvis-notask) + facts measured on the white clip
   │   · references: a real scene frame matching the carrier's state, a robot reference keeping the real arm appearance
   │   · check_h3_payload runs when building and again before the worker renders
@@ -61,6 +68,7 @@ h3_screen_prep.py composites → a VLM scores each chunk (evaluations/render-h3/
   ▼
 h3_finalize.py select: h3_select.py --choice-file → h3_assemble.py (min-diff seams, min_lead 56) → EVAL-v1 scoring
   → h3_exposure_lock.py (gain toward the first chunk, pixel positions untouched) → final-t3-<fps>fps.mp4
+  → h3_wrist_crop.py when the episode has wide_wrist (wrist views cropped back to the white's own camera model)
   ▼
 h3_score_and_pack.py --packages <pkg> (scores, writes <pkg>/pack) → h3_review_prep.py blind-review jobs
   → independent review per reviewer-instructions-v1.md (the only acceptance)
@@ -75,18 +83,38 @@ h3_score_and_pack.py --packages <pkg> (scores, writes <pkg>/pack) → h3_review_
 | First-chunk exposure gain lock (proportional gain through the origin) | Removes brightness jumps between chunks. A straight-line fit diverges in a static wrist view. Do not calibrate toward the real camera's colour, which shifts the whole picture |
 | White model as a 39-frame video reference | Suppresses content the model would otherwise invent, such as extra grippers or objects under an empty gripper. All 192 frames would overflow GPU memory |
 | Robot reference keeps the real arm appearance | With a white video reference present, if the real links cannot be seen in the real reference, the model copies the white arm |
+| Robot links in the white tinted to the real robot colour | H3 copies the carrier: pale simulator links stay white or silver even with a real robot reference |
 | Scene reference matches the carrier's task state | A state difference between the reference and the carrier flickers between chunks |
-| No isolated object reference images | An isolated object image makes the object reappear in the picture after it has been put away |
+| No isolated object images for objects that leave the view | An isolated object image makes the object reappear in the picture after it has been put away |
+| An object close-up sheet for objects that stay in view | Wrist cameras see objects closer than the head camera ever does; without a close-up they get proxy-looking objects |
+| References budgeted by encoded area (≤ 25 MP) | H3 encodes every image at a 2048-pixel short edge, so a 1280x360 strip costs ~15 MP; 31.9 MP ran out of memory |
+| Render-only object shapes and scene dressing in the white | H3 keeps the white's shapes and background: a cylinder proxy stays a plain cylinder, a dim or missing wall becomes a charcoal wall |
+| Wide wrist white, cropped back | The wide view gives H3 the scene context around the gripper; cropping restores the white's own intrinsics |
+| A white below 20 fps re-rendered densely, never interpolated | Motion interpolation warps and drags fast objects; H3 copies the drift |
+| Last carrier frame held 48 frames past the end | The end of the last chunk is where H3 invents motion or extra objects; the padding is cut off again |
+| Real pixels kept for a task state the model does not follow | A small state change (a display lighting up) is rendered at the wrong time; a keep region copies it from real pixels |
 | Per-chunk visibility prompt, no whole-episode task sentence | A whole-episode description makes the model draw future states early. `-notask` keeps only "the action follows Video 1" |
 | 8 seeds per chunk with per-chunk VLM screening | Pixel metrics cannot catch content errors such as cables, extra objects or a white arm. Screening is only selection; acceptance is the independent blind review |
 | OOD: same seed across chunks, change material and light at the output | Mixing seeds makes the table colour jump. Changing appearance at the output does not touch content, while generation-side OOD can fall back to a white table in the wrist view |
+
+### Preparing the white carrier and references
+
+The renderer copies what the carrier shows, so most visible render failures are fixed in the white, not in the prompt. Evidence for every step below is independent blind review of the 2026-11 production renders (dual-arm Piper drum, weigh-apple and stack-cups; RealBot-01 scoop-cereal), where each step turned a rejection into an acceptance or removed a reviewer-named defect.
+
+1. **Real references.** Write `tasks/<task>/episode-references.json` and run `h3_episode_references.py build`. It derives the start frame, the frame where the real robot is most visible, the robot sheet, the object close-up sheet (with a second tile for an object whose appearance changes) and the stacked wrist sheet from the task's own real episode, within the 25 MP budget. The robot pixels come from a dark-robot heuristic; for a light-coloured robot or dark furniture, first make projected label masks with `h3_robot_masks.py` from the task's validated kinematics and set `robot_masks`. For white-on-white or split objects, give `object_boxes`. Leave `object_sheet` off when an object leaves the view during the task.
+2. **Replay spec.** `h3_episode_references.py robot-colors` writes `@robot` (and `@robot_links` with masks) for the white replay. Add render-only object shapes where the simulator proxy differs from the real object, render-only `extras` where the white lacks the real wall, counter or props (a bright real wall the simulator lights dimly needs `emission`), `image_stride` for a white captured below 20 fps, and `wrist_fov_factor` 0.65 for wide wrist views. Validate with `python -m datafarm.simulation.white_replay --check-spec`.
+3. **Replay.** `python -m datafarm.simulation.white_replay <attempt> <out> --spec <spec>` on a host that can render. It refuses success when the state log differs from the attempt's or a requested change was not applied. Watch for coplanar visual parts (z-fighting) and seams between dressing parts, which H3 draws as sticks.
+4. **Carrier.** `h3_carrier.py compose --replay <out> --attempt <attempt> --out <carrier>`, then `h3_carrier.py check <carrier>`. Record `wide_wrist` (factor and the wrist principal points from the replay report) on the bundle episode.
+5. **Keep regions** (only when a task state is a small detail the model renders at the wrong time): write a `h3.keep-regions/1` spec, put its `states` into the replay colours as `@states`, and name it as the episode's `keep_regions`.
+
+The replay is a render input only. It never replaces the attempt, its judge verdict or its admission, and it may not change actions, timing or physics.
 
 ### Using it for a new task
 
 The bundle, reference images, episode list, OOD variants, recipe copy and seed-selection results are outputs of the task, derived and verified by the agent from the current real episode.
 
 1. Confirm the mode. sim2real or OOD (and its axes) can come only from the current user's in-scope instruction. Write the exact words and source into the bundle's `mode_confirmations`. When missing, `h3_bundle.py` refuses to compile.
-2. Create the run directory (`tasks/ recipes/ queue/ eval/realpool/`) and write `tasks/<task>/bundle.json`: the complete white carrier, the real references (a state-matched scene frame and a cable-free robot reference, no isolated object images), the five overlay slots and the real baseline. `h3_clean_references.py` can generate clean references from the real episode. Run `h3_bundle.py check <bundle> --run-dir <run>`.
+2. Create the run directory (`tasks/ recipes/ queue/ eval/realpool/`) and write `tasks/<task>/bundle.json`: the complete white carrier and the real references prepared as above, the five overlay slots and the real baseline. `h3_clean_references.py` can instead generate an object-free scene plate and cable-free sheets. Run `h3_bundle.py check <bundle> --run-dir <run>`; it fails on a carrier below 20 fps and warns when the head view has no wall or table seam the control can see.
 3. Copy `configs/render/h3-control-hybrid-v1.json` to `<run>/recipes/<name>.json`, changing only `name`, `bundle_variant` and per-task switches backed by evidence (`prompt_lowering`, `chunk.event_aware`).
 4. Enqueue 8 seeds and start workers on the hosts the user and deployment allow (`<run>/queue/ALLOWED_HOSTS`).
 5. Select seeds, assemble, score, lock, pack and review. Production first runs 2 complete-episode prefixes and then a fixed set of 8 canaries, with a fixed denominator and all failures kept.
@@ -141,9 +169,12 @@ The alternative renders the sim2real recipe with an OOD contract, using the same
 3. **Each chunk prompt is a deterministic lowering of the contract plus closed-schema facts.** For `h3-caption-chunkvis-*` lowerings, the builder measures `chunk_facts` from the white clip (`head_absent_arms`, `empty_wrists`, `head_max_coloured_objects`, `wrist_large_objects`), writes `lower_h3_prompt(contract, lowering, chunk_facts)` and records `chunk_facts_detector`. Free text cannot enter: the schema is closed, and the gate recomputes the prompt.
 4. **A pale object is not reported as an "empty" wrist view.** `wrist-structure-v1` counts a wrist view as showing an object in a sampled frame when saturated pixels exceed 0.4 % of the view, or when `wrist_structure()` is at least 0.75. `wrist_structure()` is the Canny edge length left after removing the dark robot, up to 4 straight room seams and specks under 12 px, in view widths. A view is "empty" only if at most 10 % of sampled frames show an object.
 5. **Control edges ignore simulator cast shadows.** The soft-HED map is multiplied by a mask of strong local luminance steps in the carrier (max−min of the blurred grey image over a `window` of 7 px > `tau` 25, dilated by 5 px). The result must have exactly `generated_frames` frames.
-6. **The default recipe is pinned:** backend `control-hybrid`, canvas `t3-guttered-1024x768`, profile `control-turbo`, 4 denoise forwards; chunks of 192 frames, `advance` 120, `keep_head` 72; soft-HED with the luma-step gate, `white_video_reference` 39; lowering `h3-caption-chunkvis-notask`, `min-diff` seams with `min_lead` 56; 8 seeds (offsets 0–7); a first-chunk exposure lock with no real-camera calibration. Model paths are `${H3_*}` placeholders.
+6. **The default recipe is pinned:** backend `control-hybrid`, canvas `t3-guttered-1024x768`, profile `control-turbo`, 4 denoise forwards; chunks of 192 frames, `advance` 120, `keep_head` 72, `tail_pad` 48; soft-HED with the luma-step gate, `white_video_reference` 39; lowering `h3-caption-chunkvis-notask`, `min-diff` seams with `min_lead` 56; 8 seeds (offsets 0–7); a first-chunk exposure lock with no real-camera calibration. Model paths are `${H3_*}` placeholders.
 7. **Deployment paths fail closed.** A missing or nonexistent value raises `MissingBinding`.
 8. **Capability evolution cannot change the evaluator.** `evaluations/` is in the evolution controller's protected list.
+9. **Padding never reaches the output.** With `tail_pad`, the canvas carrier and chunk plan cover the episode plus the held frames; `h3_assemble.py` and `h3_exposure_lock.py` cut the output back to `frames`, so output frame *i* is carrier frame *i* and the counts match the carrier clip.
+10. **A white replay is accepted only with an identical trajectory.** `white_replay` compares the replay's state log with the attempt's (every field except the PhysX contact report, or every array of `log.npz`) and exits 2 when it differs or when a requested camera, colour, stride, shape or dressing change was not applied.
+11. **Keep regions patch before the audit.** `h3_package.py build` patches the chunk inpaint video and repaint mask when the episode names `keep_regions`, records the frames kept per region, and stops when the regions appear in no white frame; the audit then hashes the patched inputs.
 
 Code: `src/datafarm/render/h3/`, `src/datafarm/render/policy.py`.
 
@@ -160,6 +191,10 @@ Code: `src/datafarm/render/h3/`, `src/datafarm/render/policy.py`.
 |---|---|---|
 | recipe `chunk_facts_wrist` | `wrist-structure-v1` | The only detector; unknown names exit |
 | recipe `chunk.event_aware` | absent | `{before, min_advance}` moves chunk starts ahead of arm entry and exit events |
+| recipe `chunk.tail_pad` | 48 | Frames the last carrier frame is held past the end before chunking; cut back after assembly |
+| bundle episode `wide_wrist` | absent | `{factor, principal_points}` of a wide-FOV wrist white; the final is cropped back |
+| bundle episode `keep_regions` | absent | `h3.keep-regions/1` spec path; real pixels kept where the white shows the state |
+| `h3_episode_references.py` spec `budget_mpix` | 25 | Encoded reference area per ticket |
 | recipe `seeds.count` / `seed_offsets` | 8 / 0–7 | Not read by code; the operator runs `h3_enqueue.py --seed-offset` once per offset. Seed = `seed_base` (1000) + offset |
 | `h3_enqueue.py --episodes` | all | Bundle episode IDs |
 | `build --hed-device` / `--hed-jobs` / `--hed-threads` | `cpu` / 4 / 16 | Where and how HED runs |

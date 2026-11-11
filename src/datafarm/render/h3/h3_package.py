@@ -25,8 +25,14 @@ The run directory (--run-dir or env H3_RUN) holds the shared HED caches; model, 
 recipe or the deployment bindings (h3_paths.py), never from built-in defaults.
 
 Recipe JSON fields: name, backend, worker_profile, canvas ("t3-guttered-1024x768"), denoise_forwards,
-chunk {frames, advance, keep_head, event_aware?}, seed_base, control {...}, prompt_lowering?, assembly {...},
+chunk {frames, advance, keep_head, event_aware?, tail_pad?}, seed_base, control {...}, prompt_lowering?, assembly {...},
 bundle_variant?.
+
+chunk.tail_pad holds the carrier's last frame for that many extra frames before chunking, so the episode's real last
+frame is never the end of the last chunk, where the generator tends to invent motion or objects; assembly and the
+exposure lock cut the output back to the episode length (frame i of the output is still carrier frame i).  The bundle
+episode may name `keep_regions` (h3_keep_regions.py: real pixels kept where the white shows a task state) and
+`wide_wrist` (wide-FOV wrist white, cropped back by h3_wrist_crop.py after the exposure lock).
 """
 from __future__ import annotations
 
@@ -41,6 +47,7 @@ import time
 from pathlib import Path
 
 import h3_bundle
+import h3_keep_regions
 import h3_paths
 from h3_media import link_or_copy, probe, sha256
 from h3_spatial import SPATIAL
@@ -529,20 +536,25 @@ def cmd_build(args) -> int:
     carrier = Path(ep["carrier"])
     fr = ep.get("frame_range") or [0, probe(carrier).frames]
     total = fr[1] - fr[0]
-    # contract + canvas carrier
+    ch = recipe["chunk"]
+    tail_pad = int(ch.get("tail_pad", 0))
+    if tail_pad < 0:
+        raise SystemExit("chunk.tail_pad must be >= 0")
+    render_total = total + tail_pad
+    # contract + canvas carrier (the last frame held for tail_pad extra frames)
     contract = h3_bundle.compile_contract(bundle, args.mode, ep["id"], args.variant, out / "contract")
     canvas = inputs / "carrier-canvas-24fps.mp4"
     ffmpeg("-i", str(carrier), "-vf", f"trim=start_frame={fr[0]}:end_frame={fr[1]},setpts=N/(24*TB),"
-           f"{SPATIAL.ffmpeg_to_canvas()}", "-fps_mode", "cfr", "-an", "-r", "24", "-c:v", "libx264",
+           f"{SPATIAL.ffmpeg_to_canvas()}" + (f",tpad=stop_mode=clone:stop={tail_pad}" if tail_pad else ""),
+           "-fps_mode", "cfr", "-an", "-r", "24", "-c:v", "libx264",
            "-preset", "fast", "-crf", "10", "-pix_fmt", "yuv420p", str(canvas))
-    if probe(canvas).frames != total:
-        raise SystemExit(f"canvas carrier frame count {probe(canvas).frames} != {total}")
-    # chunk plan
-    ch = recipe["chunk"]
+    if probe(canvas).frames != render_total:
+        raise SystemExit(f"canvas carrier frame count {probe(canvas).frames} != {render_total}")
+    # chunk plan (over the padded carrier)
     events = ()
     if ch.get("event_aware"):
-        events = arm_events(canvas, total)
-    chunks = plan_chunks(total, ch["frames"], ch["advance"], ch["keep_head"], events,
+        events = arm_events(canvas, render_total)
+    chunks = plan_chunks(render_total, ch["frames"], ch["advance"], ch["keep_head"], events,
                          before=int((ch.get("event_aware") or {}).get("before", 24)),
                          min_advance=int((ch.get("event_aware") or {}).get("min_advance", 48)))
     if ch.get("event_aware"):
@@ -557,8 +569,12 @@ def cmd_build(args) -> int:
         prompt.write_text(lower_h3_prompt(contract, lowering, assets=h3_paths.REPO))
     seed = int(recipe.get("seed_base", 1000)) + int(args.seed_offset)
     steps = int(recipe["denoise_forwards"])
-    jobs = build_chunk_jobs(out, bundle["task"], ep["id"], contract, canvas, chunks, total, seed, steps, str(prompt))
+    jobs = build_chunk_jobs(out, bundle["task"], ep["id"], contract, canvas, chunks, render_total, seed, steps,
+                            str(prompt))
     masks, heds = add_control_inputs(jobs, ctl, inputs, args)
+    keep = None
+    if ep.get("keep_regions"):   # real pixels kept where the white shows a task state (h3_keep_regions.py)
+        keep = h3_keep_regions.apply(jobs, ep["keep_regions"], h3_paths.run_dir() / "cache" / "keep")
     if lowering:
         add_chunk_prompts(jobs, contract, lowering, out / "contract",
                           recipe.get("chunk_facts_wrist", CHUNK_FACTS_DETECTORS[0]))
@@ -576,10 +592,15 @@ def cmd_build(args) -> int:
                "bundle": str(Path(args.bundle).resolve()), "carrier": str(carrier), "carrier_sha256": sha256(carrier),
                "carrier_fps": bundle["carrier_fps"], "frame_range": fr, "frames": total, "canvas": CANVAS,
                "seed_offset": int(args.seed_offset), "chunks": chunks, "canvas_carrier": str(canvas),
+               "tail_pad": tail_pad, "render_frames": render_total,
                "contract": str(out / "contract" / "contract.json"), "prompt_sha256": contract["prompt_sha256"],
                "render_root": str(render_root), "spatial": SPATIAL.to_dict(), "control": ctl,
                "control_inputs": {"masks": list(masks.values()), "hed": heds, "jobs": len(jobs)},
                "build_seconds": round(time.time() - t0, 1)}
+    if keep:
+        package["keep_regions"] = keep
+    if ep.get("wide_wrist"):
+        package["wide_wrist"] = ep["wide_wrist"]
     (out / "package.json").write_text(json.dumps(package, indent=2, ensure_ascii=False))
     ticket = {"package": str(out), "manifest": str(out / "job-manifest.json"), "contract": package["contract"],
               "output_root": str(render_root), "profile": recipe["worker_profile"]}

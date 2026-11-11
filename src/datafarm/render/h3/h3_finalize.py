@@ -7,7 +7,10 @@
 
 `select` builds <run>/recipes/<name>.json and <run>/pkgs/<name>/<task>/<tag> from the per-chunk choice (a separate
 producer-side VLM screen; h3_screen_prep.py), assembles it with min-diff seams, scores it, then applies `lock`.
-`lock` writes <run>/pkgs/exposure-lock-<name>/<task>/<tag> and scores it.  Acceptance stays the independent blind review.
+`lock` writes <run>/pkgs/exposure-lock-<name>/<task>/<tag> and scores it.  A package rendered from a wide-FOV wrist
+white (package.json wide_wrist) is then cropped back to the white's own wrist camera model (h3_wrist_crop.py) into
+<run>/pkgs/exposure-lock-<name>-wristcrop/<task>/<tag> and scored; that package is the one to pack and review.
+Acceptance stays the independent blind review.
 Relative paths resolve against the run directory.  Run with H3_PYTHON (numpy, opencv); bindings: H3_RUN, H3_EVAL_DINO.
 """
 from __future__ import annotations
@@ -23,6 +26,7 @@ from h3_assemble import assemble
 from h3_exposure_lock import lock_package
 from h3_score_and_pack import score
 from h3_select import select_seeds
+from h3_wrist_crop import crop_back
 
 
 def score_package(pkg_dir: Path, task: str, run: Path) -> None:
@@ -41,6 +45,10 @@ def lock(package: Path, name: str, run: Path) -> Path:
             indent=2))
     dst = lock_package(package, json.loads(recipe_path.read_text()), run)
     score_package(dst, package.parts[-2], run)
+    cropped = crop_back(dst, run)   # wide-FOV wrist white: back to the white's own wrist camera model
+    if cropped is not None:
+        score_package(cropped, package.parts[-2], run)
+        return cropped
     return dst
 
 

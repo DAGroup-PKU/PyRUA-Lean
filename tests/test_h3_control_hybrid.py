@@ -203,7 +203,7 @@ def test_default_recipe_has_the_validated_control_hybrid_settings():
     c = recipe_config()
     assert c['backend'] == 'control-hybrid' and c['canvas'] == 't3-guttered-1024x768'
     assert c['worker_profile'] == 'control-turbo' and c['denoise_forwards'] == 4
-    assert c['chunk'] == {'frames': 192, 'advance': 120, 'keep_head': 72}
+    assert c['chunk'] == {'frames': 192, 'advance': 120, 'keep_head': 72, 'tail_pad': 48}
     ctl = c['control']
     assert ctl['type'] == 'soft-hed' and ctl['hed_min_intensity'] == 0
     assert ctl['edge_gate'] == {'type': 'luma-step', 'tau': 25, 'window': 7, 'dilate': 5}
@@ -342,7 +342,10 @@ def test_builder_cpu_path_produces_a_gate_checked_control_package(no_bindings, t
     assert manifest['backend'] == 'control-hybrid' and manifest['prompt_lowering'] == 'h3-caption-chunkvis-notask'
     assert ticket['profile'] == 'control-turbo'
     job = manifest['jobs'][0]
-    assert job['generated_frames'] == 141 and job['control_meta']['device'] == 'stub'
+    # 130 carrier frames + the 48-frame held tail = 178 -> one legal 192-frame chunk
+    assert job['generated_frames'] == 192 and job['control_meta']['device'] == 'stub'
+    package = json.loads((out / 'package.json').read_text())
+    assert (package['frames'], package['tail_pad'], package['render_frames']) == (130, 48, 178)
     assert manifest['control']['edge_gate']['tau'] == 25 and job['control_video'].endswith('-gate25.mp4')
     assert set(job['chunk_facts']) <= {'head_absent_arms', 'empty_wrists', 'head_max_coloured_objects',
                                        'wrist_large_objects'}

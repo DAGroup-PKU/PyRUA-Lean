@@ -110,8 +110,10 @@ def assemble(pkg_dir: Path) -> dict:
     final = pkg_dir / f"final-t3-{fps}fps.mp4"
     assembly = pkg["recipe"].get("assembly") or {}
     canvas = assemble_canvas(pkg_dir, work, assembly.get("seam", "fixed"), int(assembly.get("min_lead", 0)))
+    # a tail-padded package renders past the episode end (package.json tail_pad): cut back to the episode length
+    trim = f"trim=end_frame={int(pkg['frames'])}," if int(pkg.get("tail_pad", 0)) else ""
     run(["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(canvas), "-vf",
-         f"{SPATIAL.ffmpeg_canvas_to_active()},setpts=N/({fps}*TB)", "-fps_mode", "cfr", "-r", str(fps), "-an",
+         f"{trim}{SPATIAL.ffmpeg_canvas_to_active()},setpts=N/({fps}*TB)", "-fps_mode", "cfr", "-r", str(fps), "-an",
          "-c:v", "libx264", "-preset", "fast", "-crf", "14", "-pix_fmt", "yuv420p", str(final)])
     carrier_clip = pkg_dir / f"carrier-t3-{fps}fps.mp4"
     fr = pkg["frame_range"]
