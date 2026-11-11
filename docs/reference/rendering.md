@@ -66,12 +66,16 @@ launch_control_worker.sh [memory_mode]  (one resident worker per GPU) → h3_con
 h3_screen_prep.py composites → a VLM scores each chunk (evaluations/render-h3/prompts/seed-screen.txt) → choice.json
   (parts from several agents are merged with h3_screen_prep.py merge)
   ▼
-h3_finalize.py select: h3_select.py --choice-file → h3_assemble.py (min-diff seams, min_lead 56) → EVAL-v1 scoring
+h3_finalize.py select: h3_select.py --choice-file (the occupancy screen when the VLM gave no usable choice.json)
+  → h3_assemble.py (min-diff seams, min_lead 56) → EVAL-v1 scoring
   → h3_exposure_lock.py (gain toward the first chunk, pixel positions untouched) → final-t3-<fps>fps.mp4
   → h3_wrist_crop.py when the episode has wide_wrist (wrist views cropped back to the white's own camera model)
   ▼
 h3_score_and_pack.py --packages <pkg> (scores, writes <pkg>/pack) → h3_review_prep.py blind-review jobs
   → independent review per reviewer-instructions-v1.md (the only acceptance)
+  ▼
+h3_gate.py record/status: 2 prefixes → canary (≥ 75% accepted, no blocking kind in half of it) → the rest;
+  h3_enqueue.py --gate refuses episodes the gate has not released
 ```
 
 ### Recipe rationale
@@ -114,15 +118,17 @@ The replay is a render input only. It never replaces the attempt, its judge verd
 The bundle, reference images, episode list, OOD variants, recipe copy and seed-selection results are outputs of the task, derived and verified by the agent from the current real episode.
 
 1. Confirm the mode. sim2real or OOD (and its axes) can come only from the current user's in-scope instruction. Write the exact words and source into the bundle's `mode_confirmations`. When missing, `h3_bundle.py` refuses to compile.
-2. Create the run directory (`tasks/ recipes/ queue/ eval/realpool/`) and write `tasks/<task>/bundle.json`: the complete white carrier and the real references prepared as above, the five overlay slots and the real baseline. `h3_clean_references.py` can instead generate an object-free scene plate and cable-free sheets. Run `h3_bundle.py check <bundle> --run-dir <run>`; it fails on a carrier below 20 fps and warns when the head view has no wall or table seam the control can see.
+2. Create the run directory (`tasks/ recipes/ queue/ eval/realpool/`) and write `tasks/<task>/bundle.json`: the complete white carrier and the real references prepared as above, the five overlay slots and the real baseline. `h3_clean_references.py` can instead generate an object-free scene plate and cable-free sheets. Run `h3_bundle.py check <bundle> --run-dir <run>`; it fails on a carrier below 20 fps and warns when the head view has no wall or table seam the control can see. Write the text fields once per task from the real references and the carrier itself (object identity, colour, size and count; phases, events and terminal relations); every episode of the task then reuses that bundle text. A generic template text loses object identity: with "the objects follow the source video" the drum was drawn as a plain cylinder.
 3. Copy `configs/render/h3-control-hybrid-v1.json` to `<run>/recipes/<name>.json`, changing only `name`, `bundle_variant` and per-task switches backed by evidence (`prompt_lowering`, `chunk.event_aware`).
 4. Enqueue 8 seeds and start workers on the hosts the user and deployment allow (`<run>/queue/ALLOWED_HOSTS`).
-5. Select seeds, assemble, score, lock, pack and review. Production first runs 2 complete-episode prefixes and then a fixed set of 8 canaries, with a fixed denominator and all failures kept.
+5. Select seeds, assemble, score, lock, pack and review. Production first runs 2 complete-episode prefixes and then a fixed set of 8 canaries, with a fixed denominator and all failures kept. `h3_gate.py init` fixes the three lists before the first render; enqueue with `--gate`, and `record` every final package (or a render failure) as it finishes. The gate reads only the blind-review verdicts. When the seed-screen session fails or leaves a partial `choice.json`, `h3_finalize.py select` falls back to the occupancy screen and records why; the episode still goes to blind review.
 
 ```bash
 export H3_RUN=/data/runs/<run> ; H=<datafarm>/src/datafarm/render/h3
+python $H/h3_gate.py init --gate <name>-g1 --recipe <name> --task <task> --prefix <e1> <e2> \
+  --canary <e3> <e4> <e5> <e6> <e7> <e8> <e9> <e10> --rest <e11> ...
 for s in 0 1 2 3 4 5 6 7; do
-  python $H/h3_enqueue.py --recipe $H3_RUN/recipes/<name>.json --tasks <task> \
+  python $H/h3_enqueue.py --recipe $H3_RUN/recipes/<name>.json --tasks <task> --gate <name>-g1 \
     --episodes <episode> --modes sim2real --seed-offset $s --priority 001 --per-chunk
 done
 bash $H/launch_control_worker.sh full     # submit once per GPU
@@ -134,6 +140,9 @@ python $H/h3_finalize.py select --render-recipe <name> --task <task> --episode-t
 P=$H3_RUN/pkgs/exposure-lock-<name>v-vlm/<task>/<episode>-sim2real    # holds final-t3-<fps>fps.mp4
 python $H/h3_score_and_pack.py --packages $P
 python $H/h3_review_prep.py --subjects $P
+# the independent reviewer writes reviews/<rid>/review/review.json
+python $H/h3_gate.py record --gate <name>-g1 --episode <episode> --package $P   # or --failed "<reason>"
+python $H/h3_gate.py status --gate <name>-g1      # stage, verdicts, the episodes released for rendering
 ```
 
 Single-package commands:
@@ -183,7 +192,8 @@ Code: `src/datafarm/render/h3/`, `src/datafarm/render/policy.py`.
 - **Bundle** `<run>/tasks/<task>/bundle.json`: carrier, real references, the five overlay slots, real baseline, `mode_confirmations`, and a flat list of episodes.
 - **Recipe** `<run>/recipes/<name>.json` (`datafarm.h3-render-recipe/1`). Fields used by code: `backend`, `canvas`, `worker_profile`, `denoise_forwards`, `chunk {frames, advance, keep_head, clip_frames, clip_offset, event_aware?}`, `seed_base`, `control {...}`, `prompt_lowering`, `assembly {seam, min_lead}`, optional `chunk_facts_wrist`.
 - **Package** (`h3.package/1`) with `job-manifest.json` (`h3.control-hybrid-manifest/1`). Each job has `chunk_id`, `chunk_index`, `seed`, `source_frame_range`, `generated_frames`, `white`, `control_video`, `inpaint_video`, `inpaint_mask` (with `_sha256`), `reference_images`, `prompt`, `chunk_facts` and `chunk_facts_detector`. The package also holds `ticket.json`. Worker output: `chunks/<chunk_id>/chunk-render.mp4`, `segment-manifest.json`, `policy-receipt.json`.
-- **Seed choice** `screen/<task>/<episode>/choice.json` (`h3.seed-screen/1`): `chunks [{chunk, choice}]`, `screener`. Written by an agent, not by code.
+- **Seed choice** `screen/<task>/<episode>/choice.json` (`h3.seed-screen/1`): `chunks [{chunk, choice, scores}]`, `screener`. Written by an agent, not by code. The selected package's `selection` records `mode` (`screen` or `occupancy`), the choice, and `fallback_reason` when the occupancy screen stood in.
+- **Gate** `gates/<name>.json` (`h3.render-gate/1`): `recipe`, `task`, `prefix`, `canary`, `rest` (fixed at `init`) and `records {episode: {package} | {failed}}`. Verdicts are read from `reviews/` at `status`, never stored by hand.
 
 ### Configuration
 
@@ -206,8 +216,8 @@ Any binding, audit or shape failure stops the build or worker before rendering, 
 
 ### Limitations
 
-- **No code-enforced canary gate.** The tools are standalone scripts; the canary and blind review are required by the [render-batch skill](../../.agents/skills/render-batch/SKILL.md).
-- **No automatic re-render path.** An agent-run VLM writes `choice.json`; no code calls a VLM, and flagged chunks are not re-rendered. Without `--choice-file`, `h3_select.py` uses a pixel occupancy screen.
+- **The canary gate binds only through `--gate`.** `h3_enqueue.py` without `--gate` renders anything; the [render-batch skill](../../.agents/skills/render-batch/SKILL.md) requires the gate for production. The 75% rule and the common-kind rule count blind-review verdicts only, so the gate is as good as the reviews, and it does not judge whether the canary episodes cover the layouts.
+- **No automatic re-render path.** An agent-run VLM writes `choice.json`; no code calls a VLM, and flagged chunks are not re-rendered. Without a usable choice file the pixel occupancy screen picks the seed. It misses content errors a VLM sees (cables, a white arm) and assumes a dark robot in the carrier.
 - **The default recipe is a starting point, not a qualification.** A new task needs its own complete-episode canary and independent review, and OOD is not automatic.
 - **Artifacts to check in review.** Shadows can look hard or smudged, with slight colour cast, vignetting and garbled small digits.
 - **Reference policy is advice, not code.** The text in `references_policy` is not enforced; code enforces only hashes and ordering.

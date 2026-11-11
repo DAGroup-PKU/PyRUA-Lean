@@ -134,6 +134,51 @@ def test_build_finalize_score_and_ood_on_cpu(no_bindings, tmp_path):  # noqa: F8
     assert json.loads((out / 'restyle.json').read_text())['schema'] == 'h3.ood-restyle/1'
 
 
+def draw_red_box(video):
+    """Re-encode a chunk render with a saturated red box in the head view: an object the carrier does not have."""
+    tmp = video.with_suffix('.tmp.mp4')
+    subprocess.run(['ffmpeg', '-hide_banner', '-loglevel', 'error', '-y', '-i', str(video), '-vf',
+                    'drawbox=x=300:y=100:w=140:h=140:color=red:t=fill', '-c:v', 'libx264', '-preset', 'ultrafast',
+                    '-pix_fmt', 'yuv420p', str(tmp)], check=True)
+    tmp.replace(video)
+
+
+def test_unusable_seed_screen_falls_back_to_the_occupancy_screen(no_bindings, tmp_path):  # noqa: F811
+    """A failed VLM screen (no or partial choice.json) must not stop the episode: the occupancy screen picks, per chunk,
+    the candidate without invented content, and the package records the fallback and its reason."""
+    run, packages = built_packages(no_bindings, tmp_path)
+    manifests = [fake_render(p) for p in packages]
+    chunks = len(manifests[0]['jobs'])
+    assert chunks == 2
+    draw_red_box(packages[1] / 'render/chunks' / manifests[1]['jobs'][0]['chunk_id'] / 'chunk-render.mp4')
+    draw_red_box(packages[0] / 'render/chunks' / manifests[0]['jobs'][1]['chunk_id'] / 'chunk-render.mp4')
+
+    finalize = import_hybrid('h3_finalize')
+    no_bindings.setattr(finalize, 'score', lambda generated, carrier, out, task, run_dir: Path(out).write_text('{}'))
+    partial = run / 'screen/unseen-task/ep0/choice.json'
+    partial.parent.mkdir(parents=True)
+    partial.write_text(json.dumps({'schema': 'h3.seed-screen/1', 'screener': 'test-model',
+                                   'chunks': [{'chunk': 0, 'choice': 0, 'scores': [0, 1]}]}))
+    for choice_file, reason in ((Path('screen/unseen-task/ep0/choice.json'), 'expected 0..1'),
+                                (None, 'no choice file given')):
+        final = finalize.select(SimpleNamespace(
+            render_recipe='test-hybrid', task='unseen-task', episode_tag='ep0-sim2real', name='test-vlm',
+            choice_file=choice_file, seeds=['s0', 's1']), run)
+        assert final == run / 'pkgs/exposure-lock-test-vlm/unseen-task/ep0-sim2real'
+        selection = json.loads((run / 'pkgs/test-vlm/unseen-task/ep0-sim2real/package.json').read_text())['selection']
+        assert selection['mode'] == 'occupancy' and selection['choice'] == [0, 1]
+        assert reason in selection['fallback_reason']
+        assert selection['penalties'][0][1] > selection['penalties'][0][0]
+        recipe = json.loads((run / 'recipes/test-vlm.json').read_text())
+        assert recipe['selection']['mode'] == 'occupancy' and 'fallback' in recipe['single_variable']
+
+    select = import_hybrid('h3_select')
+    assert select.choice_problem({'schema': 'h3.seed-screen/1', 'chunks': [
+        {'chunk': 0, 'choice': 2, 'scores': [0, 1]}]}, 1, 2) == 'chunk 0 chooses candidate 2 of 2'
+    assert 'schema' in select.choice_problem({'chunks': []}, 0, 2)
+    assert select.choice_problem({'schema': 'h3.seed-screen/1', 'chunks': 'x'}, 1, 2).startswith('malformed')
+
+
 def test_rejected_build_leaves_no_ticket(no_bindings, tmp_path):  # noqa: F811
     package = import_hybrid('h3_package')
     no_bindings.setattr(package, 'audit', lambda pkg: (_ for _ in ()).throw(ValueError('rejected')))

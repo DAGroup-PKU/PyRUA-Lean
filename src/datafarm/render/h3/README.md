@@ -22,7 +22,8 @@ The tools run by path with `H3_PYTHON`, which need not have this package install
 | render | `launch_control_worker.sh` -> `h3_control_worker.py` |
 | return tickets of dead workers to the queue | `h3_requeue_orphans.py` |
 | seed screen composites, merge of answers | `h3_screen_prep.py` |
-| seed choice, assembly, exposure lock, wide-wrist crop back, scores | `h3_finalize.py` (`h3_select.py`, `h3_assemble.py`, `h3_exposure_lock.py`, `h3_wrist_crop.py`) |
+| seed choice (VLM screen, or the occupancy screen as fallback), assembly, exposure lock, wide-wrist crop back, scores | `h3_finalize.py` (`h3_select.py`, `h3_assemble.py`, `h3_exposure_lock.py`, `h3_wrist_crop.py`) |
+| production gate: 2 prefixes, then the canary, then the rest (`h3_enqueue.py --gate`) | `h3_gate.py` |
 | score and write the review pack | `h3_score_and_pack.py` |
 | blind review jobs | `h3_review_prep.py` |
 | OOD edit of an accepted render | `h3_sam2_table_masks.py`, `h3_ood_restyle.py` |

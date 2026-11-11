@@ -7,6 +7,8 @@ Bundles are read from <run>/tasks/<task>/, packages go to <run>/pkgs/<recipe>/<t
 --episodes selects bundle episode ids (default: all).  OOD episodes cycle through the bundle's ood_variants (episode k ->
 variant k mod n).  --per-chunk writes one ticket per unrendered chunk, so several workers can share one package (chunks
 render independently).  Existing packages are reused (not rebuilt); tickets already done/running are not re-queued.
+--gate <name> (production) refuses unless the h3_gate.py gate of this recipe and task has released every selected
+episode: the 2 prefixes first, the canary after both prefixes pass blind review, the rest after the canary passes.
 """
 from __future__ import annotations
 
@@ -51,6 +53,7 @@ def main() -> int:
     ap.add_argument("--priority", type=int, default=100, help="lower runs first (ticket filename prefix)")
     ap.add_argument("--per-chunk", action="store_true", help="one ticket per chunk instead of one per package")
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--gate", help="h3_gate.py gate name: enqueue only episodes it has released")
     h3_paths.add_run_dir_arg(ap)
     args = ap.parse_args()
     run = h3_paths.run_dir(args.run_dir)
@@ -71,6 +74,11 @@ def main() -> int:
                     f"-s{args.seed_offset}" if args.seed_offset else "")
                 items.append({"task": task, "episode": ep["id"], "mode": mode, "variant": variant,
                               "out": run / "pkgs" / recipe_name / task / tag, "rank": k, "tag": tag})
+    if args.gate:
+        if len(args.tasks) != 1:
+            raise SystemExit("--gate covers one task")
+        import h3_gate
+        h3_gate.check_enqueue(run, args.gate, recipe_name, args.tasks[0], sorted({it["episode"] for it in items}))
     # round-robin order: episode rank, then mode, then task
     items.sort(key=lambda it: (it["rank"], args.modes.index(it["mode"]), args.tasks.index(it["task"])))
 
