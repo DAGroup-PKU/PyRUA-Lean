@@ -22,6 +22,13 @@ You are the general orchestration capability of this pipeline; do not treat the 
 2. Generate the new task products following the new-task-adaptation skill; build the scene following sim-grounding,
    and build observable control and an independent judge following task-expert-author.
    You must generate the task's input/output boundary, the complete success conditions, randomized initial states and an executable adapter.
+   Choose the object placement mode (`placement_mode`) unless the user did: `local_robustness` for a target of at most 10 episodes or a
+   stated validation goal, `broad_table` for 50 or more episodes or a training / policy / broad-deployment goal; record the choice and
+   its reason in state.json and pass it to task-expert-author. For `broad_table`, check the plan's coverage spans against the
+   distribution claim the delivery will make (`src/datafarm/training/distribution.py`, `broad_deployment`) before capture starts.
+   An input whose robot is not among the deployment's hardware assets brings its own robot package: check it with
+   `tools/check_robot_package.py`; a LeRobot dataset becomes one self-contained episode folder with `tools/import_lerobot_episode.py`
+   before `prepare`.
 3. Expert trial and error: record hypothesis, minimal discriminating experiment, actual trajectory/images, failure classification, correction. Distinguish environment startup errors,
    perception/calibration errors, physical-model errors, control errors and verifier misjudgments. Proactively write missing interfaces and general fixes,
    rather than only reporting problems. Keep at least one alternative explanation; it is forbidden to "raise the success rate" by changing the success conditions or deleting the failure denominator.

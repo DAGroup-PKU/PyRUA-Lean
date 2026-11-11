@@ -42,7 +42,7 @@ def run(args):
         print(brief)
         return {}
     return run_phase(args.task_dir, config, args.phase, template, brief, source=source,
-                     resume_from=args.resume_from)
+                     resume_from=args.resume_from, model=args.model)
 
 
 def main(argv=None):
@@ -59,6 +59,7 @@ def main(argv=None):
     r.add_argument('--brief', type=Path, help='use this brief instead of rendering a template')
     r.add_argument('--resume-from', metavar='PHASE', help='continue that session after an infrastructure failure')
     r.add_argument('--print-brief', action='store_true', help='print the rendered brief and exit')
+    r.add_argument('--model', help="this phase's model, over the config's model and its role's model")
     c = sub.add_parser('capture', help='run the frozen capture with no model until the gate stops it')
     c.add_argument('--task-dir', type=Path, required=True)
     c.add_argument('--review', required=True, help='the review folder under work/reviews/ that froze the batch')

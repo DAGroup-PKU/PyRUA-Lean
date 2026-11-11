@@ -6,6 +6,7 @@
 - `sol-pi.template.json`: SoL-Pi settings with all four mechanisms on; copy it to `~/.pi/agent/sol-pi.json` and fill in the reducer model.
 - `agent_cli_driver.py`: the argv driver behind those two configs.
 - `phases-solpi.json`, `phases-claude-code.json`, `phases-codex.json`: harness, prices and USD caps for [phased runs](../../docs/reference/phased-runs.md). Check the prices against your provider and fill in `environment`.
+- `phases-solpi-cross-model.json`: the Pi config with one model for producers and another for reviewers (`roles`); replace `<provider>` with your Pi provider names.
 - `budget-disabled.json`: cost policy whose target and limit are not acted on; usage is still recorded and unknown costs stay unknown.
 - `budget-enforced.json`: strict cost policy; it needs a metered driver and cannot be used with the native CLI.
 - `metered_codex_driver.py`: an example metered driver; see [cost control](../../docs/reference/cost-control.md).

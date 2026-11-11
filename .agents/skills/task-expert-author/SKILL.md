@@ -18,6 +18,12 @@ The orchestrating agent configures the adapter; no human fills it in by hand.
    rigidly about the tabletop origin, while the robot base and cameras stay fixed), implemented in the task's scene sampler. Initial-state objects must land on the tilted plane; the expert reads the actual support
    plane and the live object poses from the observations and must not assume a level table. Turn it off only with a recorded reason (such as a paired level control or a hardware fact);
    write the reason into the plan. This is geometric randomization, needs a new full physics rollout to validate, and does not authorize appearance/OOD changes.
+   Initial object placement has two modes, recorded as `placement_mode` in task/scene.json and chosen by the orchestrator:
+   `local_robustness` (default) jitters each manipulated object around its nominal position derived from the real episode (default ±30 mm),
+   for small validation runs and debugging; `broad_table` samples each object independently and uniformly over the reachable tabletop
+   (`reachable_tabletop_xy` in grounding, probed with forward kinematics and joint limits on the table plane), for training data and
+   broad deployment. Both keep a minimum object spacing (default 80 mm). Generate the plan with `tools/prepare_object_placement_plan.py`
+   and have the seeded scene sampler read it; under `broad_table` the expert must handle any legal layout and may not assume nominal positions.
 3. First run lint-brief, prepare-round, the built-in preflight of run-round, and a minimal complete round. Confirm the output media/actions/state, the independent judge receipts,
    the failure classification and the cost accounting. When isolation is unavailable, fix the environment or report the block honestly; never silently switch to none and claim independent pass.
 4. The author runs development seeds only through the xh broker; read the actual rollout failures, event frames, joint readbacks and physics logs,

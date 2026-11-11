@@ -23,7 +23,9 @@
     "RI": 8,
     "R3": 10,
     "P4": 8,
-    "R3b": 6
+    "R3b": 6,
+    "R1u": 10,
+    "P2u": 30
   },
   "poll_seconds": 30,
   "freshness_forbidden": [],

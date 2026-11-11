@@ -19,6 +19,11 @@ PRICES = {'model-a': {'input': 1, 'cache_read': .1, 'cache_write_5m': 2, 'output
 PI = '''#!/usr/bin/env python3
 import json, os, pathlib, sys, time, uuid
 args = sys.argv[1:]
+if os.environ.get('STUB_AUTH'):
+    print('Error: No API key found for provider "route"', file=sys.stderr)
+    sys.exit(0)
+if os.environ.get('STUB_SILENT'):
+    sys.exit(0)
 root = pathlib.Path(args[args.index('--session-dir') + 1]); root.mkdir(parents=True, exist_ok=True)
 sid = args[args.index('--session') + 1] if '--session' in args else str(uuid.uuid4())
 assert pathlib.Path(args[-1][1:]).read_text()
@@ -210,7 +215,8 @@ def test_config_is_validated(tmp_path, change, message):
 TEMPLATES = sorted(p.stem for p in (ROOT / 'prompts/phases').glob('*.md') if p.stem not in {'common', 'protocol'})
 
 
-@pytest.mark.parametrize('name', ['phases-solpi.json', 'phases-claude-code.json', 'phases-codex.json'])
+@pytest.mark.parametrize('name', ['phases-solpi.json', 'phases-claude-code.json', 'phases-codex.json',
+                                  'phases-solpi-cross-model.json'])
 def test_example_configs_load_and_cap_every_phase(name):
     value = phases.load_config(ROOT / 'examples/runtime' / name)
     assert set(value['phase_caps_usd']) == set(TEMPLATES)
@@ -291,3 +297,51 @@ def test_cli_runs_a_phase_and_reports_cost(task, tmp_path):
     assert json.loads(ran.stdout)['status'] == 'done'
     cost = subprocess.run([*tool, 'cost', '--task-dir', str(task)], capture_output=True, text=True, env=env)
     assert json.loads(cost.stdout)['phases'][0]['phase'] == 'P1'
+
+
+def test_auth_failure_fails_the_phase_without_output(task, monkeypatch):
+    monkeypatch.setenv('STUB_AUTH', '1')
+    row = run(task)
+    assert row['exit'] == 0 and row['status'] == 'failed' and 'authentication failed' in row['stop_reason']
+    assert row['phase_usd'] == 0
+
+
+def test_a_pi_session_without_any_response_fails(task, monkeypatch):
+    monkeypatch.setenv('STUB_SILENT', '1')
+    row = run(task)
+    assert row['exit'] == 0 and row['status'] == 'failed' and row['stop_reason'] is None
+
+
+def test_roles_and_model_override_choose_the_model_per_phase(task):
+    cfg = config(model='base-model', roles={'producer': {'model': 'route/model-a'},
+                                            'reviewer': {'model': 'route/model-b', 'extra_args': ['--approve']}},
+                 phase_caps_usd={'P1': 50, 'R1': 50, 'P2': 50})
+    run(task, 'P1', cfg=cfg)
+    run(task, 'R1', cfg=cfg)
+    run(task, 'P2', cfg=cfg, model='route/model-c')
+    argv = {p: json.loads((task / 'phases' / p / 'command.json').read_text()) for p in ('P1', 'R1', 'P2')}
+    assert argv['P1'][argv['P1'].index('--model') + 1] == 'route/model-a' and '--approve' not in argv['P1']
+    assert argv['R1'][argv['R1'].index('--model') + 1] == 'route/model-b' and '--approve' in argv['R1']
+    assert argv['P2'][argv['P2'].index('--model') + 1] == 'route/model-c'
+    assert [r['model'] for r in phases.ledger(task)] == ['route/model-a', 'route/model-b', 'route/model-c']
+
+
+@pytest.mark.parametrize('roles,message', [({'author': {}}, 'producer and reviewer'),
+                                           ({'reviewer': {'prices_usd_per_mtok': {}}}, 'may only set')])
+def test_roles_are_validated(tmp_path, roles, message):
+    path = tmp_path / 'c.json'
+    path.write_text(json.dumps(config(roles=roles)))
+    with pytest.raises(phases.PhaseError, match=message):
+        phases.load_config(path)
+
+
+def test_contract_folder_follows_an_amendment(task):
+    cfg = config(phase_caps_usd={'R2': 5})
+    default = phases.render_brief('R2', phases.brief_values(task, cfg, 'R2', 'R2', source=ROOT))
+    amended = phases.render_brief('R2', phases.brief_values(task, cfg, 'R2c', 'R2', source=ROOT,
+                                                            settings={'CONTRACT_REVIEW': 'R1u'}))
+    assert '`W/reviews/R1/`' in default and '`W/reviews/R1u/`' in amended and '`W/reviews/R1/`' not in amended
+    r1u = phases.render_brief('R1u', phases.brief_values(task, config(phase_caps_usd={'R1u': 5}), 'R1u', 'R1u',
+                                                         source=ROOT))
+    assert '`W/reviews/user-feedback-001/`' in r1u and 'Never edit the earlier freeze' in r1u
+    assert phases.role_of('R1u') == 'reviewer' and phases.role_of('P2u') == 'producer'

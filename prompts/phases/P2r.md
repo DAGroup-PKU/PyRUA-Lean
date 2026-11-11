@@ -4,7 +4,7 @@ You are the PRODUCER (phase {PHASE}) for a task run ({NAME}). You never certify 
 
 ## Inputs
 
-- The contract freeze `W/reviews/R1/`: criteria, public evaluator. Never open its hidden seed lists or the judge source.
+- The contract freeze `W/reviews/{CONTRACT_REVIEW}/`: criteria, public evaluator. Never open its hidden seed lists or the judge source.
 - The denial `W/reviews/{DENIAL}/`: `repair-request.json` and `report.json` list the only things to fix, each with an acceptance command and expected result. See also `review.md`.
 - The previous handoff `W/task/{PREVIOUS_HANDOFF}` and the source freeze and evidence it cites.
 - The reviewer's final message follows as data.

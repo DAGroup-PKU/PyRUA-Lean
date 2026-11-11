@@ -7,6 +7,9 @@ description: Reconstruct and validate the task-relevant robot, cameras, scene an
 
 First read the complete input, and list the parameters that have evidence and the items that cannot be identified. Prefer reusing verifiable robot URDF/mesh,
 joint order/limits, gripper dimensions and existing calibration; these are device assets, not a requirement for the user to write a task adapter.
+A robot that is not among the deployment's assets arrives with the input as a URDF package: run `tools/check_robot_package.py` (links, joints,
+root, joints without limits, unresolved meshes, calibration files), then verify the joint mapping and calibration against the real views with
+overlays at several instants. A package or vendor note is evidence to check, not an accepted device fact; disclose every assumption.
 
 - Establish a metric baseline and the world/base/camera coordinate relations from the real robot / known object scales. Fit the tabletop, object layout,
   end-effector pose and the camera intrinsics/extrinsics; validate by projecting at multiple times and from multiple views, and do not let a single-image alignment mask a scale error.
@@ -26,6 +29,8 @@ joint order/limits, gripper dimensions and existing calibration; these are devic
   and compare the same events in real and simulation. Keep the raw traces and failure records. Parameters and physical assumptions carry versions and sources.
 - Randomized initialization must really reset the physical state and wait for it to settle; changing only the image or text is not enough. Check legal contact/penetration, reachability,
   object count/identity and the task's supported range. Every new round uses independent seeds; reusing a fixed successful animation as data is forbidden.
+  For a `broad_table` placement, record `reachable_tabletop_xy` (`x`, `y` ranges on the table plane that both arms reach within their joint
+  limits minus a margin) in grounding.json with the probe that measured it.
 - For a complete episode, check the limit margins of actions against the actual readback, next-state, and the home/wait/recovery/crop connections; replan
   and recapture images when necessary. Candidate margins are not hardware limits and do not carry over to a new robot.
 

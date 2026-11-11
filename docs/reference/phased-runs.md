@@ -18,6 +18,8 @@ Unlike [`supervise`](agent-runtime.md), this flow does not decide what runs next
 | `R3` | Reviewer | Admits or rejects each candidate episode | $10 |
 | `P4` | Producer | Builds the white delivery over the admitted files | $8 |
 | `R3b` | Reviewer | Binds the review files to the delivery manifests; runs the verifier | $6 |
+| `R1u` | Reviewer | Only after user feedback: amends the frozen contract where the feedback addresses it, as a new freeze | $10 |
+| `P2u` | Producer | Changes the expert to meet the amended contract and the user's requirements; then `R2` runs again | $30 |
 
 The general rules every phase follows are in [`protocol.md`](../../prompts/phases/protocol.md).
 
@@ -58,12 +60,31 @@ $RUN --phase P2-retry --template P2 --resume-from P2 --brief /data/continue.md
 
 `pipeline_phases.py cost --task-dir /data/task` prints the spend per phase, including the running phase.
 
+### Different models for producers and reviewers
+
+`roles` in the config sets `model`, `extra_args` or `env` per role; a value there replaces the base value for every phase of that role (templates starting with `R` are reviewers). `--model` on `run` overrides both for one phase. [`phases-solpi-cross-model.json`](../../examples/runtime/phases-solpi-cross-model.json) writes with one model and reviews with another, so two producers can be compared under the same reviewer.
+
+When a producer does not reach source approval within the repair rounds, the host may continue with another producer model under new labels, for example `$RUN --phase P2b --template P2r --model <other> --quote-final R2b ...`. Earlier phases, denials and their cost stay in the record. On RealBot-01 (a new dual-arm robot, scoop cereal into a cup, 2026-11-10), the same R1 contract and the same reviewer model saw a GPT-6.1 Sol producer reach 0/20 dev seeds and two denials, while a Claude Opus 5.5 producer reached 17/30 dev seeds and source approval. That is one task; it says nothing general about either model, and no rule here switches models automatically.
+
+### User feedback after review
+
+When the user rejects something a frozen contract allowed (for example a wobbling motion in admitted episodes), the host writes the feedback verbatim into `work/reviews/user-feedback-<n>/`: `report.json` (`schema` `datafarm.user-feedback/1`, `user_quotes`, `provenance`, `requirements` each with the quote it comes from, optional `host_diagnosis` and `rejected_episodes`) and `review.md`. Then:
+
+```bash
+$RUN --phase R1u --quote-final P2 --set FEEDBACK=user-feedback-001
+$RUN --phase P2u --quote-final R1u --set FEEDBACK=user-feedback-001 --set PREVIOUS_HANDOFF=P2-handoff.md
+$RUN --phase R2c --template R2 --quote-final P2u --set CONTRACT_REVIEW=R1u --set REQUEST=P2u-source-request.json \
+  --set HANDOFF=P2u-handoff.md
+```
+
+`R1u` writes a new freeze and never edits the earlier one. It changes only what the feedback addresses, moves a threshold only where a quoted requirement moves it, shows that each new or changed gate fails the rejected episodes and passes a known-good case, and draws new hidden admission seeds. From then on pass `--set CONTRACT_REVIEW=R1u` to `R2`, `P2r` and `R3`. Earlier admissions stay in the record under the old contract; they are not admitted under the new one. On RealBot-01 this loop turned the user's "no back-and-forth motion" into a smoothness gate that rejected all five earlier admissions, (stop-and-go and reversal counts of 5–10 and 4–14 against limits of 2), and the repaired expert's capture had 5 of 12 attempts admitted, all five later accepted in blind H3 render review.
+
 ## Guarantees
 
 1. **A label runs once.** A second run of a label is refused, so a phase cannot be rerun over its own record.
 2. **Caps stop the session.** The host polls usage every `poll_seconds` and stops the whole process group at the phase cap, the task cap or `max_phase_seconds`. A phase does not start once the task cap is reached.
 3. **Usage without a price stops the phase.** A cap cannot be enforced on usage it cannot price.
-4. **Provider errors count as failures.** Pi exits 0 after a provider error, so the host reads the outcome from the last assistant message. Claude Code and Codex are read from their result events.
+4. **Provider errors count as failures.** Pi exits 0 after a provider error, so the host reads the outcome from the last assistant message, and a Pi session with no assistant message at all fails. Claude Code and Codex are read from their result events. A session that ends without output after the model API refused its credentials (HTTP 401/403, no API key) is `failed` with `stop_reason` "model API authentication failed", so the next phase does not start on work that was never done.
 5. **Sessions stay separate.** The ledger records each session ID. A session reused by another phase is marked `session_reused`, unless `--resume-from` asked for it.
 6. **A finished review gets a host-written execution record.** `work/reviews/executions/<label>/` holds a copy of the session's transcript and an `execution.json` that binds it. `verify` checks this record, and reports it as `declared-execution-record`.
 7. **The gate decides capture and only the reviewer admits.** `capture` runs the reviewer-frozen `capture_attempt.sh` one attempt at a time and stops at any `decision` other than `continue`, including a missing one.
@@ -86,6 +107,7 @@ Configs use schema `datafarm.phase-run/1`. Examples: [`phases-solpi.json`](../..
 |---|---|
 | `harness` | `pi`, `claude` or `codex` |
 | `model` | Passed to the CLI; required for `codex`, whose stream does not name it |
+| `roles` | Optional `producer` / `reviewer` objects with `model`, `extra_args`, `env`; they replace the base values for that role's phases |
 | `extra_args`, `env` | Added to the CLI's arguments and environment. Do not put credentials here |
 | `prices_usd_per_mtok` | Per model: `input`, `cache_read`, `cache_write_5m`, `output`, optional `long_prompt` (`above_tokens`, `input_multiplier`, `output_multiplier`). A key matches any model ID that contains it. Check these against your provider |
 | `task_cap_usd`, `phase_caps_usd` | Required. A cap is looked up by label, then by template |

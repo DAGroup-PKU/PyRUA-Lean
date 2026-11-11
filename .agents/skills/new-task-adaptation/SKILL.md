@@ -11,8 +11,9 @@ never depending on the task name appearing in a registry. Read prompts/instructi
 1. Observe the whole video, not just the final frame. Record each camera's identity, the robot/gripper, objects and counts, the grasp/contact/transfer/
    release/final-state time windows, occlusions and the initial state. Extract representative real-robot frames, and keep the original video SHA, frame numbers/times and crop
    mappings. When action/state files are available, read the schema, units and clock; if there are none, acknowledge the uncertainty of the motion estimate.
+   An imported dataset episode carries `episode.json` (camera mapping, state/action fields, fps, task text): start there.
 2. Write "what was done" as an appearance-independent object-relation / event contract; distinguish the incidental trajectory of the demonstration from the conditions the task requires.
-   Infer the stage order, completion conditions, the randomizable range (by default including table height and a 1–2° table tilt, see task-expert-author), invariants and failure types. Tie every fact to an observed frame or
+   Infer the stage order, completion conditions, the randomizable range (by default including table height and a 1–2° table tilt, and the object placement mode `local_robustness` or `broad_table`, see task-expert-author), invariants and failure types. Tie every fact to an observed frame or
    device information; mark fitted parameters as inference. Ask only when the task goal is unclear; you do the technical adaptation.
 3. Generate requirements.md, task.json, the scene/init code, adapter.json, brief, verifier spec,
    render-overlay.json and the batch/dataset config. It need not be perfect in one pass: first validate the interface with a minimal complete episode,

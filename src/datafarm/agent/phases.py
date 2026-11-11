@@ -23,6 +23,10 @@ ROOT = Path(__file__).resolve().parents[3]
 TEMPLATES = ROOT / 'prompts/phases'
 PRODUCER_ID = 'phase-producer'
 TERMINATE_GRACE_S = 10
+ROLE_KEYS = {'model', 'extra_args', 'env'}
+# a stderr line that means the model API refused the credentials: the session did no work
+AUTH_FAILURE = re.compile(r'\b(401|403)\b.*(unauthori[sz]ed|forbidden|api key|authentication)|no api key found|'
+                          r'invalid api key|authentication[_ ]error', re.IGNORECASE)
 
 
 class PhaseError(ValueError):
@@ -135,13 +139,14 @@ class PiHarness(Harness):
         return usd, unpriced
 
     def outcome(self, stream):
-        session_id, text, failed = None, '', False
+        # Pi exits 0 after a provider error, so the last assistant message decides. No assistant message at all
+        # (a missing or rejected API key ends Pi before the first response) is a failure too.
+        session_id, text, failed = None, '', True
         for event in read_events(stream):
             if event.get('type') == 'session':
                 session_id = session_id or event.get('id')
             message = event.get('message') if event.get('type') == 'message_end' else None
             if isinstance(message, dict) and message.get('role') == 'assistant':
-                # Pi exits 0 after a provider error, so the last assistant message decides.
                 failed = message.get('stopReason') == 'error'
                 parts = [p.get('text', '') for p in message.get('content') or [] if isinstance(p, dict)]
                 text = ''.join(parts).strip() or text
@@ -244,7 +249,23 @@ def load_config(path):
         raise PhaseError('the codex harness needs an explicit model: its stream does not name one')
     if not float(config.get('task_cap_usd', 0)) > 0:
         raise PhaseError('task_cap_usd must be positive')
+    roles = config.get('roles') or {}
+    if not isinstance(roles, dict) or set(roles) - {'producer', 'reviewer'}:
+        raise PhaseError('roles may only set producer and reviewer')
+    for role, value in roles.items():
+        if not isinstance(value, dict) or set(value) - ROLE_KEYS:
+            raise PhaseError(f'roles.{role} may only set {sorted(ROLE_KEYS)}')
+        if config['harness'] == 'codex' and 'model' in value and not value['model']:
+            raise PhaseError('the codex harness needs an explicit model: its stream does not name one')
     return config
+
+
+def harness_config(config, template, model=None):
+    """The harness settings of one phase: the base config, then its role's `roles` entry, then a --model override."""
+    merged = {**config, **(config.get('roles') or {}).get(role_of(template), {})}
+    if model:
+        merged['model'] = model
+    return merged
 
 
 def ledger_path(task):
@@ -302,6 +323,7 @@ def brief_values(task, config, phase, template, *, source, quoted=None, summary=
         'FORBIDDEN': ', '.join(f'`{p}`' for p in config.get('freshness_forbidden', [])) or 'none listed',
         'SUMMARY': summary or 'None.', 'PHASE': phase,
         'REQUEST': 'P2-source-request.json', 'HANDOFF': 'P2-handoff.md', 'BATCH_REVIEW': 'R2',
+        'CONTRACT_REVIEW': 'R1', 'AMENDMENT': 'R1u', 'FEEDBACK': 'user-feedback-001',
         'ADMISSION_REVIEW': 'R3', 'DELIVERY_PHASE': 'P4',
         'PRODUCER': '\n'.join(f'> {line}' for line in (quoted or '').strip().splitlines()),
     }
@@ -335,7 +357,7 @@ def write_execution(task, phase, transcript_source):
     return folder / 'execution.json'
 
 
-def run_phase(task, config, phase, template, brief, *, source, resume_from=None, poll_seconds=None):
+def run_phase(task, config, phase, template, brief, *, source, resume_from=None, poll_seconds=None, model=None):
     task = Path(task).resolve()
     if not (task / 'work' / 'input.json').is_file():
         raise PhaseError(f'{task}/work is not a prepared task; run pipeline_agent.py prepare --output {task}/work')
@@ -359,7 +381,7 @@ def run_phase(task, config, phase, template, brief, *, source, resume_from=None,
     before = task_total(task)
     if before >= task_cap:
         raise PhaseError(f'task cap reached before {phase}: ${before:.2f} of ${task_cap:.2f}')
-    harness = HARNESSES[config['harness']](config)
+    harness = HARNESSES[config['harness']](harness_config(config, template, model))
     phase_dir.mkdir(parents=True)
     agents = (Path(source) / 'AGENTS.md').read_text()
     prompt = phase_dir / 'prompt.md'
@@ -411,9 +433,17 @@ def run_phase(task, config, phase, template, brief, *, source, resume_from=None,
     spent = max(spent, usd - baseline)
     live.unlink(missing_ok=True)
     (phase_dir / 'final.md').write_text(text + '\n')
+    try:
+        stderr_tail = (phase_dir / 'stderr.log').read_text(errors='replace')[-8000:]
+    except OSError:
+        stderr_tail = ''
+    if failed and not text and not stop_reason and AUTH_FAILURE.search(stderr_tail):
+        stop_reason = 'model API authentication failed: the session did no work; renew the credentials'
     earlier = {r.get('session_id'): r['phase'] for r in rows if r.get('session_id')}
     reused = session_id in earlier and not (resume and session_id == resume['session_id'])
-    status = ('session_reused' if reused else 'stopped' if stop_reason else 'failed' if code or failed else 'done')
+    auth = bool(stop_reason) and stop_reason.startswith('model API authentication failed')
+    status = ('session_reused' if reused else 'failed' if auth else 'stopped' if stop_reason
+              else 'failed' if code or failed else 'done')
     row = {'at': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), 'phase': phase, 'template': template,
            'role': role_of(template), 'harness': harness.name, 'model': harness.model, 'exit': code,
            'status': status, 'stop_reason': stop_reason, 'session_id': session_id, 'resumed_from': resume_from,
