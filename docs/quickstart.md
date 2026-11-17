@@ -6,11 +6,11 @@ Install a coding agent. To use SoL-Pi or Claude Code, see [examples/runtime](../
 
 ## Run a task
 
-Save the user's request to a file, then prepare the task:
+Save the user's request to a file, then prepare the task. The commands below use the sample in [examples/quickstart](../examples/quickstart/README.md), a real stack-cups episode and its request. For your own task, pass your episode (one video file or a directory) and your request file instead.
 
 ```bash
-python tools/pipeline_agent.py prepare --episode /data/episode.mp4 \
-  --request-file /data/request.txt --target-count 5 --stop-after white --output /data/task
+python tools/pipeline_agent.py prepare --episode examples/quickstart/episode \
+  --request-file examples/quickstart/request.txt --target-count 5 --stop-after white --output /data/task
 python tools/pipeline_agent.py context --work /data/task --role orchestrator --output /data/task/context
 python tools/pipeline_agent.py supervise --work /data/task --config examples/runtime/native-codex.json
 ```

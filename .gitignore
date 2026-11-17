@@ -27,3 +27,4 @@ outputs/
 checkpoints/
 wandb/
 *.mp4
+!examples/quickstart/episode/*.mp4

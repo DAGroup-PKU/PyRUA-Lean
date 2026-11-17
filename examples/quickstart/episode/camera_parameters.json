@@ -1,0 +1,203 @@
+{
+  "cameras": {
+    "cam_high": {
+      "camera_info": {
+        "binning_x": 0,
+        "binning_y": 0,
+        "d": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "distortion_model": "plumb_bob",
+        "frame_id": "camera_f_l_color_optical_frame",
+        "height": 720,
+        "k": [
+          908.45703125,
+          0.0,
+          649.3128051757812,
+          0.0,
+          908.3267211914062,
+          365.38031005859375,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "p": [
+          908.45703125,
+          0.0,
+          649.3128051757812,
+          0.0,
+          0.0,
+          908.3267211914062,
+          365.38031005859375,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        "r": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "roi": {
+          "do_rectify": false,
+          "height": 0,
+          "width": 0,
+          "x_offset": 0,
+          "y_offset": 0
+        },
+        "timestamp": 1787420391.8940098,
+        "width": 1280
+      },
+      "topic": "/camera_f_l/color/camera_info"
+    },
+    "cam_left_wrist": {
+      "camera_info": {
+        "binning_x": 0,
+        "binning_y": 0,
+        "d": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "distortion_model": "plumb_bob",
+        "frame_id": "camera_l_color_optical_frame",
+        "height": 720,
+        "k": [
+          906.1882934570312,
+          0.0,
+          649.1497192382812,
+          0.0,
+          905.34716796875,
+          367.70440673828125,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "p": [
+          906.1882934570312,
+          0.0,
+          649.1497192382812,
+          0.0,
+          0.0,
+          905.34716796875,
+          367.70440673828125,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        "r": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "roi": {
+          "do_rectify": false,
+          "height": 0,
+          "width": 0,
+          "x_offset": 0,
+          "y_offset": 0
+        },
+        "timestamp": 1787420391.9249558,
+        "width": 1280
+      },
+      "topic": "/camera_l/color/camera_info"
+    },
+    "cam_right_wrist": {
+      "camera_info": {
+        "binning_x": 0,
+        "binning_y": 0,
+        "d": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "distortion_model": "plumb_bob",
+        "frame_id": "camera_r_color_optical_frame",
+        "height": 720,
+        "k": [
+          906.2843017578125,
+          0.0,
+          654.5358276367188,
+          0.0,
+          904.684326171875,
+          367.20648193359375,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "p": [
+          906.2843017578125,
+          0.0,
+          654.5358276367188,
+          0.0,
+          0.0,
+          904.684326171875,
+          367.20648193359375,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0
+        ],
+        "r": [
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0,
+          0.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "roi": {
+          "do_rectify": false,
+          "height": 0,
+          "width": 0,
+          "x_offset": 0,
+          "y_offset": 0
+        },
+        "timestamp": 1787420391.8951185,
+        "width": 1280
+      },
+      "topic": "/camera_r/color/camera_info"
+    }
+  },
+  "captured_at_utc": "2026-08-22T17:39:51+00:00",
+  "cross_camera_extrinsics": null,
+  "cross_camera_extrinsics_note": "CameraInfo does not contain transforms between the three physical cameras. Cross-camera extrinsics require a separate multi-camera calibration or a verified shared TF tree.",
+  "historical_episode_calibration": false,
+  "matrix_conventions": {
+    "d": "distortion coefficients interpreted using distortion_model",
+    "k": "3x3 row-major intrinsic camera matrix",
+    "p": "3x4 row-major projection matrix",
+    "r": "3x3 row-major rectification matrix"
+  },
+  "schema_version": "piper_dual_camera_parameters_v1",
+  "source": "live_ros2_camera_info",
+  "source_note": "Calibration was read from the current online camera nodes at export time; it was not stored in, and cannot prove the calibration used by, the historical HDF5 episode."
+}

@@ -1,0 +1,6 @@
+This is one real episode of our dual-arm robot (AgileX Cobot Magic with two Piper arms). It has a head camera, two wrist cameras, joint and end-effector states, and the camera parameters.
+In the episode the robot stacks the paper cups on the table into one stack, in the order shown, and then both arms return safely to their starting pose.
+
+Please turn this task into simulated data: 5 complete episodes with action labels, each independently reviewed.
+Stop after the simulated episodes. Do not do photoreal rendering or policy training this time.
+Stack the cups the way the real episode does, and bring both arms back safely at the end. Keep every attempt and failure, and do not loosen the success criteria to reach the count.

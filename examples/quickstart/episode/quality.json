@@ -1,0 +1,23 @@
+{
+  "errors": [],
+  "fps": 30,
+  "frame_count": 673,
+  "image_decode_counts": {
+    "cam_high": 673,
+    "cam_left_wrist": 673,
+    "cam_right_wrist": 673
+  },
+  "path": "/home/agilex/piper_dual_dataset/stack_cups_eef/episode_000000.hdf5",
+  "quality_path": "/home/agilex/piper_dual_dataset/stack_cups_eef_rendered/episode_000000/quality.json",
+  "schema_version": "piper_dual_ros2_v1",
+  "state_action_plot": {
+    "reason": "plots disabled via --no-plots",
+    "status": "skipped"
+  },
+  "video_paths": {
+    "cam_high": "/home/agilex/piper_dual_dataset/stack_cups_eef_rendered/episode_000000/cam_high",
+    "cam_left_wrist": "/home/agilex/piper_dual_dataset/stack_cups_eef_rendered/episode_000000/cam_left_wrist",
+    "cam_right_wrist": "/home/agilex/piper_dual_dataset/stack_cups_eef_rendered/episode_000000/cam_right_wrist",
+    "views_3x1.mp4": "/home/agilex/piper_dual_dataset/stack_cups_eef_rendered/episode_000000/views_3x1.mp4"
+  }
+}
