@@ -1,0 +1,13 @@
+diff --git a/src/solarwm/backends/minimax_h3/optional.py b/src/solarwm/backends/minimax_h3/optional.py
+index 5947e3c..5f5272f 100644
+--- a/src/solarwm/backends/minimax_h3/optional.py
++++ b/src/solarwm/backends/minimax_h3/optional.py
+@@ -120,7 +120,7 @@ def load_transformer(model_cfg: Mapping[str, Any], *, device: Any) -> H3RuntimeM
+     validate_parameter_dtypes(transformer)
+     # W6 uses our explicit compiled BlockMask path. Native unmasked attention
+     # (including Qwen token refinement and SGF score models) remains Flash.
+-    requested_backend = str(model_cfg.get("attention_backend", "flash"))
++    requested_backend = str(os.environ.get("SOLAR_ATTN_BACKEND") or model_cfg.get("attention_backend", "flash"))  # DataFarm: SOLAR_ATTN_BACKEND=native runs without flash-attn
+     transformer.set_attention_backend("flash" if requested_backend == "flex" else requested_backend)
+     if os.environ.get("SOLAR_HOPPER_ATTENTION") == "1":
+         from .hopper_attention import initialize

@@ -1,8 +1,8 @@
-# Rendering: H3 control hybrid (default) and Seedance
+# Rendering: H3 control hybrid (default), SolarRenderer and Seedance
 
-The renderers turn a simulated white carrier video (actions, objects and timing already fixed) into photographic multi-camera video. The default renderer is the **H3 control hybrid**: MiniMax-H3 Ref2VA with an H3-Fun ControlNet-Union branch driven by gated soft-HED edges of the carrier and a white inpaint source. It renders independent chunks on a tiled canvas, with 8 seeds per chunk selected by a VLM, minimum-difference seams and a first-chunk exposure lock. The second renderer is the hosted **Seedance** API. Each request is bound to the task's [render contract](render-contract.md). The agent's rules for canaries and review are in [`prompts/instructions/render.md`](../../prompts/instructions/render.md).
+The renderers turn a simulated white carrier video (actions, objects and timing already fixed) into photographic multi-camera video. The default renderer is the **H3 control hybrid**: MiniMax-H3 Ref2VA with an H3-Fun ControlNet-Union branch driven by gated soft-HED edges of the carrier and a white inpaint source. It renders independent chunks on a tiled canvas, with 8 seeds per chunk selected by a VLM, minimum-difference seams and a first-chunk exposure lock. **SolarRenderer** renders a whole episode as chained bidirectional windows, with no chunk seams or seed screening. The hosted **Seedance** API is the third renderer. Each request is bound to the task's [render contract](render-contract.md). The agent's rules for canaries and review are in [`prompts/instructions/render.md`](../../prompts/instructions/render.md).
 
-## Rules shared by both renderers
+## Rules shared by all renderers
 
 Renderers only produce candidate observations. They cannot decide the action, physical state, camera, object count, contact, task success or training admission. A successful provider return, a decodable MP4, an equal frame count or a realistic picture is not a pass.
 
@@ -275,14 +275,103 @@ Worker exceptions are written to `episodes/<id>/failure.json`, and the batch con
 - **No pause on recurring failure in the adapter.** `datafarm.render.seedance.batch` records failures and keeps going. The stop lives in the [batch supervisor](batch-supervisor.md), so run through it for that behaviour.
 - **Upload precedes the policy check.** The carrier is uploaded before `check_seedance_payload` runs, and the uploaded carrier is public until it expires (24 h).
 
+## SolarRenderer (chained bidirectional)
+
+| Location | Content |
+|---|---|
+| `src/datafarm/render/solar/` | Chain, window, clip, first-frame, prompt and batch tools; see its `README.md` |
+| `configs/render/solar-chain-bidir-v1.json` | Task-independent default recipe |
+| `vendor/solarrenderer/` | Optional SDPA stand-in for flash-attn and the one-line attention-backend patch |
+
+[SolarRenderer](https://github.com/Enderfga/SolarRenderer) is MiniMax-H3 with a control LoRA and a 4-step LoRA. It
+renders a white-carrier clip conditioned on a photographic first frame and a six-part caption. Unlike the H3 control
+hybrid, it has no independent chunks, so it shows no seam jumps or per-chunk state reversion. It has no seeds to
+screen, and in A/B comparisons it held end states and tracked motion better.
+
+### Flow
+
+1. **Carrier and first frame.** The plain T-layout white carrier, at the episode frame rate, maps 1:1 to the
+   episode. The first frame is the real episode's frame 0 in the same layout (`solar_first_frame.py`). Solar takes
+   object appearance from the first frame and mostly ignores carrier colour, so the first frame must be a photograph of
+   the scene the simulation was fitted to.
+2. **Prompt.** `solar_prompt.py` assembles the six-part caption and runs SolarRenderer's own caption check. The prompt
+   must be **state-neutral**: it describes appearance and says that drawers, lids and objects are wherever the
+   structure shows. A prompt that narrated "puts toys into the open drawers" made Solar open a drawer about 500 frames
+   early. One prompt serves every window.
+3. **Window plan.** Windows are 17k+5 frames: 532 on a GPU with at least 172 GB free (about 155 GB peak) and 447 on a
+   141 GB GPU (about 129 GB peak). Window w+1 starts 16 frames before window w ends.
+4. **Hand-over frame.** Window w's rendered frame at the next start becomes window w+1's first frame. Before that, its
+   static head-view background is re-anchored to the real frame 0. A pixel is anchored when the carrier equals its own
+   frame 0 there and the task moves it in at most 1 % of the episode's frames; the mask is eroded and feathered. This
+   stops the background from drifting from window to window.
+5. **Render.** Each window runs `solar_window.py` with the bidirectional LoRA pair, 4 evaluations with renoise, on one
+   GPU. Finished windows are reused on resume.
+6. **Stitch.** The 16 frames after each shared frame are cross-faded linearly. Every other output frame is exactly one
+   rendered frame, so output frame *i* = carrier frame *i*.
+
+### Appearance changes inside an episode
+
+Solar keeps a fixed object's first-frame look for the whole window. A scale display that lights up mid-window stays
+dark, and neither the prompt nor a recoloured carrier fixes that. `solar_chain.py --wins` ends a window a few frames
+after the change. `--handover F:SRC[:MASK]` then pastes only the changed pixels into the next window's conditioning
+frame. The pixels come from an accepted render of the same carrier frame, and the mask defaults to the lit displays
+detected in the white carrier. Rendered frames are not edited. On the weigh-apple task, hand-over 7 frames after the
+display lit passed blind review on 5 of 5 episodes. Hand-over 75 frames late failed on 4 of 5 for the state mismatch.
+
+### Guarantees
+
+1. **Frame mapping is exact.** `plan_windows` and `stitch_schedule` (`solar_canvas.py`) write every carrier frame from
+   the chain's start to its end exactly once, in order. The blend weights of each output frame sum to 1, padding to
+   17k+5 is never written, and `chain.json` records each window's carrier range and the seam output frames.
+2. **Only conditioning frames are edited.** Anchoring and hand-over change the next window's first frame and nothing
+   else. The pre-edit frame and the edit (anchor fraction, hand-over pixel count and source) are recorded.
+3. **A hand-over is checked against the plan.** A `--handover` frame that is not a hand-over frame of the plan is
+   refused before any GPU work. An empty hand-over mask prints a warning and is recorded with a pixel count of 0.
+4. **Deployment paths fail closed.** A missing or non-existent `SOLAR_*` binding raises `MissingBinding`.
+5. **Prompts pass SolarRenderer's own caption check** before they are written.
+
+### Dependencies
+
+- **GPU:** one per episode. Use `--win 532` with at least 172 GB free, or `--win 447` on 141 GB. Rendering runs at
+  about 2.2 s per frame (B200 with flash-attn, or L20X with the SDPA stand-in). A 4,348-frame episode took 4.45 GPU-hours,
+  of which about 10 % was reloading the renderer per window. Windows run in sequence, so the latency is the same.
+- **Python** (`SOLAR_PYTHON`): SolarRenderer's dependencies (torch, diffusers, transformers, its `solarwm` package) and
+  flash-attn, or the stand-in in `vendor/solarrenderer/`. The chain, clip and first-frame tools need only numpy, opencv
+  and ffmpeg.
+- **External assets** (`configs/external-assets.json`, doctor profile `solar`): the SolarRenderer repository at the
+  pinned commit, MiniMax-H3 prepared by its `scripts/prepare_h3.py`, and the SolarRenderer LoRAs.
+- **Bindings:** `SOLAR_PYTHON`, `SOLAR_REPO`, `SOLAR_H3`, `SOLAR_LORA`.
+  `python3 src/datafarm/render/solar/solar_paths.py show` prints what resolves.
+- **Scheduling:** `solar_chain.py` uses whatever GPU `CUDA_VISIBLE_DEVICES` names. Submit it through the deployment's
+  scheduler with one GPU, or use `solar_batch_local.py` on a node the run owns.
+
+### Limitations
+
+- **The CG look is a model limit.** Reviewers repeatedly note over-smooth robot shading, capsule-like objects,
+  over-sharp outlines and a slight colour cast. Distillation, grading and post-processing did not remove it.
+- **Long chains drift slowly.** Each window's first frame is re-sharpened by about 1.3×, and over many windows the
+  picture can turn cartoon-like. Anchoring the background limits this; very long episodes still need review of the
+  later windows.
+- **A short extra last window** can show concentric banding and vignetting in the head view; avoid one with `--wins`.
+- **A hand-over needs a source render** of the changed state, such as an accepted render from another route. Its
+  pixels must agree with the scene.
+- **Simulator cast shadows** become grey smudges. Render the carrier without the directional light's shadows.
+- **No canary gate or review in code.** As with the other routes, a new task needs a full-episode canary and an
+  independent blind review of the stitched video, including every seam and hand-over frame.
+
+### Licence
+
+SolarRenderer is Apache-2.0. It runs on MiniMax-H3 weights, so the MiniMax-H3 licence restrictions on outputs and
+territories under [H3 control hybrid](#licence) apply equally to SolarRenderer output.
+
 ## Comparing the routes
 
-| Dimension | H3 control hybrid | Seedance |
-|---|---|---|
-| Execution | Local GPU workers | Remote asynchronous edit API |
-| Clock | 24 FPS, profile-level frame limit | 24 FPS transport, `8n+1`, 697 frames |
-| Source authority | White carrier with structural control | White layout reference video |
-| Reference risk | Pose, layout and entity projection contamination | Phase references can reset state or appearance |
-| Continuity | Independent chunks with hard-cut seams | Overlapping phases with a non-contact seam |
-| Resume key | Local job or chunk plus output digest | Remote task ID plus immutable attempt |
-| Main failures | Extra entities, event lag, reference attraction, false style accept | Frame-count drift, phase reset, low-motion wrist seam, ambiguous create |
+| Dimension | H3 control hybrid | SolarRenderer | Seedance |
+|---|---|---|---|
+| Execution | Local GPU workers | Local GPU, one per episode | Remote asynchronous edit API |
+| Clock | 24 FPS, profile-level frame limit | Carrier frame rate 1:1, 17k+5 frame windows | 24 FPS transport, `8n+1`, 697 frames |
+| Source authority | White carrier with structural control | White carrier plus the real frame 0 as first frame | White layout reference video |
+| Reference risk | Pose, layout and entity projection contamination | Copies carrier colours and CG styling over long chains | Phase references can reset state or appearance |
+| Continuity | Independent chunks with hard-cut seams | Chained windows with a 16-frame cross-fade | Overlapping phases with a non-contact seam |
+| Resume key | Local job or chunk plus output digest | Finished window video plus run record | Remote task ID plus immutable attempt |
+| Main failures | Extra entities, event lag, reference attraction, false style accept | CG look, slow drift over many windows, mid-window appearance changes | Frame-count drift, phase reset, low-motion wrist seam, ambiguous create |

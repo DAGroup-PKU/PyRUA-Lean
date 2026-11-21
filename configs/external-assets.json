@@ -170,6 +170,76 @@
       "sha256": "2b9eec3ffcaf9d50b2d88001d52be8ddfe1cecddff2e8dcaa44f3a8e37f122dd",
       "bytes": 62921,
       "acquisition": "git clone https://github.com/NVlabs/USDCraft.git, then git checkout 46fec187bdce40845c30863a56143047edc4a263; see docs/reference/usdcraft.md."
+    },
+    {
+      "name": "solar/solarrenderer_control_lora.safetensors",
+      "path": "${SOLAR_LORA}/solarrenderer_control_lora.safetensors",
+      "profiles": [
+        "solar"
+      ],
+      "sha256": "bbd1b3cb01f59e5ead1a195341c0ecf44a1a8e02b3b26ccccd50c5f826f7ffe4",
+      "bytes": 4150865632,
+      "acquisition": "SolarRenderer LoRA from the Hugging Face repository Enderfga/SolarRenderer; verify sha256."
+    },
+    {
+      "name": "solar/solarrenderer_4step_lora.safetensors",
+      "path": "${SOLAR_LORA}/solarrenderer_4step_lora.safetensors",
+      "profiles": [
+        "solar"
+      ],
+      "sha256": "26494ad0c9acafe61926e4a2203b16e3c616eabf87f0b35875bfc8f57789a4fe",
+      "bytes": 4150865664,
+      "acquisition": "SolarRenderer LoRA from the Hugging Face repository Enderfga/SolarRenderer; verify sha256."
+    },
+    {
+      "name": "solar-causal/solarrenderer_causal_control_lora.safetensors",
+      "path": "${SOLAR_LORA}/solarrenderer_causal_control_lora.safetensors",
+      "profiles": [
+        "solar-causal"
+      ],
+      "sha256": "49704c2948a111f958f3a0fc2cb9802081f9b5c129d91f30da6c8758787a8888",
+      "bytes": 4150865680,
+      "acquisition": "SolarRenderer LoRA from the Hugging Face repository Enderfga/SolarRenderer; verify sha256."
+    },
+    {
+      "name": "solar-causal/solarrenderer_causal_4step_lora.safetensors",
+      "path": "${SOLAR_LORA}/solarrenderer_causal_4step_lora.safetensors",
+      "profiles": [
+        "solar-causal"
+      ],
+      "sha256": "10d275abf164f2115e682fd62bd1676e9b7db3c2fddaf8a66275651304d19d83",
+      "bytes": 4150865728,
+      "acquisition": "SolarRenderer LoRA from the Hugging Face repository Enderfga/SolarRenderer; verify sha256."
+    },
+    {
+      "name": "solar/MiniMax-H3/model_index.json",
+      "path": "${SOLAR_H3}/model_index.json",
+      "profiles": [
+        "solar"
+      ],
+      "sha256": "5a587fe13b2371427415ac892463142683aefcd8d322e274a3a095eac37ac7d2",
+      "bytes": 2936,
+      "acquisition": "MiniMaxAI/MiniMax-H3 from Hugging Face, laid out by SolarRenderer scripts/prepare_h3.py (transformer_ref); verify sha256."
+    },
+    {
+      "name": "solar/MiniMax-H3/transformer_ref/config.json",
+      "path": "${SOLAR_H3}/transformer_ref/config.json",
+      "profiles": [
+        "solar"
+      ],
+      "sha256": "74c11bff524336576096993cbfcdcdc2ef4fa2fa4409df693bdcbc6c666282ae",
+      "bytes": 546,
+      "acquisition": "MiniMaxAI/MiniMax-H3 from Hugging Face, laid out by SolarRenderer scripts/prepare_h3.py (transformer_ref); verify sha256."
+    },
+    {
+      "name": "solar/MiniMax-H3/transformer_ref/diffusion_pytorch_model.safetensors.index.json",
+      "path": "${SOLAR_H3}/transformer_ref/diffusion_pytorch_model.safetensors.index.json",
+      "profiles": [
+        "solar"
+      ],
+      "sha256": "ac30a3b58963f2e735d493475fbb81853a5735ec947619648b3e045acda6783e",
+      "bytes": 64488,
+      "acquisition": "MiniMaxAI/MiniMax-H3 from Hugging Face, laid out by SolarRenderer scripts/prepare_h3.py (transformer_ref); verify sha256."
     }
   ],
   "not_bundled": [
@@ -199,6 +269,18 @@
       ],
       "upstream": "https://github.com/NVlabs/USDCraft",
       "upstream_commit": "46fec187bdce40845c30863a56143047edc4a263"
+    },
+    {
+      "name": "SolarRenderer",
+      "binding": "SOLAR_REPO",
+      "profiles": [
+        "solar"
+      ],
+      "upstream": "https://github.com/Enderfga/SolarRenderer",
+      "upstream_commit": "0ca4f5e45b062cc9e9aee506de46aabdc22e4c3d",
+      "patch": "vendor/solarrenderer/solarrenderer-attention-env.patch",
+      "patch_optional": true,
+      "patch_sha256": "b62f4bdd211c45b63c930b73be159db48919889866306340cd6c6c26837771db"
     }
   ]
 }

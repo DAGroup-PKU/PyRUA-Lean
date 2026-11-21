@@ -1,0 +1,32 @@
+{
+  "schema": "datafarm.solar-render-recipe/1",
+  "name": "solar-chain-bidir-v1",
+  "description": "SolarRenderer (MiniMax-H3 + control and 4-step LoRAs) rendering a whole episode as chained bidirectional windows. Task-independent starting point, not a qualification: a new task still needs its own full-episode canary and independent blind review.",
+  "engine": "solarrenderer",
+  "tools": "src/datafarm/render/solar/",
+  "mode": "bidir",
+  "lora_pair": ["solarrenderer_control_lora", "solarrenderer_4step_lora"],
+  "canvas": {"width": 1344, "height": 768, "active_x0": 217, "active_width": 910, "layout": "t3-1280x1080"},
+  "carrier": "plain T-layout white carrier at the episode frame rate, frames map 1:1 (no tail pad, no wide wrist)",
+  "first_frame": "real episode frame 0 in the carrier's T layout (solar_first_frame.py)",
+  "prompt": {
+    "tool": "solar_prompt.py",
+    "form": "SolarRenderer caption skill, six parts, first-frame kind full",
+    "state_neutral": true,
+    "fallback": "solar_prompt.py --generic <robot>"
+  },
+  "chain": {
+    "window_frames": 532,
+    "window_frames_141gb": 447,
+    "frame_rule": "17k+5",
+    "overlap": 16,
+    "seed": 0,
+    "anchor": {"zone": "head view", "still_below": 8, "moved_diff": 24, "moved_fraction": 0.01, "moved_dilate": 41,
+               "erode": 31, "feather": 8.0},
+    "handover": {"use": "appearance that changes mid-episode (displays, lamps)", "end_window_after_change_frames": "<= 10",
+                 "mask": "lit-display detector or an explicit mask", "dilate": 7, "feather": 1.5}
+  },
+  "gpu": {"count": 1, "min_free_mb": 172000, "peak_reserved_gb_532": 155, "peak_reserved_gb_447": 129,
+          "seconds_per_frame": 2.2},
+  "review": "independent blind review per evaluations/render-h3/ on the stitched video against the carrier; seams and hand-over frames are part of the review"
+}

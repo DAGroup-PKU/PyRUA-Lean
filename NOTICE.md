@@ -10,6 +10,7 @@ simulators, services or data that it does not contain.
 |---|---|---|---|
 | `vendor/trainer/` | [openpi](https://github.com/Physical-Intelligence/openpi) (Physical Intelligence) | Apache-2.0 (`vendor/trainer/LICENSE`) | Modified by the DataFarm authors (Apache-2.0 section 4(b)): dataset adapters, joint/EEF action modes, admission-bound training entry points; see `vendor/trainer/README.md`. Only the files that this project trains with are included, and each modified file carries a notice. `LICENSE_GEMMA.txt` applies to PaliGemma weights, which are not included. |
 | `vendor/videox_fun/` | [VideoX-Fun](https://github.com/aigc-apps/VideoX-Fun) | Apache-2.0 | A patch against upstream for the control pipeline and edge (HED) control preparation; see the README in that directory. |
+| `vendor/solarrenderer/` | [SolarRenderer](https://github.com/Enderfga/SolarRenderer) | Apache-2.0 | An optional one-line patch to `src/solarwm/backends/minimax_h3/optional.py` (attention backend from `SOLAR_ATTN_BACKEND`) and an SDPA stand-in for `flash_attn` written for this project; see the README in that directory. SolarRenderer itself is not included. |
 | `src/datafarm/render/h3/h3_lora.py` | Sol-H3 `h3_runtime/lora.py` | Not yet confirmed | Unmodified copy (sha256 `0e8222b76e086f8f100092e325a08e86bfc8bd33fb404c8b8b0cdd4d3d56362c`). Not covered by the MIT License of this repository until its terms are confirmed. |
 
 
@@ -17,8 +18,9 @@ simulators, services or data that it does not contain.
 
 | Component | Used for | Terms |
 |---|---|---|
-| MiniMax-H3 weights | default renderer (`docs/reference/rendering.md`) | Obtain from their publishers. The MiniMax-H3 model license restricts some uses of generated outputs (including training other AI models) and some territories. Review it before rendering training data with H3; this repository grants no rights to the model or its outputs. |
-| Seedance API | second renderer | Hosted service under its provider's terms. |
+| MiniMax-H3 weights | H3 control hybrid and SolarRenderer (`docs/reference/rendering.md`) | Obtain from their publishers. The MiniMax-H3 model license restricts some uses of generated outputs (including training other AI models) and some territories. Review it before rendering training data with H3; this repository grants no rights to the model or its outputs. |
+| SolarRenderer and its LoRAs | SolarRenderer route (`src/datafarm/render/solar/`) | Apache-2.0 code from its repository; the LoRAs run on MiniMax-H3, whose terms apply to the outputs. |
+| Seedance API | hosted renderer | Hosted service under its provider's terms. |
 | [USDCraft](https://github.com/NVlabs/USDCraft) | optional object-asset generation (`docs/reference/usdcraft.md`) | Apache-2.0; install it separately. |
 | RoboTwin 2.0, SAPIEN, Isaac Sim | simulation | Their own licenses. |
 | GPU scheduler | job placement (`docs/deployment.md`) | Supplied by the deployment. |
