@@ -6,7 +6,8 @@ Feixiang&nbsp;Ruan<sup>1,4,\*</sup>, Guodong&nbsp;Lv<sup>1,\*</sup>, Kewei&nbsp;
 Shunyu&nbsp;Yang<sup>1</sup>, Shulong&nbsp;Jiang<sup>1</sup>, Weicheng&nbsp;Duan<sup>4</sup>, Rui&nbsp;Ni<sup>1</sup>, Jianxin&nbsp;Bi<sup>1,2</sup>, Lekai&nbsp;Wang<sup>1</sup>, Yuze&nbsp;Fan<sup>4</sup>,
 Haobo&nbsp;Li<sup>4</sup>, Zeliang&nbsp;Fu<sup>4</sup>, Jiankun&nbsp;Zhang<sup>5</sup>, Duomin&nbsp;Wang<sup>3</sup>, Enze&nbsp;Xie<sup>3</sup>, Daquan&nbsp;Zhou<sup>1,†</sup>
 
-<sup>1</sup>Peking&nbsp;University &nbsp; <sup>2</sup>National&nbsp;University&nbsp;of&nbsp;Singapore &nbsp; <sup>3</sup>NVIDIA &nbsp; <sup>4</sup>Tongji&nbsp;University &nbsp; <sup>5</sup>University&nbsp;of&nbsp;Chicago
+<sup>1</sup>Peking&nbsp;University &nbsp; <sup>2</sup>National&nbsp;University&nbsp;of&nbsp;Singapore &nbsp; <sup>3</sup>NVIDIA<br>
+<sup>4</sup>Tongji&nbsp;University &nbsp; <sup>5</sup>University&nbsp;of&nbsp;Chicago
 
 <sup>\*</sup>Equal contribution &nbsp; <sup>†</sup>Corresponding author
 
