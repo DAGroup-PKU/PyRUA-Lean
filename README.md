@@ -1,28 +1,65 @@
 <div align="center">
 
-# PyRUA-Dex: Coding Agents as Policy Learners for Dexterous Manipulation
+# PyRUA-Dex: Learning Programmatic Policies for Dexterous Bimanual Manipulation with Coding Agents
 
-PKU DAGroup, Peking University
+Feixiang Ruan<sup>1,4,*</sup>, Guodong Lv<sup>1,*</sup>, Kewei Zhang<sup>1,*</sup>, Wenbo Huang<sup>1,*</sup>, Yintianrun Zhang<sup>1</sup>, Qiang Wang<sup>1</sup>, Ruiyang Si<sup>1</sup>,
+Shunyu Yang<sup>1</sup>, Shulong Jiang<sup>1</sup>, Weicheng Duan<sup>4</sup>, Rui Ni<sup>1</sup>, Jianxin Bi<sup>1,2</sup>, Lekai Wang<sup>1</sup>, Yuze Fan<sup>4</sup>,
+Haobo Li<sup>4</sup>, Zeliang Fu<sup>4</sup>, Jiankun Zhang<sup>5</sup>, Duomin Wang<sup>3</sup>, Enze Xie<sup>3</sup>, Daquan Zhou<sup>1,†</sup>
+
+<sup>1</sup>Peking University &nbsp; <sup>2</sup>National University of Singapore &nbsp; <sup>3</sup>NVIDIA &nbsp; <sup>4</sup>Tongji University &nbsp; <sup>5</sup>University of Chicago
+
+<sup>*</sup>Equal contribution &nbsp; <sup>†</sup>Corresponding author
 
 [![Project Page](https://img.shields.io/badge/Project-Page-8C0000.svg)](https://vme0522.github.io/PyRUA-Dex/)
 ![arXiv](https://img.shields.io/badge/arXiv-coming%20soon-lightgrey.svg)
 ![Code](https://img.shields.io/badge/Code-coming%20soon-lightgrey.svg)
 
-[🌐 Project Page](https://vme0522.github.io/PyRUA-Dex/)
+[🌐 Project Page](https://vme0522.github.io/PyRUA-Dex/) · [🎬 Real-World Videos](https://vme0522.github.io/PyRUA-Dex/#real) · [📊 Results](https://vme0522.github.io/PyRUA-Dex/#results)
 
 </div>
 
-**PyRUA-Dex** makes coding agents the policy learners for dexterous manipulation. No human
-demonstration data is used and no weights are trained: for each task, coding agents explore in
-simulation, write and test a controller program, and the best program is frozen. At test time the
-program runs alone, with no language-model calls.
+**PyRUA-Dex** is a framework that enables coding agents to develop dexterous manipulation through
+programmatic policy, without the need of demonstrations. The programmatic policy is developed in two
+stages: during exploration, multiple agents explore in parallel for task skills and ways to compose
+them, and a distilling agent condenses the successful attempts into a task library and one program.
+During refinement, this program is improved through randomized layouts for enhanced robustness and
+execution efficiency.
 
-## Results
-
-On [Bench2Dex](https://github.com/Bench2Dex/Bench2Dex) (26 bimanual dexterous tasks, 4 channels,
-50 episodes each, official seeds): Score **59.13**, success rate 44.6%, latched stage completion
-67.0%.
+<p align="center">
+  <img src="assets/fig-teaser.png" width="100%" alt="PyRUA-Dex at a glance. Center: the real-world platform playing the piano, with tactile sensing at the fingertips. (a) Coding agents learn a task's program in simulation in two stages, exploration and refinement; the frozen program is deployed in the real world, and real-world feedback updates the simulation. (b) DexJoCo success rates. (c) Tasks learned for the real-world platform. (d) The Bench2Dex leaderboard. (e) The robot hands the programs drive. (f) The simulated and real-world tasks in five classes.">
+</p>
 
 ## Code
 
-Coming soon. This branch will hold the PyRUA-Dex code release.
+The code is not open-sourced yet. We are organizing the PyRUA-Dex harness for release; it will be
+published on this branch. **Coming soon.**
+
+## Results
+
+- **[Bench2Dex](https://github.com/Bench2Dex/Bench2Dex)**: PyRUA-Dex achieves SOTA with a score of
+  **72.9**.
+- **[DexJoCo](https://arxiv.org/abs/2605.16257)**: PyRUA-Dex reaches **81.0%** success under full
+  randomization.
+- On both benchmarks, PyRUA-Dex is ahead of every trained policy.
+- **Real world**: on a bimanual platform with two 22-DoF hands, PyRUA-Dex learns to play piano,
+  write calligraphy, and other tasks; learning a new piece from sheet music takes as little as
+  30 minutes.
+
+Task videos and the detailed results are on the
+[project page](https://vme0522.github.io/PyRUA-Dex/).
+
+## Citation
+
+```bibtex
+@article{ruan2026pyruadex,
+  title   = {{PyRUA-Dex}: Learning Programmatic Policies for Dexterous Bimanual
+             Manipulation with Coding Agents},
+  author  = {Ruan, Feixiang and Lv, Guodong and Zhang, Kewei and Huang, Wenbo and
+             Zhang, Yintianrun and Wang, Qiang and Si, Ruiyang and Yang, Shunyu and
+             Jiang, Shulong and Duan, Weicheng and Ni, Rui and Bi, Jianxin and
+             Wang, Lekai and Fan, Yuze and Li, Haobo and Fu, Zeliang and
+             Zhang, Jiankun and Wang, Duomin and Xie, Enze and Zhou, Daquan},
+  journal = {arXiv preprint},
+  year    = {2026}
+}
+```
