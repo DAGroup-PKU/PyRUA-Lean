@@ -2,13 +2,13 @@
 
 # PyRUA-Dex: Learning Programmatic Policies for Dexterous Bimanual Manipulation with Coding Agents
 
-Feixiang Ruan<sup>1,4,*</sup>, Guodong Lv<sup>1,*</sup>, Kewei Zhang<sup>1,*</sup>, Wenbo Huang<sup>1,*</sup>, Yintianrun Zhang<sup>1</sup>, Qiang Wang<sup>1</sup>, Ruiyang Si<sup>1</sup>,
-Shunyu Yang<sup>1</sup>, Shulong Jiang<sup>1</sup>, Weicheng Duan<sup>4</sup>, Rui Ni<sup>1</sup>, Jianxin Bi<sup>1,2</sup>, Lekai Wang<sup>1</sup>, Yuze Fan<sup>4</sup>,
-Haobo Li<sup>4</sup>, Zeliang Fu<sup>4</sup>, Jiankun Zhang<sup>5</sup>, Duomin Wang<sup>3</sup>, Enze Xie<sup>3</sup>, Daquan Zhou<sup>1,†</sup>
+Feixiang&nbsp;Ruan<sup>1,4,\*</sup>, Guodong&nbsp;Lv<sup>1,\*</sup>, Kewei&nbsp;Zhang<sup>1,\*</sup>, Wenbo&nbsp;Huang<sup>1,\*</sup>, Yintianrun&nbsp;Zhang<sup>1</sup>, Qiang&nbsp;Wang<sup>1</sup>, Ruiyang&nbsp;Si<sup>1</sup>,
+Shunyu&nbsp;Yang<sup>1</sup>, Shulong&nbsp;Jiang<sup>1</sup>, Weicheng&nbsp;Duan<sup>4</sup>, Rui&nbsp;Ni<sup>1</sup>, Jianxin&nbsp;Bi<sup>1,2</sup>, Lekai&nbsp;Wang<sup>1</sup>, Yuze&nbsp;Fan<sup>4</sup>,
+Haobo&nbsp;Li<sup>4</sup>, Zeliang&nbsp;Fu<sup>4</sup>, Jiankun&nbsp;Zhang<sup>5</sup>, Duomin&nbsp;Wang<sup>3</sup>, Enze&nbsp;Xie<sup>3</sup>, Daquan&nbsp;Zhou<sup>1,†</sup>
 
-<sup>1</sup>Peking University &nbsp; <sup>2</sup>National University of Singapore &nbsp; <sup>3</sup>NVIDIA &nbsp; <sup>4</sup>Tongji University &nbsp; <sup>5</sup>University of Chicago
+<sup>1</sup>Peking&nbsp;University &nbsp; <sup>2</sup>National&nbsp;University&nbsp;of&nbsp;Singapore &nbsp; <sup>3</sup>NVIDIA &nbsp; <sup>4</sup>Tongji&nbsp;University &nbsp; <sup>5</sup>University&nbsp;of&nbsp;Chicago
 
-<sup>*</sup>Equal contribution &nbsp; <sup>†</sup>Corresponding author
+<sup>\*</sup>Equal contribution &nbsp; <sup>†</sup>Corresponding author
 
 [![Project Page](https://img.shields.io/badge/Project-Page-8C0000.svg)](https://vme0522.github.io/PyRUA-Dex/)
 ![arXiv](https://img.shields.io/badge/arXiv-coming%20soon-lightgrey.svg)
