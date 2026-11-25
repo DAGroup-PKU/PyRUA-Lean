@@ -12,10 +12,10 @@ Haobo&nbsp;Li<sup>4</sup>, Zeliang&nbsp;Fu<sup>4</sup>, Jiankun&nbsp;Zhang<sup>5
 <sup>\*</sup>Equal contribution &nbsp; <sup>†</sup>Corresponding author
 
 [![Project Page](https://img.shields.io/badge/Project-Page-8C0000.svg)](https://vme0522.github.io/PyRUA-Dex/)
-![arXiv](https://img.shields.io/badge/arXiv-coming%20soon-lightgrey.svg)
+[![arXiv](https://img.shields.io/badge/arXiv-2611.33144-b31b1b.svg)](https://arxiv.org/abs/2611.33144)
 ![Code](https://img.shields.io/badge/Code-coming%20soon-lightgrey.svg)
 
-[🌐 Project Page](https://vme0522.github.io/PyRUA-Dex/) · [🎬 Real-World Videos](https://vme0522.github.io/PyRUA-Dex/#real) · [📊 Results](https://vme0522.github.io/PyRUA-Dex/#results)
+[🌐 Project Page](https://vme0522.github.io/PyRUA-Dex/) · [📄 Paper](https://arxiv.org/abs/2611.33144) · [🎬 Real-World Videos](https://vme0522.github.io/PyRUA-Dex/#real) · [📊 Results](https://vme0522.github.io/PyRUA-Dex/#results)
 
 </div>
 
@@ -60,7 +60,7 @@ Task videos and the detailed results are on the
              Jiang, Shulong and Duan, Weicheng and Ni, Rui and Bi, Jianxin and
              Wang, Lekai and Fan, Yuze and Li, Haobo and Fu, Zeliang and
              Zhang, Jiankun and Wang, Duomin and Xie, Enze and Zhou, Daquan},
-  journal = {arXiv preprint},
+  journal = {arXiv preprint arXiv:2611.33144},
   year    = {2026}
 }
 ```
