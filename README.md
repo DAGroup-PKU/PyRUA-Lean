@@ -27,7 +27,7 @@ During refinement, this program is improved through randomized layouts for enhan
 execution efficiency.
 
 <p align="center">
-  <img src="assets/fig-teaser.png" width="100%" alt="PyRUA-Dex at a glance. Center: the real-world platform playing the piano, with tactile sensing at the fingertips. (a) Coding agents learn a task's program in simulation in two stages, exploration and refinement; the frozen program is deployed in the real world, and real-world feedback updates the simulation. (b) DexJoCo success rates. (c) Tasks learned for the real-world platform. (d) The Bench2Dex leaderboard. (e) The robot hands the programs drive. (f) The simulated and real-world tasks in five classes.">
+  <img src="assets/fig-teaser.png" width="100%" alt="PyRUA-Dex at a glance. Center: the real-world platform playing the piano, with tactile sensing at the fingertips. (a) Coding agents learn a task's program in simulation in two stages, exploration and refinement; the frozen program is deployed in the real world, and real-world feedback updates the simulation. (b) Tasks learned for the real-world platform. (c) DexJoCo success rates. (d) The Bench2Dex leaderboard. (e) The robot hands the programs drive. (f) The simulated and real-world tasks in five classes.">
 </p>
 
 ## Code
