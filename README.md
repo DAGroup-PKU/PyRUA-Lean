@@ -10,7 +10,8 @@
 <h3 align="center">
 <a href="https://dagroup-pku.github.io/PyRUA-Lean/docs/"><b>📚 Docs</b></a> |
 <a href="https://dagroup-pku.github.io/PyRUA-Lean/"><b>🌐 PyRUA-Lean</b></a> |
-<a href="https://dagroup-pku.github.io/PyRUA-Lean/DataFarm/"><b>🌐 PyRUA-DataFarm</b></a>
+<a href="https://dagroup-pku.github.io/PyRUA-Lean/DataFarm/"><b>🌐 PyRUA-DataFarm</b></a> |
+<a href="https://dagroup-pku.github.io/PyRUA-Lean/real/"><b>🌐 PyRUA-REAL</b></a>
 </h3>
 
 <p align="center">
@@ -35,6 +36,8 @@
 
 - [Incoming] 🔜 **PyRUA-Coder v1.0** (the next release of the trained coder) and **PyRUA-RSI**, each with its own
   technical report.
+- [2026/11/04] 🦾 **PyRUA-REAL: paper is out.** Coding agents learn reusable robot skills by testing and refining Python programs on real robots. PyRUA-REAL averages **91.1% success across 8 real-world tasks** during development. On RoboDojo, the resulting programs reach **84.4% average success across 42 tasks** without language-model calls at evaluation time.
+  [[Page]](https://dagroup-pku.github.io/PyRUA-Lean/real/) [[Paper]](https://arxiv.org/abs/2611.06768)
 - [2026/11/04] 🚜 **PyRUA-DataFarm: paper and code are out.** A coding agent takes over the teleoperator's job:
   from a data request and one calibration episode, it rebuilds the task in simulation and renders photographic,
   action-labelled multi-view data. On five real-robot tasks, policies trained only on farm data reach 93 successes
@@ -109,6 +112,14 @@ projects on robot agents that act through Python code:
     and coloured light keep **87** successes where the teleoperation-trained policies fall to 46.
   - **Cost.** Adapting a task is fully automatic and costs **$21** of API usage on average, plus $5 for a render
     contract; every further episode costs **$0.80** on average, with no robot or operator.
+- **[PyRUA-REAL](https://dagroup-pku.github.io/PyRUA-Lean/real/)**: a framework in which coding agents run
+  Python programs on physical robots, use feedback from each attempt to revise the code, and retain the
+  resulting skills for future tasks.
+  - **Real-world manipulation.** PyRUA-REAL averaged **91.1% success** across **8 real-world tasks** during development:
+    tic-tac-toe, five-block stacking, Tower of Hanoi, towel folding, Push T, block sorting, block storage, and Ethernet insertion.
+    Only Ethernet insertion required online agent assistance.
+  - **RoboDojo.** Across **42 tasks**, the fixed programs achieved **84.4%** average success, with no language-model calls during evaluation.
+  - **Faster execution.** Across two real-world tasks, PyRUA-REAL achieved a **4.6–5.0× speedup** over PyRUA-Lean’s online coding and a **9.9–11.5× speedup** over GPT-6-Astra’s online action selection.
 
 ## 🚀 Quick start
 
@@ -223,6 +234,17 @@ Thanks to the following open-source projects:
   eprint = {2611.05320},
   archivePrefix = {arXiv},
   url    = {https://arxiv.org/abs/2611.05320}
+}
+```
+```bibtex
+@misc{wang2026pyruareal,
+  title = {{PyRUA-REAL}: Robot Exploration and Adaptive Learning through {RSI} in the Real World},
+  author = {Qiang Wang and Jianxin Bi and Shulong Jiang and Ruiyang Si and Wenbo Huang and Kaiqi Chen and Jiaxin Li and Liyun Li and Xuanyi Li and Daquan Zhou},
+  year = {2026},
+  eprint = {2611.06768},
+  archivePrefix = {arXiv},
+  primaryClass = {cs.RO},
+  url = {https://arxiv.org/abs/2611.06768}
 }
 ```
 
