@@ -11,7 +11,8 @@
 <a href="https://dagroup-pku.github.io/PyRUA-Lean/docs/"><b>📚 Docs</b></a> |
 <a href="https://dagroup-pku.github.io/PyRUA-Lean/"><b>🌐 PyRUA-Lean</b></a> |
 <a href="https://dagroup-pku.github.io/PyRUA-Lean/DataFarm/"><b>🌐 PyRUA-DataFarm</b></a> |
-<a href="https://dagroup-pku.github.io/PyRUA-Lean/real/"><b>🌐 PyRUA-REAL</b></a>
+<a href="https://dagroup-pku.github.io/PyRUA-Lean/real/"><b>🌐 PyRUA-REAL</b></a> |
+<a href="https://vme0522.github.io/PyRUA-Dex/"><b>🌐 PyRUA-Dex</b></a>
 </h3>
 
 <p align="center">
@@ -36,6 +37,13 @@
 
 - [Incoming] 🔜 **PyRUA-Coder v1.0** (the next release of the trained coder) and **PyRUA-RSI**, each with its own
   technical report.
+- [2026/11/25] 🖐️ **PyRUA-Dex: paper is out.** Coding agents learn dexterous bimanual manipulation as Python
+  programs, without demonstrations. PyRUA-Dex sets a new state of the art on Bench2Dex with a score of **72.9** and
+  reaches **81.0%** success on DexJoCo under full randomization, ahead of every trained policy on both benchmarks.
+  On a real platform with two 22-DoF hands it learns to play piano and write calligraphy; a new piece from sheet
+  music takes as little as 30 minutes.
+  [[Page]](https://vme0522.github.io/PyRUA-Dex/) [[Paper]](https://arxiv.org/abs/2611.33144)
+  [[Code]](https://github.com/DAGroup-PKU/PyRUA-Lean/tree/dex)
 - [2026/11/04] 🦾 **PyRUA-REAL: paper is out.** Coding agents learn reusable robot skills by testing and refining Python programs on real robots. PyRUA-REAL averages **91.1% success across 8 real-world tasks** during development. On RoboDojo, the resulting programs reach **84.4% average success across 42 tasks** without language-model calls at evaluation time.
   [[Page]](https://dagroup-pku.github.io/PyRUA-Lean/real/) [[Paper]](https://arxiv.org/abs/2611.06768)
 - [2026/11/04] 🚜 **PyRUA-DataFarm: paper and code are out.** A coding agent takes over the teleoperator's job:
@@ -120,6 +128,20 @@ projects on robot agents that act through Python code:
     Only Ethernet insertion required online agent assistance.
   - **RoboDojo.** Across **42 tasks**, the fixed programs achieved **84.4%** average success, with no language-model calls during evaluation.
   - **Faster execution.** Across two real-world tasks, PyRUA-REAL achieved a **4.6–5.0× speedup** over PyRUA-Lean’s online coding and a **9.9–11.5× speedup** over GPT-6-Astra’s online action selection.
+- **[PyRUA-Dex](https://vme0522.github.io/PyRUA-Dex/)**: a framework in which coding agents learn dexterous bimanual
+  manipulation as Python programs, without demonstrations. Code on the
+  [`dex` branch](https://github.com/DAGroup-PKU/PyRUA-Lean/tree/dex).
+  - **Two stages.** During exploration, multiple agents explore in parallel for task skills and ways to compose
+    them, and a distilling agent condenses the successful attempts into a task library and one program; during
+    refinement, the program is improved on randomized layouts for robustness and execution efficiency. The frozen
+    program calls no language model.
+  - **Bench2Dex.** On 26 tasks, PyRUA-Dex sets a new state of the art with a score of **72.9**, above every entry
+    trained on the benchmark's demonstrations (best 70.5).
+  - **DexJoCo.** On the 16-DoF Allegro hand in MuJoCo, it succeeds in **88.5%** of the rand-obj episodes and
+    **81.0%** of the rand-full ones, against 54.1% and 40.3% for the strongest trained policy, π<sub>0.5</sub>.
+  - **Real world.** On two Franka FR3 arms with two 22-DoF Sharpa Wave SE hands, frozen programs put cubes into a
+    basket, stack cubes, write "Dex" with a brush and play piano with both hands; with the piano skill, a new piece
+    from sheet music takes as little as 30 minutes.
 
 ## 🚀 Quick start
 
@@ -245,6 +267,19 @@ Thanks to the following open-source projects:
   archivePrefix = {arXiv},
   primaryClass = {cs.RO},
   url = {https://arxiv.org/abs/2611.06768}
+}
+```
+```bibtex
+@article{ruan2026pyruadex,
+  title   = {{PyRUA-Dex}: Learning Programmatic Policies for Dexterous Bimanual
+             Manipulation with Coding Agents},
+  author  = {Ruan, Feixiang and Lv, Guodong and Zhang, Kewei and Huang, Wenbo and
+             Zhang, Yintianrun and Wang, Qiang and Si, Ruiyang and Yang, Shunyu and
+             Jiang, Shulong and Duan, Weicheng and Ni, Rui and Bi, Jianxin and
+             Wang, Lekai and Fan, Yuze and Li, Haobo and Fu, Zeliang and
+             Zhang, Jiankun and Wang, Duomin and Xie, Enze and Zhou, Daquan},
+  journal = {arXiv preprint arXiv:2611.33144},
+  year    = {2026}
 }
 ```
 
