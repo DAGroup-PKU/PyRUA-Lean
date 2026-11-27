@@ -81,6 +81,7 @@ nav:
       - PyRUA-Lean: papers/pyrua-lean.md
       - PyRUA-DataFarm: papers/datafarm.md
       - PyRUA-REAL: papers/real.md
+      - PyRUA-Dex: papers/pyrua-dex.md
   - Get Started:
       - Quick Start: getting-started/quickstart.md
       - How It Works: getting-started/how-it-works.md
